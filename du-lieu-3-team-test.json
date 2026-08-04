@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "exportedAt": "2026-08-04T00:00:00.000Z",
+  "data": {
+    "teams": [
+      {
+        "id": "team-thiet-ke",
+        "name": "Team Thiết kế",
+        "members": [
+          { "id": "thiet-ke-an-nhien", "name": "An Nhiên" },
+          { "id": "thiet-ke-minh-thu", "name": "Minh Thư" },
+          { "id": "thiet-ke-bao-ngoc", "name": "Bảo Ngọc" }
+        ]
+      },
+      {
+        "id": "team-ky-thuat",
+        "name": "Team Kỹ thuật",
+        "members": [
+          { "id": "ky-thuat-quoc-bao", "name": "Quốc Bảo" },
+          { "id": "ky-thuat-gia-huy", "name": "Gia Huy" },
+          { "id": "ky-thuat-duc-anh", "name": "Đức Anh" }
+        ]
+      },
+      {
+        "id": "team-noi-dung",
+        "name": "Team Nội dung",
+        "members": [
+          { "id": "noi-dung-khanh-linh", "name": "Khánh Linh" },
+          { "id": "noi-dung-hoang-nam", "name": "Hoàng Nam" },
+          { "id": "noi-dung-mai-phuong", "name": "Mai Phương" }
+        ]
+      }
+    ],
+    "history": [],
+    "excludedTeams": [],
+    "excludedMembers": [],
+    "selectedTeamId": null,
+    "activeTab": "team",
+    "settings": {
+      "excludeAfterSpin": false,
+      "sound": true
+    },
+    "rotations": {
+      "team": 0,
+      "member": 0
+    }
+  }
+}

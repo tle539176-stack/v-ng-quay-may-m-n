@@ -1,0 +1,892 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#7d78bd" />
+  <title>Vòng quay SECI</title>
+  <style>
+    :root {
+      --ink: #302d4a;
+      --muted: #6e6b85;
+      --paper: #fffdf9;
+      --canvas: #f6f5fb;
+      --line: #e8e5f0;
+      --lilac: #e4ddff;
+      --lavender: #8d82c9;
+      --pink: #ffdce6;
+      --rose: #db7893;
+      --mint: #d5f2e7;
+      --teal: #5aa98e;
+      --cream: #fff0bd;
+      --gold: #c99838;
+      --blue: #d8edff;
+      --blue-strong: #599cc7;
+      --danger: #b54f6e;
+      --shadow: 0 12px 32px rgba(61, 51, 106, .10);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html { min-width: 320px; background: var(--canvas); }
+    body {
+      min-height: 100vh; margin: 0; color: var(--ink); background:
+        radial-gradient(circle at 85% 0%, rgba(228, 221, 255, .75), transparent 30rem),
+        radial-gradient(circle at 0% 100%, rgba(213, 242, 231, .55), transparent 27rem), var(--canvas);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif; font-size: 15px; line-height: 1.45;
+    }
+    button, input { font: inherit; }
+    button { color: inherit; cursor: pointer; }
+    button:disabled { opacity: .52; cursor: not-allowed; transform: none !important; }
+    .app-shell { max-width: 1600px; margin: 0 auto; padding: 24px; }
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between; gap: 22px;
+      margin-bottom: 20px;
+    }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .brand-mark {
+      position: relative; width: 52px; height: 52px; display: grid; place-items: center; padding: 0; overflow: hidden; border: 0; border-radius: 17px;
+      background: linear-gradient(135deg, #a49add, #e1a1b6); color: white; box-shadow: 0 9px 20px rgba(122, 108, 183, .25);
+      font-size: 26px; transform: none;
+    }
+    .brand-mark img { width: 100%; height: 100%; display: none; object-fit: cover; transform: none; }
+    .brand-mark.has-image img { display: block; }
+    .brand-mark.has-image .brand-symbol { display: none; }
+    .brand-mark::after { content: "Đổi"; position: absolute; inset: auto 0 0; padding: 3px 0 4px; color: white; background: rgba(50,45,74,.72); font-size: 9px; font-weight: 850; opacity: 0; transition: opacity .18s ease; }
+    .brand-mark:hover::after, .brand-mark:focus-visible::after { opacity: 1; }
+    h1, h2, h3, p { margin: 0; }
+    h1 { letter-spacing: .055em; font-size: clamp(20px, 3vw, 28px); font-weight: 800; }
+    .tagline { color: var(--muted); margin-top: 2px; font-size: 13px; }
+    .top-actions { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; justify-content: flex-end; }
+    .icon-button, .soft-button, .outline-button, .primary-button, .danger-button {
+      border: 0; min-height: 40px; border-radius: 12px; font-weight: 750; transition: transform .18s ease, filter .18s ease, background .18s ease;
+    }
+    .icon-button:hover, .soft-button:hover, .outline-button:hover, .primary-button:hover, .danger-button:hover { transform: translateY(-2px); filter: brightness(.98); }
+    .icon-button { min-width: 40px; padding: 0 11px; background: white; border: 1px solid var(--line); font-size: 17px; }
+    .soft-button { padding: 0 13px; background: var(--lilac); color: #514b80; }
+    .outline-button { padding: 0 13px; background: white; border: 1px solid #d8d2e7; color: #504b70; }
+    .primary-button { padding: 0 17px; background: linear-gradient(135deg, #8377c4, #a988c7); color: white; box-shadow: 0 8px 18px rgba(120, 103, 181, .22); }
+    .danger-button { padding: 0 13px; background: #fde8ed; color: var(--danger); }
+
+    .main-layout { display: block; }
+    .panel { background: rgba(255, 253, 249, .94); border: 1px solid rgba(231, 226, 241, .95); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .side-panel { overflow: hidden; position: sticky; top: 15px; }
+    .panel-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 20px 19px 14px; }
+    .panel-heading h2 { font-size: 16px; }
+    .panel-subtitle { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .team-list { max-height: calc(100vh - 278px); min-height: 165px; overflow: auto; padding: 0 12px 12px; }
+    .empty-side { text-align: center; padding: 26px 12px; color: var(--muted); font-size: 13px; }
+    .team-card { border: 1px solid var(--line); border-radius: 14px; background: #fff; margin: 8px 0; overflow: hidden; }
+    .team-card.selected { border-color: #afa5de; box-shadow: 0 0 0 3px rgba(164, 154, 221, .15); }
+    .team-top { display: flex; align-items: center; gap: 8px; padding: 10px; }
+    .team-collapse { flex: 1; display: flex; align-items: center; gap: 9px; min-width: 0; background: transparent; border: 0; text-align: left; padding: 0; }
+    .chevron { color: var(--muted); font-size: 11px; width: 12px; transition: transform .2s; }
+    .is-collapsed .chevron { transform: rotate(-90deg); }
+    .team-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 800; font-size: 14px; }
+    .count { flex: 0 0 auto; font-size: 11px; font-weight: 800; padding: 3px 7px; border-radius: 100px; color: #4e8d78; background: var(--mint); }
+    .mini-actions { display: flex; gap: 3px; }
+    .mini-button { width: 29px; height: 29px; display: grid; place-items: center; border: 0; border-radius: 8px; background: transparent; color: var(--muted); font-size: 14px; }
+    .mini-button:hover { background: #f4f1fb; color: var(--lavender); }
+    .mini-button.delete:hover { background: #fbe8ed; color: var(--danger); }
+    .member-list { padding: 0 10px 9px 30px; }
+    .member-row { display: flex; align-items: center; min-height: 32px; gap: 6px; color: #58546e; font-size: 13px; }
+    .member-dot { height: 6px; width: 6px; border-radius: 50%; background: #b3a9df; flex: 0 0 auto; }
+    .member-name { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .member-empty { color: #9994aa; font-size: 12px; padding: 4px 0; }
+    .add-member { width: 100%; margin: 7px 0 1px; min-height: 31px; color: #5c5493; font-size: 12px; font-weight: 800; background: #f3f0fd; border: 0; border-radius: 9px; }
+    .add-team-wrap { padding: 12px; border-top: 1px solid var(--line); }
+    .add-team-wrap .primary-button { width: 100%; }
+    .manage-tools { padding: 0 12px 13px; display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+    .manage-tools button { min-height: 34px; font-size: 12px; }
+    .file-input { display: none; }
+
+    .workspace { min-width: 0; display: grid; gap: 20px; }
+    .spinner-panel { min-height: 650px; padding: 0 24px 25px; overflow: hidden; position: relative; }
+    .tabs { height: 68px; display: flex; align-items: end; gap: 4px; border-bottom: 1px solid var(--line); }
+    .tab-button { position: relative; padding: 0 17px 16px; background: transparent; color: var(--muted); border: 0; font-weight: 800; }
+    .tab-button[aria-selected="true"] { color: #534c86; }
+    .tab-button[aria-selected="true"]::after { content: ""; position: absolute; height: 3px; border-radius: 3px 3px 0 0; background: #8e82c9; left: 15px; right: 15px; bottom: -1px; }
+    .spin-layout { min-height: 560px; display: grid; place-items: center; }
+    .wheel-area { width: 100%; min-width: 0; display: grid; justify-items: center; padding: 25px 0 8px; }
+    .wheel-caption { font-size: 13px; color: var(--muted); text-align: center; max-width: 510px; margin: 0 auto 14px; }
+    .member-team-picker { width: min(100%, 430px); display: flex; align-items: center; gap: 11px; margin: 0 auto 13px; padding: 10px 12px; border: 1px solid #ddd7ee; border-radius: 14px; background: #f8f5ff; }
+    .member-team-picker[hidden] { display: none; }
+    .member-team-picker label { flex: 0 0 auto; color: #5d5680; font-size: 12px; font-weight: 850; }
+    .member-team-picker select { min-width: 0; flex: 1; height: 38px; padding: 0 34px 0 11px; border: 1px solid #d7d0e8; border-radius: 10px; outline: none; color: var(--ink); background: white; font-weight: 750; cursor: pointer; }
+    .member-team-picker select:focus { border-color: #9287cc; box-shadow: 0 0 0 3px rgba(146, 135, 204, .16); }
+    .wheel-wrap { width: min(100%, 540px); position: relative; aspect-ratio: 1; display: grid; place-items: center; padding: 14px; }
+    .pointer { z-index: 4; position: absolute; top: 1px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 19px solid transparent; border-right: 19px solid transparent; border-top: 37px solid #554b77; filter: drop-shadow(0 3px 2px rgba(45, 41, 67, .2)); }
+    .pointer::after { content: ""; position: absolute; top: -34px; left: -5px; width: 10px; height: 10px; background: #fffdf9; border-radius: 50%; }
+    .wheel-disc { width: 100%; height: 100%; border: 9px solid #fffdf9; border-radius: 50%; background: #fff; box-shadow: 0 13px 26px rgba(65, 56, 111, .18), inset 0 0 0 1px rgba(80,70,110,.11); overflow: hidden; will-change: transform; }
+    #wheelCanvas { display: block; width: 100%; height: 100%; }
+    .wheel-empty { position: absolute; inset: 15%; display: grid; place-items: center; text-align: center; border-radius: 50%; padding: 40px; color: var(--muted); background: #f5f3fa; font-size: 14px; }
+    .wheel-empty[hidden] { display: none; }
+    .spin-button { width: min(100%, 410px); min-height: 60px; border: 0; border-radius: 17px; background: linear-gradient(135deg, #8276c1, #b28acd); color: white; font-size: 16px; letter-spacing: .025em; font-weight: 900; box-shadow: 0 12px 20px rgba(129, 111, 190, .25); transition: transform .18s ease, box-shadow .18s ease; }
+    .spin-button:hover { transform: translateY(-3px); box-shadow: 0 16px 25px rgba(129, 111, 190, .32); }
+    .spin-button.spinning { background: linear-gradient(135deg, #aaa4c5, #bca7c2); }
+
+    .selected-team-card { padding: 18px; background: linear-gradient(140deg, #f4f1ff, #fffaf7); border: 1px solid #e5def8; border-radius: 15px; }
+    .selected-team-card .eyebrow, .setting-label { color: var(--muted); font-size: 11px; font-weight: 850; letter-spacing: .06em; text-transform: uppercase; }
+    .selected-team-name { margin-top: 5px; font-weight: 900; font-size: 18px; overflow-wrap: anywhere; }
+    .not-selected { color: var(--muted); font-size: 14px; line-height: 1.6; }
+    .settings-card { padding: 17px; border: 1px solid var(--line); border-radius: 15px; background: #fff; }
+    .setting-row { display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+    .setting-copy { font-weight: 800; font-size: 13px; }
+    .setting-help { color: var(--muted); font-size: 12px; margin-top: 3px; max-width: 200px; }
+    .switch { position: relative; flex: 0 0 auto; width: 46px; height: 26px; border: 0; border-radius: 16px; background: #d9d6e3; padding: 0; transition: background .2s; }
+    .switch::after { content: ""; position: absolute; top: 4px; left: 4px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.16); transition: transform .2s; }
+    .switch.on { background: #7eb89e; }
+    .switch.on::after { transform: translateX(20px); }
+    .action-stack { display: grid; gap: 8px; }
+    .action-stack button { width: 100%; min-height: 39px; font-size: 12px; }
+    .available-counter { padding: 12px 15px; color: #57516e; background: #fff8dd; border: 1px solid #f3e5ad; border-radius: 13px; font-size: 12px; }
+    .available-counter strong { color: #a2711c; }
+
+    .history-panel { overflow: hidden; }
+    .history-head { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 18px 19px; border-bottom: 1px solid var(--line); }
+    .history-head h2 { font-size: 16px; }
+    .history-actions { display: flex; gap: 7px; }
+    .history-actions button { min-height: 35px; font-size: 12px; }
+    .history-scroller { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 660px; }
+    th { color: var(--muted); background: #fcfbfe; font-size: 11px; letter-spacing: .04em; text-align: left; text-transform: uppercase; }
+    th, td { padding: 12px 15px; border-bottom: 1px solid #efedf4; }
+    td { font-size: 13px; }
+    tbody tr:last-child td { border-bottom: 0; }
+    .type-chip, .status-chip { display: inline-flex; align-items: center; border-radius: 50px; padding: 4px 8px; font-size: 11px; font-weight: 800; white-space: nowrap; }
+    .type-team { color: #62529d; background: #eeeaff; }
+    .type-member { color: #397d69; background: #e2f5ed; }
+    .status-done { background: #dcf2e9; color: #347966; }
+    .status-pending { background: #f6f1e8; color: #8e794a; }
+    .history-empty { padding: 31px; color: var(--muted); text-align: center; font-size: 13px; }
+    .history-result { font-weight: 800; max-width: 210px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .modal-backdrop { z-index: 50; position: fixed; inset: 0; display: none; align-items: center; justify-content: center; padding: 18px; background: rgba(42, 37, 62, .38); backdrop-filter: blur(3px); }
+    .modal-backdrop.is-open { display: flex; animation: fade .2s ease; }
+    .modal { width: min(100%, 500px); padding: 26px; border-radius: 22px; background: #fffdf9; box-shadow: 0 24px 70px rgba(38, 31, 66, .25); animation: pop .28s cubic-bezier(.2,.8,.2,1); }
+    .modal.small { width: min(100%, 420px); }
+    .modal-kicker { color: #8277b3; font-size: 12px; text-align: center; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+    .modal-result { margin: 9px 0 2px; text-align: center; font-size: clamp(25px, 5vw, 34px); line-height: 1.16; font-weight: 900; overflow-wrap: anywhere; }
+    .modal-detail { margin: 8px 0 23px; text-align: center; color: var(--muted); }
+    .result-symbol { width: 64px; height: 64px; display: grid; place-items: center; margin: -52px auto 14px; border-radius: 20px; background: linear-gradient(135deg, #a79cdb, #e69db5); color: white; font-size: 31px; box-shadow: 0 10px 20px rgba(126, 105, 179, .3); }
+    .modal-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 9px; }
+    .modal-actions button { min-height: 42px; }
+    #settingsBackdrop { z-index: 45; }
+    .settings-modal { width: min(1060px, 100%); max-height: min(840px, calc(100vh - 28px)); display: flex; flex-direction: column; overflow: hidden; border-radius: 22px; background: #fffdf9; box-shadow: 0 24px 70px rgba(38, 31, 66, .25); animation: pop .28s cubic-bezier(.2,.8,.2,1); }
+    .settings-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 19px 22px; border-bottom: 1px solid var(--line); }
+    .settings-head h2 { font-size: 20px; }
+    .settings-head p { margin-top: 3px; color: var(--muted); font-size: 13px; }
+    .settings-grid { display: grid; grid-template-columns: minmax(330px, 1.2fr) minmax(280px, .8fr); min-height: 0; overflow: auto; }
+    .settings-modal .side-panel { position: static; border: 0; border-radius: 0; box-shadow: none; border-right: 1px solid var(--line); background: transparent; }
+    .settings-modal .team-list { max-height: 490px; }
+    .round-settings { display: grid; gap: 13px; align-content: center; padding: 22px; background: linear-gradient(145deg, rgba(245,242,253,.76), rgba(255,253,249,.1)); }
+    .round-settings .action-stack { margin-top: 2px; }
+    .dialog-title { font-size: 20px; }
+    .dialog-message { color: var(--muted); margin: 8px 0 16px; }
+    .dialog-label { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 850; color: #5d5973; }
+    .dialog-input { width: 100%; border: 1px solid #d9d3e5; outline: none; border-radius: 11px; padding: 11px 12px; color: var(--ink); background: #fff; }
+    .dialog-input:focus { border-color: #9287cc; box-shadow: 0 0 0 3px rgba(146, 135, 204, .16); }
+    .dialog-error { min-height: 18px; margin-top: 6px; color: var(--danger); font-size: 12px; }
+    .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 17px; }
+    .toast { z-index: 80; position: fixed; left: 50%; bottom: 23px; transform: translate(-50%, 25px); opacity: 0; pointer-events: none; max-width: calc(100% - 30px); padding: 10px 15px; border-radius: 12px; color: #fff; background: #4f4965; box-shadow: 0 9px 22px rgba(34,30,50,.2); font-size: 13px; font-weight: 700; transition: opacity .2s, transform .2s; }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .toast.error { background: #a74d67; }
+    .confetti-piece { z-index: 75; position: fixed; top: -22px; width: 9px; height: 14px; pointer-events: none; border-radius: 3px; animation: fall var(--fall-time) cubic-bezier(.1,.8,.2,1) forwards; }
+    @keyframes fall { to { transform: translate(var(--drift), 110vh) rotate(720deg); opacity: .1; } }
+    @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes pop { from { transform: scale(.92) translateY(12px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+
+    @media (max-width: 1050px) {
+      .spinner-panel { padding-left: 18px; padding-right: 18px; }
+    }
+    @media (max-width: 720px) {
+      .app-shell { padding: 12px; }
+      .topbar { align-items: flex-start; flex-direction: column; gap: 13px; }
+      .top-actions { justify-content: flex-start; width: 100%; }
+      .spinner-panel { min-height: 0; }
+      .tabs { overflow-x: auto; height: 59px; }
+      .tab-button { white-space: nowrap; padding-left: 12px; padding-right: 12px; }
+      .wheel-wrap { width: min(100%, 470px); }
+      .spin-layout { min-height: 0; }
+      .history-head { align-items: flex-start; flex-direction: column; }
+      .history-actions { width: 100%; }
+      .history-actions button { flex: 1; }
+      .modal { padding: 24px 17px 18px; }
+      .settings-grid { grid-template-columns: 1fr; }
+      .settings-modal .side-panel { border-right: 0; border-bottom: 1px solid var(--line); }
+      .settings-modal .team-list { max-height: 320px; }
+      .round-settings { padding: 17px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <button id="logoButton" class="brand-mark" type="button" title="Bấm để tải logo lên" aria-label="Tải ảnh logo lên">
+          <span class="brand-symbol" aria-hidden="true">✦</span>
+          <img id="brandLogo" alt="Logo SECI" />
+        </button>
+        <input id="logoInput" class="file-input" type="file" accept="image/png,image/jpeg,image/webp" />
+        <div>
+          <h1>VÒNG QUAY SECI</h1>
+          <p class="tagline">Chọn team – Chọn thành viên – Cùng nhau chia sẻ</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button id="soundButton" class="icon-button" type="button" title="Bật/tắt âm thanh" aria-label="Bật âm thanh">🔊</button>
+        <button id="settingsButton" class="primary-button" type="button">⚙ Cài đặt</button>
+        <button id="exportButton" class="soft-button" type="button">⇩ Xuất dữ liệu</button>
+        <button id="importButton" class="outline-button" type="button">⇧ Nhập dữ liệu</button>
+        <input id="importInput" class="file-input" type="file" accept="application/json,.json" />
+      </div>
+    </header>
+
+    <div class="main-layout">
+      <section class="workspace">
+        <section class="panel spinner-panel" aria-label="Vòng quay may mắn">
+          <div class="tabs" role="tablist" aria-label="Chọn loại vòng quay">
+            <button id="teamTab" class="tab-button" type="button" role="tab" aria-selected="true" aria-controls="spinnerView">Vòng quay tổng</button>
+            <button id="memberTab" class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="spinnerView">Vòng quay thành viên</button>
+          </div>
+          <div id="spinnerView" class="spin-layout">
+            <div class="wheel-area">
+              <div id="memberTeamPicker" class="member-team-picker" hidden>
+                <label for="memberTeamSelect">Chọn team</label>
+                <select id="memberTeamSelect" aria-label="Chọn team để quay thành viên"></select>
+              </div>
+              <p id="wheelCaption" class="wheel-caption"></p>
+              <div class="wheel-wrap" aria-label="Vòng quay">
+                <div class="pointer" aria-hidden="true"></div>
+                <div id="wheelDisc" class="wheel-disc"><canvas id="wheelCanvas"></canvas></div>
+                <div id="wheelEmpty" class="wheel-empty" hidden></div>
+              </div>
+              <button id="spinButton" class="spin-button" type="button">QUAY CHỌN TEAM</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel history-panel" aria-label="Lịch sử vòng quay">
+          <div class="history-head">
+            <div><h2>Lịch sử vòng quay</h2><p class="panel-subtitle">Theo dõi các lượt chọn trong phiên này</p></div>
+            <div class="history-actions">
+              <button id="undoButton" class="outline-button" type="button">↶ Hoàn tác gần nhất</button>
+              <button id="clearHistoryButton" class="danger-button" type="button">Xóa lịch sử</button>
+            </div>
+          </div>
+          <div id="historyContent" class="history-scroller"></div>
+        </section>
+      </section>
+    </div>
+  </main>
+
+  <div id="resultBackdrop" class="modal-backdrop" aria-hidden="true">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+      <div class="result-symbol" aria-hidden="true">✦</div>
+      <p id="resultKicker" class="modal-kicker">Kết quả vòng quay</p>
+      <h2 id="resultTitle" class="modal-result"></h2>
+      <p id="resultDetail" class="modal-detail"></p>
+      <div id="resultActions" class="modal-actions"></div>
+    </section>
+  </div>
+  <div id="dialogBackdrop" class="modal-backdrop" aria-hidden="true">
+    <section class="modal small" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+      <h2 id="dialogTitle" class="dialog-title"></h2>
+      <p id="dialogMessage" class="dialog-message"></p>
+      <label id="dialogLabel" class="dialog-label" for="dialogInput" hidden></label>
+      <input id="dialogInput" class="dialog-input" maxlength="80" autocomplete="off" hidden />
+      <div id="dialogError" class="dialog-error" aria-live="polite"></div>
+      <div id="dialogActions" class="dialog-actions"></div>
+    </section>
+  </div>
+  <div id="settingsBackdrop" class="modal-backdrop" aria-hidden="true">
+    <section class="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <header class="settings-head">
+        <div>
+          <h2 id="settingsTitle">Cài đặt phiên quay</h2>
+          <p>Quản lý team và điều chỉnh cách hoạt động của vòng quay.</p>
+        </div>
+        <button id="closeSettingsButton" class="icon-button" type="button" aria-label="Đóng cài đặt" title="Đóng cài đặt">×</button>
+      </header>
+      <div class="settings-grid">
+        <aside class="panel side-panel" aria-label="Quản lý danh sách team">
+          <div class="panel-heading">
+            <div>
+              <h2>Quản lý team</h2>
+              <p id="teamSummary" class="panel-subtitle">0 team</p>
+            </div>
+          </div>
+          <div id="teamList" class="team-list"></div>
+          <div class="add-team-wrap"><button id="addTeamButton" class="primary-button" type="button">＋ Thêm team</button></div>
+          <div class="manage-tools">
+            <button id="restoreSampleButton" class="soft-button" type="button">↺ Dữ liệu mẫu</button>
+            <button id="newSessionButton" class="outline-button" type="button">✦ Phiên mới</button>
+          </div>
+        </aside>
+        <section class="round-settings" aria-label="Thiết lập vòng quay">
+          <div class="selected-team-card">
+            <div class="eyebrow">Team đang chọn</div>
+            <div id="selectedTeamText" class="selected-team-name">Chưa chọn team</div>
+            <p id="selectedTeamHint" class="not-selected">Hãy quay vòng tổng để bắt đầu.</p>
+          </div>
+          <div class="settings-card">
+            <div class="setting-row">
+              <div>
+                <div class="setting-copy">Loại kết quả sau khi quay</div>
+                <div class="setting-help">Tạm ẩn kết quả ở những lượt quay sau.</div>
+              </div>
+              <button id="excludeSwitch" class="switch" type="button" role="switch" aria-checked="false" aria-label="Loại kết quả sau khi quay"></button>
+            </div>
+          </div>
+          <div id="availableCounter" class="available-counter"></div>
+          <div class="action-stack">
+            <button id="restoreAllButton" class="soft-button" type="button">↺ Khôi phục tất cả kết quả</button>
+            <button id="startNewButton" class="outline-button" type="button">✦ Bắt đầu phiên mới</button>
+          </div>
+        </section>
+      </div>
+    </section>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    'use strict';
+
+    /* Vòng quay SECI: dữ liệu được lưu cục bộ trong trình duyệt. */
+    const STORAGE_KEY = 'seci-lucky-wheel-v1';
+    const COLORS = [
+      '#d9eefe', '#ffdce7', '#e6ddff', '#fff0bd', '#d6f2e6', '#ffd9c8', '#d8e4ff', '#f3d9eb', '#e1f1cd', '#ffe5a6'
+    ];
+    const TEXT_COLORS = ['#31536a', '#713c50', '#524470', '#72551c', '#276c59', '#764835', '#41558a', '#703c61', '#456326', '#735119'];
+    const $ = (selector) => document.querySelector(selector);
+    const els = {
+      teamList: $('#teamList'), teamSummary: $('#teamSummary'), addTeam: $('#addTeamButton'), settings: $('#settingsButton'), closeSettings: $('#closeSettingsButton'), settingsBackdrop: $('#settingsBackdrop'),
+      restoreSample: $('#restoreSampleButton'), newSession: $('#newSessionButton'), startNew: $('#startNewButton'),
+      teamTab: $('#teamTab'), memberTab: $('#memberTab'), memberTeamPicker: $('#memberTeamPicker'), memberTeamSelect: $('#memberTeamSelect'), wheelCanvas: $('#wheelCanvas'), wheelDisc: $('#wheelDisc'),
+      wheelCaption: $('#wheelCaption'), wheelEmpty: $('#wheelEmpty'), spin: $('#spinButton'),
+      selectedTeamText: $('#selectedTeamText'), selectedTeamHint: $('#selectedTeamHint'), excludeSwitch: $('#excludeSwitch'),
+      availableCounter: $('#availableCounter'), restoreAll: $('#restoreAllButton'), history: $('#historyContent'),
+      undo: $('#undoButton'), clearHistory: $('#clearHistoryButton'), sound: $('#soundButton'), export: $('#exportButton'),
+      import: $('#importButton'), importInput: $('#importInput'), resultBackdrop: $('#resultBackdrop'), resultKicker: $('#resultKicker'),
+      resultTitle: $('#resultTitle'), resultDetail: $('#resultDetail'), resultActions: $('#resultActions'),
+      dialogBackdrop: $('#dialogBackdrop'), dialogTitle: $('#dialogTitle'), dialogMessage: $('#dialogMessage'),
+      dialogLabel: $('#dialogLabel'), dialogInput: $('#dialogInput'), dialogError: $('#dialogError'), dialogActions: $('#dialogActions'), toast: $('#toast'),
+      logoButton: $('#logoButton'), logoInput: $('#logoInput'), brandLogo: $('#brandLogo')
+    };
+
+    const uid = () => (window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`);
+    const normalizeText = (value) => String(value || '').trim().replace(/\s+/g, ' ');
+    const nameKey = (value) => normalizeText(value).toLocaleLowerCase('vi');
+    const memberKey = (teamId, memberId) => `${teamId}:${memberId}`;
+    const makeSamples = () => Array.from({ length: 4 }, (_, teamIndex) => ({
+      id: uid(), name: `Team ${teamIndex + 1}`,
+      members: Array.from({ length: 3 }, (_, memberIndex) => ({ id: uid(), name: `Thành viên ${memberIndex + 1}` }))
+    }));
+    const initialState = () => ({
+      teams: makeSamples(), history: [], excludedTeams: [], excludedMembers: [],
+      selectedTeamId: null, activeTab: 'team', teaseStep: 0,
+      settings: { excludeAfterSpin: false, sound: true, logoData: '' }, rotations: { team: 0, member: 0 }
+    });
+
+    function readState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return initialState();
+        return normalizeImportedState(JSON.parse(raw));
+      } catch (_) { return initialState(); }
+    }
+
+    function normalizeImportedState(raw) {
+      const source = raw && raw.data ? raw.data : raw;
+      if (!source || !Array.isArray(source.teams)) throw new Error('Dữ liệu không có danh sách team hợp lệ.');
+      const seenTeamNames = new Set(); const seenTeamIds = new Set();
+      const teams = source.teams.map((team) => {
+        const teamName = normalizeText(team && team.name);
+        if (!teamName) throw new Error('Mỗi team phải có tên.');
+        if (seenTeamNames.has(nameKey(teamName))) throw new Error(`Tên team bị trùng: ${teamName}.`);
+        seenTeamNames.add(nameKey(teamName));
+        const teamId = typeof team.id === 'string' && /^[A-Za-z0-9_-]+$/.test(team.id) ? team.id : uid();
+        if (seenTeamIds.has(teamId)) throw new Error('Dữ liệu có mã team bị trùng.');
+        seenTeamIds.add(teamId);
+        const seenMemberNames = new Set(); const seenMemberIds = new Set();
+        const members = Array.isArray(team.members) ? team.members.map((member) => {
+          const memberName = normalizeText(member && member.name);
+          if (!memberName) throw new Error(`Team ${teamName} có thành viên không hợp lệ.`);
+          if (seenMemberNames.has(nameKey(memberName))) throw new Error(`Team ${teamName} có tên thành viên trùng nhau.`);
+          seenMemberNames.add(nameKey(memberName));
+          const memberId = typeof member.id === 'string' && /^[A-Za-z0-9_-]+$/.test(member.id) ? member.id : uid();
+          if (seenMemberIds.has(memberId)) throw new Error(`Team ${teamName} có mã thành viên bị trùng.`);
+          seenMemberIds.add(memberId);
+          return { id: memberId, name: memberName };
+        }) : [];
+        return { id: teamId, name: teamName, members };
+      });
+      const teamIds = new Set(teams.map(t => t.id));
+      const validTeamId = (id) => typeof id === 'string' && teamIds.has(id);
+      const validMemberKey = (key) => {
+        const [teamId, ...rest] = String(key).split(':'); const memberId = rest.join(':');
+        return teams.some(t => t.id === teamId && t.members.some(m => m.id === memberId));
+      };
+      const history = Array.isArray(source.history) ? source.history.filter(h => h && (h.type === 'team' || h.type === 'member')).map((h) => ({
+        id: typeof h.id === 'string' ? h.id : uid(), type: h.type, resultId: String(h.resultId || ''), resultName: normalizeText(h.resultName) || 'Không rõ',
+        teamId: String(h.teamId || ''), teamName: normalizeText(h.teamName) || 'Không rõ', time: typeof h.time === 'string' ? h.time : new Date().toISOString(),
+        participated: Boolean(h.participated), eliminated: Boolean(h.eliminated)
+      })) : [];
+      return {
+        teams, history, excludedTeams: Array.from(new Set((source.excludedTeams || []).filter(validTeamId))),
+        excludedMembers: Array.from(new Set((source.excludedMembers || []).filter(validMemberKey))),
+        selectedTeamId: validTeamId(source.selectedTeamId) ? source.selectedTeamId : null,
+        activeTab: source.activeTab === 'member' ? 'member' : 'team',
+        teaseStep: Number.isInteger(source.teaseStep) ? ((source.teaseStep % 7) + 7) % 7 : 0,
+        settings: {
+          excludeAfterSpin: Boolean(source.settings && source.settings.excludeAfterSpin),
+          sound: !(source.settings && source.settings.sound === false),
+          logoData: source.settings && typeof source.settings.logoData === 'string' && /^data:image\/(png|jpeg|webp);base64,/i.test(source.settings.logoData) && source.settings.logoData.length < 2000000 ? source.settings.logoData : ''
+        },
+        rotations: { team: Number(source.rotations && source.rotations.team) || 0, member: Number(source.rotations && source.rotations.member) || 0 }
+      };
+    }
+
+    let state = readState();
+    let spinning = false;
+    let openDialog = null;
+    let toastTimer = null;
+    let audioContext = null;
+    const collapsedTeams = new Set();
+    let activeResultRecord = null;
+
+    function persist() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    function isDisabled() { return spinning; }
+    function currentTeam() { return state.teams.find(team => team.id === state.selectedTeamId) || null; }
+    function availableTeams() {
+      const remaining = state.teams.filter(team => !state.settings.excludeAfterSpin || !state.excludedTeams.includes(team.id));
+      return remaining.length || !state.settings.excludeAfterSpin ? remaining : state.teams;
+    }
+    function availableMembers(team) {
+      const members = team ? team.members : [];
+      const remaining = members.filter(member => !state.settings.excludeAfterSpin || !state.excludedMembers.includes(memberKey(team.id, member.id)));
+      return remaining.length || !state.settings.excludeAfterSpin ? remaining : members;
+    }
+    function recycleExhaustedResults(tab, team) {
+      if (!state.settings.excludeAfterSpin) return;
+      if (tab === 'team' && state.teams.length && state.teams.every(item => state.excludedTeams.includes(item.id))) state.excludedTeams = [];
+      if (tab === 'member' && team && team.members.length && team.members.every(item => state.excludedMembers.includes(memberKey(team.id, item.id)))) state.excludedMembers = state.excludedMembers.filter(key => !key.startsWith(`${team.id}:`));
+    }
+    function currentItems() { return state.activeTab === 'team' ? availableTeams() : availableMembers(currentTeam()); }
+    function randomIndex(length) {
+      if (length < 1) return -1;
+      if (window.crypto && window.crypto.getRandomValues) {
+        const ceiling = Math.floor(0x100000000 / length) * length;
+        const bucket = new Uint32Array(1);
+        do { window.crypto.getRandomValues(bucket); } while (bucket[0] >= ceiling);
+        return bucket[0] % length;
+      }
+      return Math.floor(Math.random() * length);
+    }
+    function escapeHtml(value) { return String(value).replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' })[char]); }
+    function truncate(value, max) { return value.length <= max ? value : `${value.slice(0, Math.max(1, max - 1))}…`; }
+    function formatTime(iso) { try { return new Intl.DateTimeFormat('vi-VN', { dateStyle: 'short', timeStyle: 'medium' }).format(new Date(iso)); } catch (_) { return iso; } }
+
+    function showToast(message, type = '') {
+      clearTimeout(toastTimer); els.toast.textContent = message; els.toast.className = `toast ${type}`.trim();
+      requestAnimationFrame(() => els.toast.classList.add('show'));
+      toastTimer = setTimeout(() => els.toast.classList.remove('show'), 3300);
+    }
+
+    function setButtonDisabled(button, disabled) { button.disabled = disabled; }
+
+    function renderTeams() {
+      const disabled = isDisabled();
+      els.teamSummary.textContent = `${state.teams.length} team · ${state.teams.reduce((sum, team) => sum + team.members.length, 0)} thành viên`;
+      if (!state.teams.length) {
+        els.teamList.innerHTML = '<div class="empty-side">Chưa có team nào.<br>Hãy thêm team để bắt đầu.</div>';
+      } else {
+        els.teamList.innerHTML = state.teams.map(team => {
+          const collapsed = collapsedTeams.has(team.id);
+          const selected = team.id === state.selectedTeamId ? ' selected' : '';
+          const memberRows = team.members.length ? team.members.map(member => `
+            <div class="member-row" title="${escapeHtml(member.name)}"><span class="member-dot"></span><span class="member-name">${escapeHtml(member.name)}</span>
+              <button class="mini-button" type="button" data-action="rename-member" data-team-id="${team.id}" data-member-id="${member.id}" title="Sửa tên thành viên" aria-label="Sửa ${escapeHtml(member.name)}" ${disabled ? 'disabled' : ''}>✎</button>
+              <button class="mini-button delete" type="button" data-action="delete-member" data-team-id="${team.id}" data-member-id="${member.id}" title="Xóa thành viên" aria-label="Xóa ${escapeHtml(member.name)}" ${disabled ? 'disabled' : ''}>×</button>
+            </div>`).join('') : '<div class="member-empty">Chưa có thành viên.</div>';
+          return `<article class="team-card${selected}${collapsed ? ' is-collapsed' : ''}">
+            <div class="team-top">
+              <button class="team-collapse" type="button" data-action="collapse" data-team-id="${team.id}" aria-expanded="${!collapsed}">
+                <span class="chevron">▼</span><span class="team-name" title="${escapeHtml(team.name)}">${escapeHtml(team.name)}</span><span class="count">${team.members.length}</span>
+              </button>
+              <div class="mini-actions">
+                <button class="mini-button" type="button" data-action="rename-team" data-team-id="${team.id}" title="Sửa tên team" aria-label="Sửa ${escapeHtml(team.name)}" ${disabled ? 'disabled' : ''}>✎</button>
+                <button class="mini-button delete" type="button" data-action="delete-team" data-team-id="${team.id}" title="Xóa team" aria-label="Xóa ${escapeHtml(team.name)}" ${disabled ? 'disabled' : ''}>×</button>
+              </div>
+            </div>
+            ${collapsed ? '' : `<div class="member-list">${memberRows}<button class="add-member" type="button" data-action="add-member" data-team-id="${team.id}" ${disabled ? 'disabled' : ''}>＋ Thêm thành viên</button></div>`}
+          </article>`;
+        }).join('');
+      }
+      [els.addTeam, els.restoreSample, els.newSession, els.startNew, els.restoreAll, els.undo, els.clearHistory, els.export, els.import, els.settings].forEach(button => setButtonDisabled(button, disabled));
+    }
+
+    function drawWheel() {
+      const canvas = els.wheelCanvas; const rect = canvas.getBoundingClientRect();
+      const size = Math.max(1, Math.floor(Math.min(rect.width, rect.height))); const scale = Math.min(window.devicePixelRatio || 1, 2);
+      if (!size) return;
+      canvas.width = size * scale; canvas.height = size * scale;
+      const ctx = canvas.getContext('2d'); ctx.setTransform(scale, 0, 0, scale, 0, 0); ctx.clearRect(0, 0, size, size);
+      const items = currentItems(); const center = size / 2; const radius = center;
+      canvas.title = items.length ? `Các mục trên vòng quay: ${items.map(item => item.name).join(' · ')}` : '';
+      els.wheelEmpty.hidden = items.length > 0;
+      if (!items.length) { ctx.fillStyle = '#f5f3fa'; ctx.beginPath(); ctx.arc(center, center, radius, 0, Math.PI * 2); ctx.fill(); return; }
+      const segment = (Math.PI * 2) / items.length;
+      const labelFont = items.length > 12 ? 10 : items.length > 8 ? 11 : items.length > 5 ? 13 : 15;
+      items.forEach((item, index) => {
+        const start = -Math.PI / 2 + index * segment; const end = start + segment;
+        ctx.beginPath(); ctx.moveTo(center, center); ctx.arc(center, center, radius, start, end); ctx.closePath(); ctx.fillStyle = COLORS[index % COLORS.length]; ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,.88)'; ctx.lineWidth = 1.5; ctx.stroke();
+        const middle = start + segment / 2;
+        const labelRadius = radius * .68;
+        ctx.save(); ctx.translate(center + Math.cos(middle) * labelRadius, center + Math.sin(middle) * labelRadius);
+        let textAngle = (middle + Math.PI / 2) % (Math.PI * 2);
+        if (textAngle > Math.PI / 2 && textAngle < Math.PI * 1.5) textAngle += Math.PI;
+        ctx.rotate(textAngle);
+        ctx.fillStyle = TEXT_COLORS[index % TEXT_COLORS.length]; ctx.font = `800 ${labelFont}px "Segoe UI", "Noto Sans", Arial, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        const charLimit = items.length > 10 ? 10 : items.length > 6 ? 16 : 25;
+        ctx.fillText(truncate(item.name, charLimit), 0, 0, radius * .54);
+        ctx.restore();
+      });
+    }
+
+    function setRotation() {
+      const rotation = state.activeTab === 'team' ? state.rotations.team : state.rotations.member;
+      els.wheelDisc.style.transition = 'none'; els.wheelDisc.style.transform = `rotate(${rotation}deg)`;
+    }
+    function renderWheel() {
+      const isTeam = state.activeTab === 'team'; const team = currentTeam(); const items = currentItems();
+      els.teamTab.setAttribute('aria-selected', String(isTeam)); els.memberTab.setAttribute('aria-selected', String(!isTeam));
+      els.memberTab.disabled = spinning;
+      els.teamTab.disabled = spinning;
+      els.memberTeamPicker.hidden = isTeam;
+      if (!isTeam) {
+        els.memberTeamSelect.innerHTML = `<option value="">— Chọn một team —</option>${state.teams.map(item => `<option value="${item.id}" ${item.id === state.selectedTeamId ? 'selected' : ''}>${escapeHtml(item.name)} · ${item.members.length} thành viên</option>`).join('')}`;
+        els.memberTeamSelect.disabled = spinning || !state.teams.length;
+      }
+      if (isTeam) {
+        els.wheelCaption.textContent = 'Mỗi phần là một team đang có trong danh sách.';
+        els.spin.textContent = spinning ? 'ĐANG QUAY…' : 'QUAY CHỌN TEAM';
+        els.wheelEmpty.textContent = 'Chưa có team nào để quay.';
+      } else {
+        els.wheelCaption.textContent = team ? `Đang quay thành viên của ${team.name}` : 'Chọn một team ở phía trên để quay thành viên.';
+        els.spin.textContent = spinning ? 'ĐANG QUAY…' : 'QUAY CHỌN THÀNH VIÊN';
+        els.wheelEmpty.textContent = !team ? 'Chưa có team được chọn. Hãy quay chọn team trước.' : 'Team này chưa có thành viên để quay.';
+      }
+      els.spin.disabled = spinning || !items.length;
+      els.selectedTeamText.textContent = team ? team.name : 'Chưa chọn team';
+      els.selectedTeamHint.textContent = team ? `${team.members.length} thành viên trong team này.` : 'Hãy quay vòng tổng để bắt đầu.';
+      els.excludeSwitch.classList.toggle('on', state.settings.excludeAfterSpin); els.excludeSwitch.setAttribute('aria-checked', String(state.settings.excludeAfterSpin)); els.excludeSwitch.disabled = spinning;
+      const count = isTeam ? `${items.length}/${state.teams.length} team khả dụng` : team ? `${items.length}/${team.members.length} thành viên khả dụng` : 'Chưa có team được chọn';
+      els.availableCounter.innerHTML = `<strong>${count}</strong>${state.settings.excludeAfterSpin ? '<br>Chế độ loại kết quả đang bật.' : '<br>Kết quả có thể được chọn lại.'}`;
+      drawWheel(); setRotation();
+    }
+
+    function renderHistory() {
+      if (!state.history.length) {
+        els.history.innerHTML = '<div class="history-empty">Chưa có kết quả nào. Hãy quay để bắt đầu lịch sử phiên.</div>';
+        els.undo.disabled = true; els.clearHistory.disabled = true; return;
+      }
+      els.undo.disabled = spinning; els.clearHistory.disabled = spinning;
+      const rows = state.history.map((record, index) => `<tr>
+        <td>${index + 1}</td><td><span class="type-chip ${record.type === 'team' ? 'type-team' : 'type-member'}">${record.type === 'team' ? 'Team' : 'Thành viên'}</span></td>
+        <td class="history-result" title="${escapeHtml(record.resultName)}">${escapeHtml(record.resultName)}</td>
+        <td>${escapeHtml(record.teamName)}</td><td>${formatTime(record.time)}</td>
+        <td><span class="status-chip ${record.participated ? 'status-done' : 'status-pending'}">${record.participated ? 'Đã tham gia' : 'Chưa tham gia'}</span></td>
+      </tr>`).join('');
+      els.history.innerHTML = `<table><thead><tr><th>Lượt</th><th>Loại</th><th>Kết quả</th><th>Team liên quan</th><th>Thời gian</th><th>Trạng thái</th></tr></thead><tbody>${rows}</tbody></table>`;
+    }
+
+    function render() { renderTeams(); renderWheel(); renderHistory(); updateSoundButton(); renderLogo(); }
+    function updateSoundButton() { els.sound.textContent = state.settings.sound ? '🔊' : '🔇'; els.sound.title = state.settings.sound ? 'Tắt âm thanh' : 'Bật âm thanh'; els.sound.setAttribute('aria-label', els.sound.title); }
+    function renderLogo() {
+      const hasLogo = Boolean(state.settings.logoData);
+      els.logoButton.classList.toggle('has-image', hasLogo);
+      if (hasLogo) els.brandLogo.src = state.settings.logoData;
+      else els.brandLogo.removeAttribute('src');
+    }
+
+    function uploadLogo(file) {
+      if (!file) return;
+      if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) { showToast('Vui lòng chọn ảnh PNG, JPG hoặc WebP.', 'error'); return; }
+      if (file.size > 5 * 1024 * 1024) { showToast('Ảnh logo không được lớn hơn 5 MB.', 'error'); return; }
+      const reader = new FileReader();
+      reader.onerror = () => showToast('Không thể đọc ảnh logo.', 'error');
+      reader.onload = () => {
+        const image = new Image();
+        image.onerror = () => showToast('File ảnh không hợp lệ.', 'error');
+        image.onload = () => {
+          const maxSize = 400; const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
+          const canvas = document.createElement('canvas'); canvas.width = Math.max(1, Math.round(image.width * scale)); canvas.height = Math.max(1, Math.round(image.height * scale));
+          const context = canvas.getContext('2d'); context.drawImage(image, 0, 0, canvas.width, canvas.height);
+          state.settings.logoData = canvas.toDataURL('image/webp', .88); persist(); renderLogo(); showToast('Đã cập nhật logo.');
+        };
+        image.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+    function ensureNotSpinning() { if (spinning) { showToast('Vui lòng chờ vòng quay kết thúc.', 'error'); return false; } return true; }
+
+    function playSound(type) {
+      if (!state.settings.sound) return;
+      try {
+        audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
+        const now = audioContext.currentTime; const oscillator = audioContext.createOscillator(); const gain = audioContext.createGain();
+        oscillator.type = type === 'result' ? 'sine' : 'triangle'; oscillator.frequency.setValueAtTime(type === 'result' ? 523 : 190, now);
+        if (type === 'result') oscillator.frequency.exponentialRampToValueAtTime(784, now + .16);
+        gain.gain.setValueAtTime(.0001, now); gain.gain.exponentialRampToValueAtTime(.075, now + .02); gain.gain.exponentialRampToValueAtTime(.0001, now + (type === 'result' ? .34 : .14));
+        oscillator.connect(gain).connect(audioContext.destination); oscillator.start(now); oscillator.stop(now + (type === 'result' ? .36 : .16));
+      } catch (_) { /* Một số trình duyệt có thể chặn âm thanh; ứng dụng vẫn hoạt động. */ }
+    }
+
+    function releaseConfetti() {
+      const colors = ['#9a8fd3', '#eca6bc', '#8cc5ab', '#f0c55c', '#76b7dc'];
+      for (let i = 0; i < 45; i++) {
+        const piece = document.createElement('i'); piece.className = 'confetti-piece'; piece.style.left = `${Math.random() * 100}vw`; piece.style.background = colors[i % colors.length];
+        piece.style.setProperty('--drift', `${(Math.random() - .5) * 240}px`); piece.style.setProperty('--fall-time', `${1.7 + Math.random() * 1.4}s`);
+        document.body.appendChild(piece); piece.addEventListener('animationend', () => piece.remove());
+      }
+    }
+
+    function closeResult() { els.resultBackdrop.classList.remove('is-open'); els.resultBackdrop.setAttribute('aria-hidden', 'true'); activeResultRecord = null; }
+    function openSettings() {
+      if (!ensureNotSpinning()) return;
+      render(); els.settingsBackdrop.classList.add('is-open'); els.settingsBackdrop.setAttribute('aria-hidden', 'false');
+    }
+    function closeSettings() { els.settingsBackdrop.classList.remove('is-open'); els.settingsBackdrop.setAttribute('aria-hidden', 'true'); }
+    function button(label, className, handler, disabled = false) { const b = document.createElement('button'); b.type = 'button'; b.className = className; b.textContent = label; b.disabled = disabled; b.addEventListener('click', handler); return b; }
+    function showResult(record) {
+      activeResultRecord = record; const isTeam = record.type === 'team';
+      els.resultKicker.textContent = isTeam ? 'Team được chọn' : 'Người được chọn';
+      els.resultTitle.textContent = record.resultName;
+      els.resultDetail.textContent = isTeam ? 'Sẵn sàng chọn thành viên của team này.' : `${record.teamName} · Một lựa chọn mới cho buổi SECI.`;
+      els.resultActions.innerHTML = '';
+      if (isTeam) {
+        els.resultActions.append(button('Quay lại', 'outline-button', closeResult));
+        els.resultActions.append(button('Quay thành viên của team này', 'primary-button', () => { state.selectedTeamId = record.teamId; state.activeTab = 'member'; persist(); closeResult(); render(); }));
+      } else {
+        const already = record.participated;
+        els.resultActions.append(button('Quay lại thành viên', 'outline-button', closeResult));
+        els.resultActions.append(button('Chọn team tiếp theo', 'soft-button', () => { state.activeTab = 'team'; persist(); closeResult(); render(); }));
+        els.resultActions.append(button(already ? 'Đã đánh dấu tham gia' : 'Đánh dấu đã tham gia', 'primary-button', () => markParticipated(record.id), already));
+      }
+      els.resultBackdrop.classList.add('is-open'); els.resultBackdrop.setAttribute('aria-hidden', 'false');
+    }
+
+    function markParticipated(recordId) {
+      const record = state.history.find(item => item.id === recordId); if (!record) return;
+      record.participated = true; persist(); renderHistory(); showToast(`Đã đánh dấu ${record.resultName} tham gia.`); showResult(record);
+    }
+
+    function closeDialog() { els.dialogBackdrop.classList.remove('is-open'); els.dialogBackdrop.setAttribute('aria-hidden', 'true'); openDialog = null; }
+    function showConfirm({ title, message, confirmLabel = 'Xác nhận', danger = false, onConfirm }) {
+      openDialog = { kind: 'confirm' }; els.dialogTitle.textContent = title; els.dialogMessage.textContent = message; els.dialogInput.hidden = true; els.dialogLabel.hidden = true; els.dialogError.textContent = ''; els.dialogActions.innerHTML = '';
+      els.dialogActions.append(button('Hủy', 'outline-button', closeDialog));
+      els.dialogActions.append(button(confirmLabel, danger ? 'danger-button' : 'primary-button', () => { closeDialog(); onConfirm(); }));
+      els.dialogBackdrop.classList.add('is-open'); els.dialogBackdrop.setAttribute('aria-hidden', 'false');
+    }
+    function showPrompt({ title, message, label = 'Tên', value = '', confirmLabel = 'Lưu', validate, onConfirm }) {
+      openDialog = { kind: 'prompt' }; els.dialogTitle.textContent = title; els.dialogMessage.textContent = message; els.dialogLabel.textContent = label; els.dialogLabel.hidden = false; els.dialogInput.hidden = false; els.dialogInput.value = value; els.dialogError.textContent = ''; els.dialogActions.innerHTML = '';
+      const submit = () => { const checked = validate(normalizeText(els.dialogInput.value)); if (checked !== true) { els.dialogError.textContent = checked; return; } const result = normalizeText(els.dialogInput.value); closeDialog(); onConfirm(result); };
+      els.dialogActions.append(button('Hủy', 'outline-button', closeDialog)); els.dialogActions.append(button(confirmLabel, 'primary-button', submit));
+      els.dialogInput.onkeydown = event => { if (event.key === 'Enter') submit(); };
+      els.dialogBackdrop.classList.add('is-open'); els.dialogBackdrop.setAttribute('aria-hidden', 'false'); setTimeout(() => els.dialogInput.focus(), 30);
+    }
+
+    function updateData(mutator, message) { mutator(); persist(); render(); if (message) showToast(message); }
+    function hasTeamName(name, exceptId) { return state.teams.some(team => team.id !== exceptId && nameKey(team.name) === nameKey(name)); }
+    function teamById(id) { return state.teams.find(team => team.id === id); }
+    function memberById(team, id) { return team && team.members.find(member => member.id === id); }
+    function cleanReferences() {
+      const ids = new Set(state.teams.map(team => team.id)); state.excludedTeams = state.excludedTeams.filter(id => ids.has(id));
+      state.excludedMembers = state.excludedMembers.filter(key => { const [teamId, ...rest] = key.split(':'); const memberId = rest.join(':'); return state.teams.some(team => team.id === teamId && team.members.some(member => member.id === memberId)); });
+      if (!teamById(state.selectedTeamId)) { state.selectedTeamId = null; if (state.activeTab === 'member') state.activeTab = 'team'; }
+    }
+
+    function addTeam() {
+      if (!ensureNotSpinning()) return;
+      showPrompt({ title: 'Thêm team mới', message: 'Nhập tên để tạo team mới.', label: 'Tên team', confirmLabel: 'Tạo team',
+        validate: name => !name ? 'Tên team không được để trống.' : hasTeamName(name) ? 'Tên team này đã tồn tại.' : true,
+        onConfirm: name => updateData(() => state.teams.push({ id: uid(), name, members: [] }), `Đã tạo ${name}.`) });
+    }
+    function renameTeam(teamId) {
+      const team = teamById(teamId); if (!team || !ensureNotSpinning()) return;
+      showPrompt({ title: 'Đổi tên team', message: 'Tên mới sẽ được cập nhật trong danh sách hiện tại.', label: 'Tên team', value: team.name,
+        validate: name => !name ? 'Tên team không được để trống.' : hasTeamName(name, team.id) ? 'Tên team này đã tồn tại.' : true,
+        onConfirm: name => updateData(() => { const oldName = team.name; team.name = name; state.history.forEach(record => { if (record.teamId === team.id) record.teamName = name; if (record.type === 'team' && record.resultId === team.id) record.resultName = name; }); }, 'Đã đổi tên team.') });
+    }
+    function deleteTeam(teamId) {
+      const team = teamById(teamId); if (!team || !ensureNotSpinning()) return;
+      showConfirm({ title: 'Xóa team?', message: `Team “${team.name}” và ${team.members.length} thành viên sẽ bị xóa. Thao tác này không thể hoàn tác.`, confirmLabel: 'Xóa team', danger: true,
+        onConfirm: () => updateData(() => { state.teams = state.teams.filter(item => item.id !== teamId); cleanReferences(); }, `Đã xóa ${team.name}.`) });
+    }
+    function addMember(teamId) {
+      const team = teamById(teamId); if (!team || !ensureNotSpinning()) return;
+      showPrompt({ title: 'Thêm thành viên', message: `Thêm người vào ${team.name}.`, label: 'Tên thành viên', confirmLabel: 'Thêm',
+        validate: name => !name ? 'Tên thành viên không được để trống.' : team.members.some(member => nameKey(member.name) === nameKey(name)) ? 'Tên này đã có trong team.' : true,
+        onConfirm: name => updateData(() => team.members.push({ id: uid(), name }), `Đã thêm ${name}.`) });
+    }
+    function renameMember(teamId, memberId) {
+      const team = teamById(teamId); const member = memberById(team, memberId); if (!team || !member || !ensureNotSpinning()) return;
+      showPrompt({ title: 'Đổi tên thành viên', message: `Cập nhật tên trong ${team.name}.`, label: 'Tên thành viên', value: member.name,
+        validate: name => !name ? 'Tên thành viên không được để trống.' : team.members.some(item => item.id !== member.id && nameKey(item.name) === nameKey(name)) ? 'Tên này đã có trong team.' : true,
+        onConfirm: name => updateData(() => { member.name = name; state.history.forEach(record => { if (record.type === 'member' && record.teamId === team.id && record.resultId === member.id) record.resultName = name; }); }, 'Đã đổi tên thành viên.') });
+    }
+    function deleteMember(teamId, memberId) {
+      const team = teamById(teamId); const member = memberById(team, memberId); if (!team || !member || !ensureNotSpinning()) return;
+      showConfirm({ title: 'Xóa thành viên?', message: `Bạn có chắc muốn xóa “${member.name}” khỏi ${team.name}?`, confirmLabel: 'Xóa thành viên', danger: true,
+        onConfirm: () => updateData(() => { team.members = team.members.filter(item => item.id !== memberId); cleanReferences(); }, `Đã xóa ${member.name}.`) });
+    }
+
+    function handleTeamListClick(event) {
+      const control = event.target.closest('[data-action]'); if (!control) return;
+      const { action, teamId, memberId } = control.dataset;
+      if (action === 'collapse') { collapsedTeams.has(teamId) ? collapsedTeams.delete(teamId) : collapsedTeams.add(teamId); renderTeams(); return; }
+      if (action === 'rename-team') renameTeam(teamId); if (action === 'delete-team') deleteTeam(teamId); if (action === 'add-member') addMember(teamId);
+      if (action === 'rename-member') renameMember(teamId, memberId); if (action === 'delete-member') deleteMember(teamId, memberId);
+    }
+
+    function switchTab(tab) {
+      if (!ensureNotSpinning()) return;
+      state.activeTab = tab; persist(); render();
+    }
+
+    function chooseMemberTeam(event) {
+      if (!ensureNotSpinning()) return;
+      state.selectedTeamId = event.target.value || null; state.activeTab = 'member'; persist(); render();
+      const team = currentTeam();
+      if (team && !team.members.length) showToast(`${team.name} chưa có thành viên. Hãy thêm thành viên trong Cài đặt.`, 'error');
+    }
+
+    function moveWheel(rotation, duration, easing = 'cubic-bezier(.12,.82,.14,1)') {
+      return new Promise(resolve => {
+        let finished = false;
+        const finish = event => {
+          if (event && event.target !== els.wheelDisc) return;
+          if (finished) return;
+          finished = true; els.wheelDisc.removeEventListener('transitionend', finish); clearTimeout(fallback); resolve();
+        };
+        const fallback = setTimeout(finish, duration + 260);
+        els.wheelDisc.addEventListener('transitionend', finish);
+        els.wheelDisc.style.transition = `transform ${duration}ms ${easing}`;
+        requestAnimationFrame(() => { els.wheelDisc.style.transform = `rotate(${rotation}deg)`; });
+      });
+    }
+
+    const pause = duration => new Promise(resolve => setTimeout(resolve, duration));
+
+    async function spin() {
+      if (!ensureNotSpinning()) return;
+      const tab = state.activeTab; const team = currentTeam(); recycleExhaustedResults(tab, team); persist();
+      const items = currentItems();
+      if (!items.length) { showToast(state.activeTab === 'team' ? 'Chưa có team khả dụng để quay.' : 'Chưa có thành viên khả dụng để quay.', 'error'); return; }
+      const selectedIndex = randomIndex(items.length); const selected = items[selectedIndex];
+      spinning = true; render(); playSound('spin');
+      const segmentDegrees = 360 / items.length; const current = state.rotations[tab];
+      const targetAngle = index => (360 - (index * segmentDegrees + segmentDegrees / 2)) % 360;
+      const rotationTo = (angle, extraLoops) => {
+        const normalized = ((current % 360) + 360) % 360;
+        return current + extraLoops * 360 + (angle - normalized + 360) % 360;
+      };
+      // Chu kỳ 7 lượt: lùi → thường → tiến → thường → lùi → thường → tiến.
+      const teasePattern = [0, 2, 1, 2, 0, 2, 1];
+      const teaseMode = items.length > 1 ? teasePattern[state.teaseStep] : 2;
+      if (items.length > 1) { state.teaseStep = (state.teaseStep + 1) % teasePattern.length; persist(); }
+      let finalRotation;
+      if (teaseMode !== 2) {
+        const isReverse = teaseMode === 0;
+        // Lùi: giả dừng ở ô trước kết quả. Tiến: giả dừng ở ô sau kết quả.
+        const decoyIndex = isReverse
+          ? (selectedIndex - 1 + items.length) % items.length
+          : (selectedIndex + 1) % items.length;
+        const fakeRotation = rotationTo(targetAngle(decoyIndex), 5 + randomIndex(2));
+        state.rotations[tab] = fakeRotation; persist();
+        els.spin.textContent = 'SUÝT DỪNG…';
+        await moveWheel(fakeRotation, 3400 + randomIndex(500));
+        await pause(650 + randomIndex(250));
+        finalRotation = fakeRotation + (isReverse ? -segmentDegrees : segmentDegrees);
+        state.rotations[tab] = finalRotation; persist();
+        els.spin.textContent = isReverse ? 'Ồ, LÙI LẠI…' : 'Ồ, TIẾN THÊM…';
+        await moveWheel(finalRotation, 1100 + randomIndex(400), 'cubic-bezier(.24,.92,.25,1)');
+      } else {
+        finalRotation = rotationTo(targetAngle(selectedIndex), 6 + randomIndex(3));
+        state.rotations[tab] = finalRotation; persist();
+        await moveWheel(finalRotation, 4400 + randomIndex(1300));
+      }
+      spinning = false;
+      const record = {
+        id: uid(), type: tab, resultId: selected.id, resultName: selected.name,
+        teamId: tab === 'team' ? selected.id : team.id, teamName: tab === 'team' ? selected.name : team.name,
+        time: new Date().toISOString(), participated: false, eliminated: state.settings.excludeAfterSpin
+      };
+      if (tab === 'team') state.selectedTeamId = selected.id;
+      if (state.settings.excludeAfterSpin) {
+        if (tab === 'team') state.excludedTeams.push(selected.id);
+        else state.excludedMembers.push(memberKey(team.id, selected.id));
+      }
+      state.history.push(record); persist(); render(); playSound('result'); releaseConfetti(); showResult(record);
+    }
+
+    function restoreAll() {
+      if (!ensureNotSpinning()) return;
+      const total = state.excludedTeams.length + state.excludedMembers.length;
+      if (!total) { showToast('Chưa có kết quả nào bị loại tạm thời.'); return; }
+      updateData(() => { state.excludedTeams = []; state.excludedMembers = []; }, 'Đã khôi phục tất cả kết quả vào vòng quay.');
+    }
+    function startNewSession() {
+      if (!ensureNotSpinning()) return;
+      showConfirm({ title: 'Bắt đầu phiên mới?', message: 'Lịch sử sẽ được xóa và mọi kết quả tạm loại sẽ được khôi phục. Danh sách team vẫn được giữ.', confirmLabel: 'Bắt đầu phiên',
+        onConfirm: () => updateData(() => { state.history = []; state.excludedTeams = []; state.excludedMembers = []; state.selectedTeamId = null; state.activeTab = 'team'; state.teaseStep = 0; }, 'Đã bắt đầu một phiên mới.') });
+    }
+    function undoLatest() {
+      if (!ensureNotSpinning() || !state.history.length) return;
+      const record = state.history[state.history.length - 1];
+      updateData(() => { state.history.pop(); if (record.eliminated) { if (record.type === 'team') state.excludedTeams = state.excludedTeams.filter(id => id !== record.resultId); else state.excludedMembers = state.excludedMembers.filter(key => key !== memberKey(record.teamId, record.resultId)); } }, 'Đã hoàn tác kết quả gần nhất.');
+    }
+    function clearHistory() {
+      if (!ensureNotSpinning() || !state.history.length) return;
+      showConfirm({ title: 'Xóa lịch sử?', message: 'Toàn bộ lịch sử vòng quay sẽ bị xóa. Các kết quả đang tạm loại vẫn được giữ.', confirmLabel: 'Xóa lịch sử', danger: true,
+        onConfirm: () => updateData(() => { state.history = []; }, 'Đã xóa lịch sử vòng quay.') });
+    }
+    function restoreSamples() {
+      if (!ensureNotSpinning()) return;
+      showConfirm({ title: 'Khôi phục dữ liệu mẫu?', message: 'Danh sách team, lịch sử và các kết quả tạm loại hiện có sẽ được thay bằng dữ liệu mẫu.', confirmLabel: 'Khôi phục mẫu', danger: true,
+        onConfirm: () => { const savedLogo = state.settings.logoData; state = initialState(); state.settings.logoData = savedLogo; persist(); render(); showToast('Đã khôi phục dữ liệu mẫu.'); } });
+    }
+    function exportData() {
+      if (!ensureNotSpinning()) return;
+      const payload = { version: 1, exportedAt: new Date().toISOString(), data: state }; const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob); const anchor = document.createElement('a'); anchor.href = url; anchor.download = `vong-quay-seci-${new Date().toISOString().slice(0, 10)}.json`; document.body.appendChild(anchor); anchor.click(); anchor.remove(); URL.revokeObjectURL(url); showToast('Đã xuất file dữ liệu JSON.');
+    }
+    function importData(file) {
+      if (!ensureNotSpinning() || !file) return;
+      const reader = new FileReader();
+      reader.onerror = () => showToast('Không thể đọc file đã chọn.', 'error');
+      reader.onload = () => {
+        try {
+          const incoming = normalizeImportedState(JSON.parse(reader.result));
+          showConfirm({ title: 'Nhập dữ liệu?', message: 'Dữ liệu hiện tại sẽ được ghi đè sau khi xác nhận.', confirmLabel: 'Nhập dữ liệu',
+            onConfirm: () => { state = incoming; persist(); render(); showToast('Đã nhập dữ liệu thành công.'); } });
+        } catch (error) { showToast(`File JSON không hợp lệ: ${error.message}`, 'error'); }
+      };
+      reader.readAsText(file, 'UTF-8');
+    }
+
+    els.teamList.addEventListener('click', handleTeamListClick); els.addTeam.addEventListener('click', addTeam); els.restoreSample.addEventListener('click', restoreSamples); els.newSession.addEventListener('click', startNewSession); els.startNew.addEventListener('click', startNewSession); els.settings.addEventListener('click', openSettings); els.closeSettings.addEventListener('click', closeSettings);
+    els.teamTab.addEventListener('click', () => switchTab('team')); els.memberTab.addEventListener('click', () => switchTab('member')); els.memberTeamSelect.addEventListener('change', chooseMemberTeam); els.spin.addEventListener('click', spin); els.restoreAll.addEventListener('click', restoreAll); els.undo.addEventListener('click', undoLatest); els.clearHistory.addEventListener('click', clearHistory);
+    els.excludeSwitch.addEventListener('click', () => { if (!ensureNotSpinning()) return; state.settings.excludeAfterSpin = !state.settings.excludeAfterSpin; persist(); render(); showToast(state.settings.excludeAfterSpin ? 'Đã bật loại kết quả sau khi quay.' : 'Đã tắt loại kết quả sau khi quay.'); });
+    els.sound.addEventListener('click', () => { state.settings.sound = !state.settings.sound; persist(); updateSoundButton(); if (state.settings.sound) playSound('result'); });
+    els.logoButton.addEventListener('click', () => els.logoInput.click()); els.logoInput.addEventListener('change', event => { uploadLogo(event.target.files[0]); event.target.value = ''; });
+    els.export.addEventListener('click', exportData); els.import.addEventListener('click', () => { if (ensureNotSpinning()) els.importInput.click(); }); els.importInput.addEventListener('change', event => { importData(event.target.files[0]); event.target.value = ''; });
+    els.resultBackdrop.addEventListener('click', event => { if (event.target === els.resultBackdrop) closeResult(); }); els.dialogBackdrop.addEventListener('click', event => { if (event.target === els.dialogBackdrop) closeDialog(); }); els.settingsBackdrop.addEventListener('click', event => { if (event.target === els.settingsBackdrop) closeSettings(); });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') { if (els.resultBackdrop.classList.contains('is-open')) closeResult(); else if (els.dialogBackdrop.classList.contains('is-open')) closeDialog(); else if (els.settingsBackdrop.classList.contains('is-open')) closeSettings(); } });
+    window.addEventListener('resize', () => { drawWheel(); setRotation(); });
+    render();
+  </script>
+</body>
+</html>
