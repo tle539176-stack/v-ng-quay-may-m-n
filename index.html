@@ -636,12 +636,39 @@
       if (!state.settings.sound) return;
       try {
         audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
+        if (audioContext.state === 'suspended') audioContext.resume();
         const now = audioContext.currentTime; const oscillator = audioContext.createOscillator(); const gain = audioContext.createGain();
         oscillator.type = type === 'result' ? 'sine' : 'triangle'; oscillator.frequency.setValueAtTime(type === 'result' ? 523 : 190, now);
         if (type === 'result') oscillator.frequency.exponentialRampToValueAtTime(784, now + .16);
         gain.gain.setValueAtTime(.0001, now); gain.gain.exponentialRampToValueAtTime(.075, now + .02); gain.gain.exponentialRampToValueAtTime(.0001, now + (type === 'result' ? .34 : .14));
         oscillator.connect(gain).connect(audioContext.destination); oscillator.start(now); oscillator.stop(now + (type === 'result' ? .36 : .16));
       } catch (_) { /* Một số trình duyệt có thể chặn âm thanh; ứng dụng vẫn hoạt động. */ }
+    }
+
+    function playWheelTick(progress) {
+      if (!state.settings.sound) return;
+      try {
+        audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
+        if (audioContext.state === 'suspended') audioContext.resume();
+        const now = audioContext.currentTime; const oscillator = audioContext.createOscillator(); const gain = audioContext.createGain();
+        oscillator.type = 'square'; oscillator.frequency.setValueAtTime(760 - progress * 330, now);
+        const volume = .018 - progress * .007;
+        gain.gain.setValueAtTime(.0001, now); gain.gain.exponentialRampToValueAtTime(Math.max(.006, volume), now + .004); gain.gain.exponentialRampToValueAtTime(.0001, now + .032);
+        oscillator.connect(gain).connect(audioContext.destination); oscillator.start(now); oscillator.stop(now + .036);
+      } catch (_) { /* Giữ vòng quay hoạt động nếu trình duyệt không hỗ trợ Web Audio. */ }
+    }
+
+    function startWheelTicks(duration) {
+      let stopped = false; let timer = null; const startedAt = Date.now();
+      const tick = () => {
+        if (stopped || !spinning) return;
+        const progress = Math.min(1, (Date.now() - startedAt) / duration);
+        playWheelTick(progress);
+        const nextDelay = 45 + Math.pow(progress, 2.25) * 225;
+        timer = setTimeout(tick, nextDelay);
+      };
+      tick();
+      return () => { stopped = true; if (timer) clearTimeout(timer); };
     }
 
     function releaseConfetti() {
@@ -778,6 +805,12 @@
       });
     }
 
+    async function moveWheelWithSound(rotation, duration, easing) {
+      const stopTicks = startWheelTicks(duration);
+      try { await moveWheel(rotation, duration, easing); }
+      finally { stopTicks(); }
+    }
+
     const pause = duration => new Promise(resolve => setTimeout(resolve, duration));
 
     async function spin() {
@@ -807,16 +840,16 @@
         const fakeRotation = rotationTo(targetAngle(decoyIndex), 5 + randomIndex(2));
         state.rotations[tab] = fakeRotation; persist();
         els.spin.textContent = 'SUÝT DỪNG…';
-        await moveWheel(fakeRotation, 3400 + randomIndex(500));
+        await moveWheelWithSound(fakeRotation, 3400 + randomIndex(500));
         await pause(650 + randomIndex(250));
         finalRotation = fakeRotation + (isReverse ? -segmentDegrees : segmentDegrees);
         state.rotations[tab] = finalRotation; persist();
         els.spin.textContent = isReverse ? 'Ồ, LÙI LẠI…' : 'Ồ, TIẾN THÊM…';
-        await moveWheel(finalRotation, 1100 + randomIndex(400), 'cubic-bezier(.24,.92,.25,1)');
+        await moveWheelWithSound(finalRotation, 1100 + randomIndex(400), 'cubic-bezier(.24,.92,.25,1)');
       } else {
         finalRotation = rotationTo(targetAngle(selectedIndex), 6 + randomIndex(3));
         state.rotations[tab] = finalRotation; persist();
-        await moveWheel(finalRotation, 4400 + randomIndex(1300));
+        await moveWheelWithSound(finalRotation, 4400 + randomIndex(1300));
       }
       spinning = false;
       const record = {
