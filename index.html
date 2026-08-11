@@ -177,6 +177,7 @@
     .modal-result { margin: 9px 0 2px; text-align: center; font-size: clamp(25px, 5vw, 34px); line-height: 1.16; font-weight: 900; overflow-wrap: anywhere; }
     .modal-detail { margin: 8px 0 23px; text-align: center; color: var(--muted); }
     .result-symbol { width: 76px; height: 76px; display: grid; place-items: center; margin: -60px auto 14px; overflow: hidden; border: 4px solid #fffdf9; border-radius: 24px; background: linear-gradient(135deg, #a79cdb, #e69db5); color: white; font-size: 31px; box-shadow: 0 10px 20px rgba(126, 105, 179, .3); }
+    .result-symbol[hidden] { display: none; }
     .result-symbol.has-image { width: min(180px, 70vw); height: min(210px, 32vh); margin: 0 auto 16px; border-radius: 24px; background: #f5f3fa; }
     .result-symbol.has-image.member-image { width: min(290px, 78vw); height: min(360px, 46vh); }
     .result-symbol img { width: 100%; height: 100%; display: block; object-fit: contain; }
@@ -327,7 +328,7 @@
               <p id="teamSummary" class="panel-subtitle">0 team</p>
             </div>
           </div>
-          <p class="image-tip"><strong>Thêm ảnh:</strong> nhấn nút <strong>📷 Ảnh</strong> cạnh tên team hoặc thành viên.</p>
+          <p class="image-tip"><strong>Ảnh thành viên:</strong> nhấn nút <strong>📷 Ảnh</strong> cạnh tên từng người.</p>
           <div id="teamList" class="team-list"></div>
           <div class="add-team-wrap"><button id="addTeamButton" class="primary-button" type="button">＋ Thêm team</button></div>
           <div class="manage-tools">
@@ -510,14 +511,12 @@
 
     function setButtonDisabled(button, disabled) { button.disabled = disabled; }
 
-    function avatarMarkup(item, type, teamId, memberId, disabled) {
-      const action = type === 'team' ? 'image-team' : 'image-member';
-      const memberAttribute = memberId ? ` data-member-id="${memberId}"` : '';
+    function memberAvatarMarkup(item, teamId, memberId, disabled) {
       const content = item.imageData
         ? `<img src="${escapeHtml(item.imageData)}" alt="" />`
         : `<span>${escapeHtml(Array.from(item.name)[0] || '?')}</span>`;
       const verb = item.imageData ? 'Đổi ảnh' : 'Thêm ảnh';
-      return `<button class="entity-avatar${type === 'member' ? ' member-avatar' : ''}" type="button" data-action="${action}" data-team-id="${teamId}"${memberAttribute} title="${verb} cho ${escapeHtml(item.name)}" aria-label="${verb} cho ${escapeHtml(item.name)}" ${disabled ? 'disabled' : ''}>${content}</button>`;
+      return `<button class="entity-avatar member-avatar" type="button" data-action="image-member" data-team-id="${teamId}" data-member-id="${memberId}" title="${verb} cho ${escapeHtml(item.name)}" aria-label="${verb} cho ${escapeHtml(item.name)}" ${disabled ? 'disabled' : ''}>${content}</button>`;
     }
 
     function renderTeams() {
@@ -530,19 +529,17 @@
           const collapsed = collapsedTeams.has(team.id);
           const selected = team.id === state.selectedTeamId ? ' selected' : '';
           const memberRows = team.members.length ? team.members.map(member => `
-            <div class="member-row" title="${escapeHtml(member.name)}">${avatarMarkup(member, 'member', team.id, member.id, disabled)}<span class="member-name">${escapeHtml(member.name)}</span>
+            <div class="member-row" title="${escapeHtml(member.name)}">${memberAvatarMarkup(member, team.id, member.id, disabled)}<span class="member-name">${escapeHtml(member.name)}</span>
               <button class="photo-button" type="button" data-action="image-member" data-team-id="${team.id}" data-member-id="${member.id}" title="${member.imageData ? 'Đổi ảnh' : 'Thêm ảnh'} cho ${escapeHtml(member.name)}" ${disabled ? 'disabled' : ''}>📷 Ảnh</button>
               <button class="mini-button" type="button" data-action="rename-member" data-team-id="${team.id}" data-member-id="${member.id}" title="Sửa tên thành viên" aria-label="Sửa ${escapeHtml(member.name)}" ${disabled ? 'disabled' : ''}>✎</button>
               <button class="mini-button delete" type="button" data-action="delete-member" data-team-id="${team.id}" data-member-id="${member.id}" title="Xóa thành viên" aria-label="Xóa ${escapeHtml(member.name)}" ${disabled ? 'disabled' : ''}>×</button>
             </div>`).join('') : '<div class="member-empty">Chưa có thành viên.</div>';
           return `<article class="team-card${selected}${collapsed ? ' is-collapsed' : ''}">
             <div class="team-top">
-              ${avatarMarkup(team, 'team', team.id, '', disabled)}
               <button class="team-collapse" type="button" data-action="collapse" data-team-id="${team.id}" aria-expanded="${!collapsed}">
                 <span class="chevron">▼</span><span class="team-name" title="${escapeHtml(team.name)}">${escapeHtml(team.name)}</span><span class="count">${team.members.length}</span>
               </button>
               <div class="mini-actions">
-                <button class="photo-button" type="button" data-action="image-team" data-team-id="${team.id}" title="${team.imageData ? 'Đổi ảnh' : 'Thêm ảnh'} cho ${escapeHtml(team.name)}" ${disabled ? 'disabled' : ''}>📷 Ảnh</button>
                 <button class="mini-button" type="button" data-action="rename-team" data-team-id="${team.id}" title="Sửa tên team" aria-label="Sửa ${escapeHtml(team.name)}" ${disabled ? 'disabled' : ''}>✎</button>
                 <button class="mini-button delete" type="button" data-action="delete-team" data-team-id="${team.id}" title="Xóa team" aria-label="Xóa ${escapeHtml(team.name)}" ${disabled ? 'disabled' : ''}>×</button>
               </div>
@@ -844,8 +841,9 @@
     function button(label, className, handler, disabled = false) { const b = document.createElement('button'); b.type = 'button'; b.className = className; b.textContent = label; b.disabled = disabled; b.addEventListener('click', handler); return b; }
     function showResult(record) {
       activeResultRecord = record; const isTeam = record.type === 'team';
-      const resultTeam = teamById(record.teamId); const resultEntity = isTeam ? teamById(record.resultId) : memberById(resultTeam, record.resultId);
-      const resultImage = resultEntity && resultEntity.imageData;
+      const resultTeam = teamById(record.teamId); const resultEntity = isTeam ? null : memberById(resultTeam, record.resultId);
+      const resultImage = !isTeam && resultEntity && resultEntity.imageData;
+      els.resultVisual.hidden = isTeam;
       els.resultVisual.classList.toggle('has-image', Boolean(resultImage)); els.resultVisual.classList.toggle('member-image', Boolean(resultImage) && !isTeam); els.resultImage.hidden = !resultImage; els.resultFallback.hidden = Boolean(resultImage);
       if (resultImage) els.resultImage.src = resultImage; else els.resultImage.removeAttribute('src');
       els.resultKicker.textContent = isTeam ? 'Team được chọn' : 'Người được chọn';
@@ -933,7 +931,7 @@
       const control = event.target.closest('[data-action]'); if (!control) return;
       const { action, teamId, memberId } = control.dataset;
       if (action === 'collapse') { collapsedTeams.has(teamId) ? collapsedTeams.delete(teamId) : collapsedTeams.add(teamId); renderTeams(); return; }
-      if (action === 'image-team') requestEntityImage('team', teamId); if (action === 'image-member') requestEntityImage('member', teamId, memberId);
+      if (action === 'image-member') requestEntityImage('member', teamId, memberId);
       if (action === 'rename-team') renameTeam(teamId); if (action === 'delete-team') deleteTeam(teamId); if (action === 'add-member') addMember(teamId);
       if (action === 'rename-member') renameMember(teamId, memberId); if (action === 'delete-member') deleteMember(teamId, memberId);
     }
