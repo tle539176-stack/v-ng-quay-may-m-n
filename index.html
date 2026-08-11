@@ -136,18 +136,11 @@
     .selected-team-card .eyebrow, .setting-label { color: var(--muted); font-size: 11px; font-weight: 850; letter-spacing: .06em; text-transform: uppercase; }
     .selected-team-name { margin-top: 5px; font-weight: 900; font-size: 18px; overflow-wrap: anywhere; }
     .not-selected { color: var(--muted); font-size: 14px; line-height: 1.6; }
-    .settings-card { padding: 17px; border: 1px solid var(--line); border-radius: 15px; background: #fff; }
-    .setting-row { display: flex; gap: 12px; align-items: center; justify-content: space-between; }
-    .setting-copy { font-weight: 800; font-size: 13px; }
-    .setting-help { color: var(--muted); font-size: 12px; margin-top: 3px; max-width: 200px; }
-    .switch { position: relative; flex: 0 0 auto; width: 46px; height: 26px; border: 0; border-radius: 16px; background: #d9d6e3; padding: 0; transition: background .2s; }
-    .switch::after { content: ""; position: absolute; top: 4px; left: 4px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.16); transition: transform .2s; }
-    .switch.on { background: #7eb89e; }
-    .switch.on::after { transform: translateX(20px); }
+    .toolbar-toggle { color: #665d91; font-size: 21px; }
+    .toolbar-toggle.on { color: #236c58; border-color: #a9d7c6; background: #e2f5ed; }
+    .reset-icon { color: #5d5680; font-size: 21px; }
     .action-stack { display: grid; gap: 8px; }
     .action-stack button { width: 100%; min-height: 39px; font-size: 12px; }
-    .available-counter { padding: 12px 15px; color: #57516e; background: #fff8dd; border: 1px solid #f3e5ad; border-radius: 13px; font-size: 12px; }
-    .available-counter strong { color: #a2711c; }
 
     .history-panel { overflow: hidden; }
     .history-head { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 18px 19px; border-bottom: 1px solid var(--line); }
@@ -155,16 +148,14 @@
     .history-actions { display: flex; gap: 7px; }
     .history-actions button { min-height: 35px; font-size: 12px; }
     .history-scroller { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; min-width: 660px; }
+    table { width: 100%; border-collapse: collapse; min-width: 570px; }
     th { color: var(--muted); background: #fcfbfe; font-size: 11px; letter-spacing: .04em; text-align: left; text-transform: uppercase; }
     th, td { padding: 12px 15px; border-bottom: 1px solid #efedf4; }
     td { font-size: 13px; }
     tbody tr:last-child td { border-bottom: 0; }
-    .type-chip, .status-chip { display: inline-flex; align-items: center; border-radius: 50px; padding: 4px 8px; font-size: 11px; font-weight: 800; white-space: nowrap; }
+    .type-chip { display: inline-flex; align-items: center; border-radius: 50px; padding: 4px 8px; font-size: 11px; font-weight: 800; white-space: nowrap; }
     .type-team { color: #62529d; background: #eeeaff; }
     .type-member { color: #397d69; background: #e2f5ed; }
-    .status-done { background: #dcf2e9; color: #347966; }
-    .status-pending { background: #f6f1e8; color: #8e794a; }
     .history-empty { padding: 31px; color: var(--muted); text-align: center; font-size: 13px; }
     .history-result { font-weight: 800; max-width: 210px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
@@ -178,8 +169,8 @@
     .modal-detail { margin: 8px 0 23px; text-align: center; color: var(--muted); }
     .result-symbol { width: 76px; height: 76px; display: grid; place-items: center; margin: -60px auto 14px; overflow: hidden; border: 4px solid #fffdf9; border-radius: 24px; background: linear-gradient(135deg, #a79cdb, #e69db5); color: white; font-size: 31px; box-shadow: 0 10px 20px rgba(126, 105, 179, .3); }
     .result-symbol[hidden] { display: none; }
-    .result-symbol.has-image { width: min(180px, 70vw); height: min(210px, 32vh); margin: 0 auto 16px; border-radius: 24px; background: #f5f3fa; }
-    .result-symbol.has-image.member-image { width: min(290px, 78vw); height: min(360px, 46vh); }
+    .result-symbol.has-image { --result-image-size: min(180px, 70vw, 32vh); width: var(--result-image-size); height: var(--result-image-size); aspect-ratio: 1; margin: 0 auto 16px; border-radius: 24px; background: #f5f3fa; }
+    .result-symbol.has-image.member-image { --result-image-size: min(290px, 78vw, 46vh); }
     .result-symbol img { width: 100%; height: 100%; display: block; object-fit: contain; }
     .modal-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 9px; }
     .modal-actions button { min-height: 42px; }
@@ -247,6 +238,8 @@
       </div>
       <div class="top-actions">
         <button id="soundButton" class="icon-button" type="button" title="Bật/tắt âm thanh" aria-label="Bật âm thanh">🔊</button>
+        <button id="excludeSwitch" class="icon-button toolbar-toggle" type="button" aria-pressed="false" title="Loại sau khi quay: Tắt" aria-label="Loại sau khi quay: Tắt">⊘</button>
+        <button id="restoreAllButton" class="icon-button reset-icon" type="button" title="Reset các kết quả đã loại" aria-label="Reset các kết quả đã loại">↺</button>
         <button id="settingsButton" class="primary-button" type="button">⚙ Cài đặt</button>
         <button id="exportButton" class="soft-button" type="button">⇩ Xuất dữ liệu</button>
         <button id="importButton" class="outline-button" type="button">⇧ Nhập dữ liệu</button>
@@ -342,18 +335,7 @@
             <div id="selectedTeamText" class="selected-team-name">Chưa chọn team</div>
             <p id="selectedTeamHint" class="not-selected">Hãy quay vòng tổng để bắt đầu.</p>
           </div>
-          <div class="settings-card">
-            <div class="setting-row">
-              <div>
-                <div class="setting-copy">Loại kết quả sau khi quay</div>
-                <div class="setting-help">Tạm ẩn kết quả ở những lượt quay sau.</div>
-              </div>
-              <button id="excludeSwitch" class="switch" type="button" role="switch" aria-checked="false" aria-label="Loại kết quả sau khi quay"></button>
-            </div>
-          </div>
-          <div id="availableCounter" class="available-counter"></div>
           <div class="action-stack">
-            <button id="restoreAllButton" class="soft-button" type="button">↺ Khôi phục tất cả kết quả</button>
             <button id="startNewButton" class="outline-button" type="button">✦ Bắt đầu phiên mới</button>
           </div>
         </section>
@@ -379,7 +361,7 @@
       teamTab: $('#teamTab'), memberTab: $('#memberTab'), memberTeamPicker: $('#memberTeamPicker'), memberTeamSelect: $('#memberTeamSelect'), wheelCanvas: $('#wheelCanvas'), wheelDisc: $('#wheelDisc'),
       wheelCaption: $('#wheelCaption'), wheelEmpty: $('#wheelEmpty'), spin: $('#spinButton'),
       selectedTeamText: $('#selectedTeamText'), selectedTeamHint: $('#selectedTeamHint'), excludeSwitch: $('#excludeSwitch'),
-      availableCounter: $('#availableCounter'), restoreAll: $('#restoreAllButton'), history: $('#historyContent'),
+      restoreAll: $('#restoreAllButton'), history: $('#historyContent'),
       undo: $('#undoButton'), clearHistory: $('#clearHistoryButton'), sound: $('#soundButton'), export: $('#exportButton'),
       import: $('#importButton'), importInput: $('#importInput'), resultBackdrop: $('#resultBackdrop'), resultKicker: $('#resultKicker'),
       resultTitle: $('#resultTitle'), resultDetail: $('#resultDetail'), resultActions: $('#resultActions'), resultVisual: $('#resultVisual'), resultImage: $('#resultImage'), resultFallback: $('#resultFallback'),
@@ -445,7 +427,7 @@
       const history = Array.isArray(source.history) ? source.history.filter(h => h && (h.type === 'team' || h.type === 'member')).map((h) => ({
         id: typeof h.id === 'string' ? h.id : uid(), type: h.type, resultId: String(h.resultId || ''), resultName: normalizeText(h.resultName) || 'Không rõ',
         teamId: String(h.teamId || ''), teamName: normalizeText(h.teamName) || 'Không rõ', time: typeof h.time === 'string' ? h.time : new Date().toISOString(),
-        participated: Boolean(h.participated), eliminated: Boolean(h.eliminated)
+        eliminated: Boolean(h.eliminated)
       })) : [];
       return {
         teams, history, excludedTeams: Array.from(new Set((source.excludedTeams || []).filter(validTeamId))),
@@ -552,8 +534,9 @@
     }
 
     function drawWheel() {
-      const canvas = els.wheelCanvas; const rect = canvas.getBoundingClientRect();
-      const size = Math.max(1, Math.floor(Math.min(rect.width, rect.height))); const scale = Math.min(window.devicePixelRatio || 1, 2);
+      const canvas = els.wheelCanvas;
+      // clientWidth/clientHeight không bị thay đổi khi .wheel-disc đang xoay.
+      const size = Math.max(1, Math.floor(Math.min(canvas.clientWidth, canvas.clientHeight))); const scale = Math.min(window.devicePixelRatio || 1, 2);
       if (!size) return;
       canvas.width = size * scale; canvas.height = size * scale;
       const ctx = canvas.getContext('2d'); ctx.setTransform(scale, 0, 0, scale, 0, 0); ctx.clearRect(0, 0, size, size);
@@ -562,9 +545,8 @@
       els.wheelEmpty.hidden = items.length > 0;
       if (!items.length) { ctx.fillStyle = '#f5f3fa'; ctx.beginPath(); ctx.arc(center, center, radius, 0, Math.PI * 2); ctx.fill(); return; }
       const segment = (Math.PI * 2) / items.length;
-      const wheelScale = Math.max(.86, Math.min(1.08, size / 480));
-      const labelFontBase = items.length > 12 ? 15 : items.length > 8 ? 17 : items.length > 5 ? 19 : 22;
-      const labelFont = Math.round(labelFontBase * wheelScale);
+      // Một cỡ chữ cố định cho mọi trạng thái: trước quay, đang quay và đã dừng.
+      const labelFont = 20;
       items.forEach((item, index) => {
         const start = -Math.PI / 2 + index * segment; const end = start + segment;
         ctx.beginPath(); ctx.moveTo(center, center); ctx.arc(center, center, radius, start, end); ctx.closePath(); ctx.fillStyle = COLORS[index % COLORS.length]; ctx.fill();
@@ -575,7 +557,7 @@
         let textAngle = (middle + Math.PI / 2) % (Math.PI * 2);
         if (textAngle > Math.PI / 2 && textAngle < Math.PI * 1.5) textAngle += Math.PI;
         ctx.rotate(textAngle);
-        ctx.fillStyle = TEXT_COLORS[index % TEXT_COLORS.length]; ctx.font = `900 ${labelFont}px "Segoe UI", "Noto Sans", Arial, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillStyle = TEXT_COLORS[index % TEXT_COLORS.length]; ctx.font = `900 ${labelFont}px system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         const charLimit = items.length > 10 ? 10 : items.length > 6 ? 16 : 25;
         ctx.fillText(truncate(item.name, charLimit), 0, 0, radius * .54);
         ctx.restore();
@@ -608,9 +590,11 @@
       els.spin.disabled = spinning || !items.length;
       els.selectedTeamText.textContent = team ? team.name : 'Chưa chọn team';
       els.selectedTeamHint.textContent = team ? `${team.members.length} thành viên trong team này.` : 'Hãy quay vòng tổng để bắt đầu.';
-      els.excludeSwitch.classList.toggle('on', state.settings.excludeAfterSpin); els.excludeSwitch.setAttribute('aria-checked', String(state.settings.excludeAfterSpin)); els.excludeSwitch.disabled = spinning;
-      const count = isTeam ? `${items.length}/${state.teams.length} team khả dụng` : team ? `${items.length}/${team.members.length} thành viên khả dụng` : 'Chưa có team được chọn';
-      els.availableCounter.innerHTML = `<strong>${count}</strong>${state.settings.excludeAfterSpin ? '<br>Chế độ loại kết quả đang bật.' : '<br>Kết quả có thể được chọn lại.'}`;
+      const exclusionOn = state.settings.excludeAfterSpin;
+      els.excludeSwitch.classList.toggle('on', exclusionOn); els.excludeSwitch.setAttribute('aria-pressed', String(exclusionOn)); els.excludeSwitch.disabled = spinning;
+      els.excludeSwitch.textContent = '⊘';
+      els.excludeSwitch.title = exclusionOn ? 'Đang loại kết quả sau mỗi lượt quay' : 'Bấm để loại kết quả sau mỗi lượt quay';
+      els.excludeSwitch.setAttribute('aria-label', exclusionOn ? 'Loại sau khi quay: Bật' : 'Loại sau khi quay: Tắt');
       drawWheel(); setRotation();
     }
 
@@ -624,9 +608,8 @@
         <td>${index + 1}</td><td><span class="type-chip ${record.type === 'team' ? 'type-team' : 'type-member'}">${record.type === 'team' ? 'Team' : 'Thành viên'}</span></td>
         <td class="history-result" title="${escapeHtml(record.resultName)}">${escapeHtml(record.resultName)}</td>
         <td>${escapeHtml(record.teamName)}</td><td>${formatTime(record.time)}</td>
-        <td><span class="status-chip ${record.participated ? 'status-done' : 'status-pending'}">${record.participated ? 'Đã tham gia' : 'Chưa tham gia'}</span></td>
       </tr>`).join('');
-      els.history.innerHTML = `<table><thead><tr><th>Lượt</th><th>Loại</th><th>Kết quả</th><th>Team liên quan</th><th>Thời gian</th><th>Trạng thái</th></tr></thead><tbody>${rows}</tbody></table>`;
+      els.history.innerHTML = `<table><thead><tr><th>Lượt</th><th>Loại</th><th>Kết quả</th><th>Team liên quan</th><th>Thời gian</th></tr></thead><tbody>${rows}</tbody></table>`;
     }
 
     function render() { renderTeams(); renderWheel(); renderHistory(); updateSoundButton(); renderLogo(); }
@@ -856,17 +839,10 @@
         els.resultActions.append(button('Quay lại', 'outline-button', closeResult));
         els.resultActions.append(button('Quay thành viên của team này', 'primary-button', () => { state.selectedTeamId = record.teamId; state.activeTab = 'member'; persist(); closeResult(); render(); }));
       } else {
-        const already = record.participated;
         els.resultActions.append(button('Quay lại thành viên', 'outline-button', closeResult));
         els.resultActions.append(button('Chọn team tiếp theo', 'soft-button', () => { state.activeTab = 'team'; persist(); closeResult(); render(); }));
-        els.resultActions.append(button(already ? 'Đã đánh dấu tham gia' : 'Đánh dấu đã tham gia', 'primary-button', () => markParticipated(record.id), already));
       }
       els.resultBackdrop.classList.add('is-open'); els.resultBackdrop.setAttribute('aria-hidden', 'false');
-    }
-
-    function markParticipated(recordId) {
-      const record = state.history.find(item => item.id === recordId); if (!record) return;
-      record.participated = true; persist(); renderHistory(); showToast(`Đã đánh dấu ${record.resultName} tham gia.`); showResult(record);
     }
 
     function closeDialog() { els.dialogBackdrop.classList.remove('is-open'); els.dialogBackdrop.setAttribute('aria-hidden', 'true'); openDialog = null; }
@@ -1017,7 +993,7 @@
       const record = {
         id: uid(), type: tab, resultId: selected.id, resultName: selected.name,
         teamId: tab === 'team' ? selected.id : team.id, teamName: tab === 'team' ? selected.name : team.name,
-        time: new Date().toISOString(), participated: false, eliminated: state.settings.excludeAfterSpin
+        time: new Date().toISOString(), eliminated: state.settings.excludeAfterSpin
       };
       if (tab === 'team') state.selectedTeamId = selected.id;
       if (state.settings.excludeAfterSpin) {
