@@ -171,13 +171,15 @@
     .modal-backdrop { z-index: 50; position: fixed; inset: 0; display: none; align-items: center; justify-content: center; padding: 18px; background: rgba(42, 37, 62, .38); backdrop-filter: blur(3px); }
     .modal-backdrop.is-open { display: flex; animation: fade .2s ease; }
     .modal { width: min(100%, 500px); padding: 26px; border-radius: 22px; background: #fffdf9; box-shadow: 0 24px 70px rgba(38, 31, 66, .25); animation: pop .28s cubic-bezier(.2,.8,.2,1); }
+    .result-modal { max-height: calc(100vh - 36px); overflow-y: auto; }
     .modal.small { width: min(100%, 420px); }
     .modal-kicker { color: #8277b3; font-size: 12px; text-align: center; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
     .modal-result { margin: 9px 0 2px; text-align: center; font-size: clamp(25px, 5vw, 34px); line-height: 1.16; font-weight: 900; overflow-wrap: anywhere; }
     .modal-detail { margin: 8px 0 23px; text-align: center; color: var(--muted); }
     .result-symbol { width: 76px; height: 76px; display: grid; place-items: center; margin: -60px auto 14px; overflow: hidden; border: 4px solid #fffdf9; border-radius: 24px; background: linear-gradient(135deg, #a79cdb, #e69db5); color: white; font-size: 31px; box-shadow: 0 10px 20px rgba(126, 105, 179, .3); }
-    .result-symbol.has-image { background: #fff; }
-    .result-symbol img { width: 100%; height: 100%; display: block; object-fit: cover; }
+    .result-symbol.has-image { width: min(180px, 70vw); height: min(210px, 32vh); margin: 0 auto 16px; border-radius: 24px; background: #f5f3fa; }
+    .result-symbol.has-image.member-image { width: min(290px, 78vw); height: min(360px, 46vh); }
+    .result-symbol img { width: 100%; height: 100%; display: block; object-fit: contain; }
     .modal-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 9px; }
     .modal-actions button { min-height: 42px; }
     #settingsBackdrop { z-index: 45; }
@@ -290,7 +292,7 @@
   </main>
 
   <div id="resultBackdrop" class="modal-backdrop" aria-hidden="true">
-    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+    <section class="modal result-modal" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
       <div id="resultVisual" class="result-symbol" aria-hidden="true"><img id="resultImage" alt="" hidden /><span id="resultFallback">✦</span></div>
       <p id="resultKicker" class="modal-kicker">Kết quả vòng quay</p>
       <h2 id="resultTitle" class="modal-result"></h2>
@@ -565,12 +567,22 @@
       return image.complete && image.naturalWidth ? image : null;
     }
 
-    function drawWheelPortrait(ctx, image, x, y, size) {
-      const sourceSize = Math.min(image.naturalWidth, image.naturalHeight);
-      const sourceX = (image.naturalWidth - sourceSize) / 2; const sourceY = (image.naturalHeight - sourceSize) / 2;
-      ctx.save(); ctx.beginPath(); ctx.arc(x, y, size / 2, 0, Math.PI * 2); ctx.clip();
-      ctx.drawImage(image, sourceX, sourceY, sourceSize, sourceSize, x - size / 2, y - size / 2, size, size); ctx.restore();
-      ctx.beginPath(); ctx.arc(x, y, size / 2, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(255,255,255,.92)'; ctx.lineWidth = Math.max(2, size * .08); ctx.stroke();
+    function roundedRectPath(ctx, x, y, width, height, radius) {
+      const corner = Math.min(radius, width / 2, height / 2);
+      ctx.beginPath(); ctx.moveTo(x + corner, y); ctx.lineTo(x + width - corner, y); ctx.arcTo(x + width, y, x + width, y + corner, corner);
+      ctx.lineTo(x + width, y + height - corner); ctx.arcTo(x + width, y + height, x + width - corner, y + height, corner);
+      ctx.lineTo(x + corner, y + height); ctx.arcTo(x, y + height, x, y + height - corner, corner);
+      ctx.lineTo(x, y + corner); ctx.arcTo(x, y, x + corner, y, corner); ctx.closePath();
+    }
+
+    function drawWheelPortrait(ctx, image, x, y, width, height) {
+      const left = x - width / 2; const top = y - height / 2; const padding = Math.max(3, width * .07);
+      ctx.save(); roundedRectPath(ctx, left, top, width, height, Math.max(5, width * .18)); ctx.fillStyle = 'rgba(255,255,255,.96)'; ctx.fill(); ctx.clip();
+      const availableWidth = width - padding * 2; const availableHeight = height - padding * 2;
+      const imageScale = Math.min(availableWidth / image.naturalWidth, availableHeight / image.naturalHeight);
+      const drawWidth = image.naturalWidth * imageScale; const drawHeight = image.naturalHeight * imageScale;
+      ctx.drawImage(image, x - drawWidth / 2, y - drawHeight / 2, drawWidth, drawHeight); ctx.restore();
+      roundedRectPath(ctx, left, top, width, height, Math.max(5, width * .18)); ctx.strokeStyle = 'rgba(255,255,255,.98)'; ctx.lineWidth = Math.max(2, width * .065); ctx.stroke();
     }
 
     function drawWheel() {
@@ -592,11 +604,12 @@
         const middle = start + segment / 2;
         const wheelImage = getWheelImage(item.imageData);
         if (wheelImage) {
-          const portraitSize = items.length > 10 ? Math.max(15, radius * .07) : items.length > 6 ? radius * .105 : radius * .145;
-          const portraitRadius = radius * (items.length > 8 ? .48 : .46);
-          drawWheelPortrait(ctx, wheelImage, center + Math.cos(middle) * portraitRadius, center + Math.sin(middle) * portraitRadius, portraitSize);
+          const portraitWidth = items.length > 10 ? Math.max(20, radius * .11) : items.length > 6 ? radius * .17 : radius * .28;
+          const portraitHeight = items.length > 10 ? Math.max(27, radius * .15) : items.length > 6 ? radius * .22 : radius * .36;
+          const portraitRadius = radius * (items.length > 8 ? .46 : .43);
+          drawWheelPortrait(ctx, wheelImage, center + Math.cos(middle) * portraitRadius, center + Math.sin(middle) * portraitRadius, portraitWidth, portraitHeight);
         }
-        const labelRadius = radius * (item.imageData ? .73 : .68);
+        const labelRadius = radius * (item.imageData ? .78 : .68);
         ctx.save(); ctx.translate(center + Math.cos(middle) * labelRadius, center + Math.sin(middle) * labelRadius);
         let textAngle = (middle + Math.PI / 2) % (Math.PI * 2);
         if (textAngle > Math.PI / 2 && textAngle < Math.PI * 1.5) textAngle += Math.PI;
@@ -719,10 +732,9 @@
         image.onerror = () => showToast('File ảnh không hợp lệ.', 'error');
         image.onload = () => {
           const entity = resolveImageTarget(target); if (!entity) { showToast('Team hoặc thành viên không còn tồn tại.', 'error'); return; }
-          const side = 240; const sourceSize = Math.min(image.naturalWidth, image.naturalHeight);
-          const sourceX = (image.naturalWidth - sourceSize) / 2; const sourceY = (image.naturalHeight - sourceSize) / 2;
-          const canvas = document.createElement('canvas'); canvas.width = side; canvas.height = side;
-          const context = canvas.getContext('2d'); context.drawImage(image, sourceX, sourceY, sourceSize, sourceSize, 0, 0, side, side);
+          const maxDimension = 520; const imageScale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
+          const canvas = document.createElement('canvas'); canvas.width = Math.max(1, Math.round(image.naturalWidth * imageScale)); canvas.height = Math.max(1, Math.round(image.naturalHeight * imageScale));
+          const context = canvas.getContext('2d'); context.drawImage(image, 0, 0, canvas.width, canvas.height);
           const imageData = canvas.toDataURL('image/webp', .8);
           if (!normalizeImageData(imageData)) { showToast('Không thể tối ưu ảnh này. Hãy thử ảnh khác.', 'error'); return; }
           const previousImage = entity.imageData; entity.imageData = imageData;
@@ -846,12 +858,19 @@
     }
 
     function releaseConfetti() {
-      const colors = ['#9a8fd3', '#eca6bc', '#8cc5ab', '#f0c55c', '#76b7dc'];
-      for (let i = 0; i < 45; i++) {
-        const piece = document.createElement('i'); piece.className = 'confetti-piece'; piece.style.left = `${Math.random() * 100}vw`; piece.style.background = colors[i % colors.length];
-        piece.style.setProperty('--drift', `${(Math.random() - .5) * 240}px`); piece.style.setProperty('--fall-time', `${1.7 + Math.random() * 1.4}s`);
-        document.body.appendChild(piece); piece.addEventListener('animationend', () => piece.remove());
-      }
+      const colors = ['#9a8fd3', '#eca6bc', '#8cc5ab', '#f0c55c', '#76b7dc', '#f28d78', '#ffffff'];
+      const launchWave = (count, delay) => setTimeout(() => {
+        for (let i = 0; i < count; i++) {
+          const piece = document.createElement('i'); const width = 6 + Math.random() * 8;
+          piece.className = 'confetti-piece'; piece.style.left = `${Math.random() * 100}vw`; piece.style.background = colors[i % colors.length];
+          piece.style.width = `${width}px`; piece.style.height = `${width * (.75 + Math.random() * 1.2)}px`;
+          piece.style.borderRadius = i % 4 === 0 ? '50%' : `${1 + Math.random() * 3}px`;
+          if (i % 9 === 0) piece.style.clipPath = 'polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 100%,50% 72%,21% 100%,32% 57%,2% 35%,39% 35%)';
+          piece.style.setProperty('--drift', `${(Math.random() - .5) * 420}px`); piece.style.setProperty('--fall-time', `${2 + Math.random() * 2.2}s`);
+          document.body.appendChild(piece); piece.addEventListener('animationend', () => piece.remove());
+        }
+      }, delay);
+      launchWave(70, 0); launchWave(55, 320); launchWave(40, 680);
     }
 
     function closeResult() { els.resultBackdrop.classList.remove('is-open'); els.resultBackdrop.setAttribute('aria-hidden', 'true'); activeResultRecord = null; }
@@ -865,7 +884,7 @@
       activeResultRecord = record; const isTeam = record.type === 'team';
       const resultTeam = teamById(record.teamId); const resultEntity = isTeam ? teamById(record.resultId) : memberById(resultTeam, record.resultId);
       const resultImage = resultEntity && resultEntity.imageData;
-      els.resultVisual.classList.toggle('has-image', Boolean(resultImage)); els.resultImage.hidden = !resultImage; els.resultFallback.hidden = Boolean(resultImage);
+      els.resultVisual.classList.toggle('has-image', Boolean(resultImage)); els.resultVisual.classList.toggle('member-image', Boolean(resultImage) && !isTeam); els.resultImage.hidden = !resultImage; els.resultFallback.hidden = Boolean(resultImage);
       if (resultImage) els.resultImage.src = resultImage; else els.resultImage.removeAttribute('src');
       els.resultKicker.textContent = isTeam ? 'Team được chọn' : 'Người được chọn';
       els.resultTitle.textContent = record.resultName;
