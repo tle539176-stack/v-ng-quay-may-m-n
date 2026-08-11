@@ -469,7 +469,6 @@
     let pendingImageTarget = null;
     const collapsedTeams = new Set();
     let activeResultRecord = null;
-    const wheelImageCache = new Map();
 
     function persist() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
     function isDisabled() { return spinning; }
@@ -555,36 +554,6 @@
       [els.addTeam, els.restoreSample, els.newSession, els.startNew, els.restoreAll, els.undo, els.clearHistory, els.export, els.import, els.settings].forEach(button => setButtonDisabled(button, disabled));
     }
 
-    function getWheelImage(source) {
-      if (!source) return null;
-      let image = wheelImageCache.get(source);
-      if (!image) {
-        image = new Image(); image.decoding = 'async';
-        image.onload = () => drawWheel();
-        image.src = source; wheelImageCache.set(source, image);
-        if (wheelImageCache.size > 80) { const latest = image; wheelImageCache.clear(); wheelImageCache.set(source, latest); }
-      }
-      return image.complete && image.naturalWidth ? image : null;
-    }
-
-    function roundedRectPath(ctx, x, y, width, height, radius) {
-      const corner = Math.min(radius, width / 2, height / 2);
-      ctx.beginPath(); ctx.moveTo(x + corner, y); ctx.lineTo(x + width - corner, y); ctx.arcTo(x + width, y, x + width, y + corner, corner);
-      ctx.lineTo(x + width, y + height - corner); ctx.arcTo(x + width, y + height, x + width - corner, y + height, corner);
-      ctx.lineTo(x + corner, y + height); ctx.arcTo(x, y + height, x, y + height - corner, corner);
-      ctx.lineTo(x, y + corner); ctx.arcTo(x, y, x + corner, y, corner); ctx.closePath();
-    }
-
-    function drawWheelPortrait(ctx, image, x, y, width, height) {
-      const left = x - width / 2; const top = y - height / 2; const padding = Math.max(3, width * .07);
-      ctx.save(); roundedRectPath(ctx, left, top, width, height, Math.max(5, width * .18)); ctx.fillStyle = 'rgba(255,255,255,.96)'; ctx.fill(); ctx.clip();
-      const availableWidth = width - padding * 2; const availableHeight = height - padding * 2;
-      const imageScale = Math.min(availableWidth / image.naturalWidth, availableHeight / image.naturalHeight);
-      const drawWidth = image.naturalWidth * imageScale; const drawHeight = image.naturalHeight * imageScale;
-      ctx.drawImage(image, x - drawWidth / 2, y - drawHeight / 2, drawWidth, drawHeight); ctx.restore();
-      roundedRectPath(ctx, left, top, width, height, Math.max(5, width * .18)); ctx.strokeStyle = 'rgba(255,255,255,.98)'; ctx.lineWidth = Math.max(2, width * .065); ctx.stroke();
-    }
-
     function drawWheel() {
       const canvas = els.wheelCanvas; const rect = canvas.getBoundingClientRect();
       const size = Math.max(1, Math.floor(Math.min(rect.width, rect.height))); const scale = Math.min(window.devicePixelRatio || 1, 2);
@@ -602,14 +571,7 @@
         ctx.beginPath(); ctx.moveTo(center, center); ctx.arc(center, center, radius, start, end); ctx.closePath(); ctx.fillStyle = COLORS[index % COLORS.length]; ctx.fill();
         ctx.strokeStyle = 'rgba(255,255,255,.88)'; ctx.lineWidth = 1.5; ctx.stroke();
         const middle = start + segment / 2;
-        const wheelImage = getWheelImage(item.imageData);
-        if (wheelImage) {
-          const portraitWidth = items.length > 10 ? Math.max(20, radius * .11) : items.length > 6 ? radius * .17 : radius * .28;
-          const portraitHeight = items.length > 10 ? Math.max(27, radius * .15) : items.length > 6 ? radius * .22 : radius * .36;
-          const portraitRadius = radius * (items.length > 8 ? .46 : .43);
-          drawWheelPortrait(ctx, wheelImage, center + Math.cos(middle) * portraitRadius, center + Math.sin(middle) * portraitRadius, portraitWidth, portraitHeight);
-        }
-        const labelRadius = radius * (item.imageData ? .78 : .68);
+        const labelRadius = radius * .68;
         ctx.save(); ctx.translate(center + Math.cos(middle) * labelRadius, center + Math.sin(middle) * labelRadius);
         let textAngle = (middle + Math.PI / 2) % (Math.PI * 2);
         if (textAngle > Math.PI / 2 && textAngle < Math.PI * 1.5) textAngle += Math.PI;
@@ -714,7 +676,7 @@
       els.dialogInput.hidden = true; els.dialogLabel.hidden = true; els.dialogError.textContent = ''; els.dialogActions.innerHTML = '';
       els.dialogActions.append(button('Hủy', 'outline-button', () => { pendingImageTarget = null; closeDialog(); }));
       els.dialogActions.append(button('Xóa ảnh', 'danger-button', () => {
-        closeDialog(); pendingImageTarget = null; entity.imageData = ''; wheelImageCache.clear(); persist(); render(); showToast(`Đã xóa ảnh của ${entity.name}.`);
+        closeDialog(); pendingImageTarget = null; entity.imageData = ''; persist(); render(); showToast(`Đã xóa ảnh của ${entity.name}.`);
       }));
       els.dialogActions.append(button('Chọn ảnh khác', 'primary-button', () => { closeDialog(); els.entityImageInput.click(); }));
       els.dialogBackdrop.classList.add('is-open'); els.dialogBackdrop.setAttribute('aria-hidden', 'false');
@@ -740,7 +702,7 @@
           const previousImage = entity.imageData; entity.imageData = imageData;
           try { persist(); }
           catch (_) { entity.imageData = previousImage; showToast('Bộ nhớ trình duyệt không còn đủ chỗ cho ảnh mới.', 'error'); return; }
-          wheelImageCache.clear(); render(); showToast(`Đã cập nhật ảnh của ${entity.name}.`);
+          render(); showToast(`Đã cập nhật ảnh của ${entity.name}.`);
         };
         image.src = reader.result;
       };
