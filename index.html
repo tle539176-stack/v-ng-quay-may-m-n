@@ -562,7 +562,9 @@
       els.wheelEmpty.hidden = items.length > 0;
       if (!items.length) { ctx.fillStyle = '#f5f3fa'; ctx.beginPath(); ctx.arc(center, center, radius, 0, Math.PI * 2); ctx.fill(); return; }
       const segment = (Math.PI * 2) / items.length;
-      const labelFont = items.length > 12 ? 10 : items.length > 8 ? 11 : items.length > 5 ? 13 : 15;
+      const wheelScale = Math.max(.86, Math.min(1.08, size / 480));
+      const labelFontBase = items.length > 12 ? 15 : items.length > 8 ? 17 : items.length > 5 ? 19 : 22;
+      const labelFont = Math.round(labelFontBase * wheelScale);
       items.forEach((item, index) => {
         const start = -Math.PI / 2 + index * segment; const end = start + segment;
         ctx.beginPath(); ctx.moveTo(center, center); ctx.arc(center, center, radius, start, end); ctx.closePath(); ctx.fillStyle = COLORS[index % COLORS.length]; ctx.fill();
@@ -573,7 +575,7 @@
         let textAngle = (middle + Math.PI / 2) % (Math.PI * 2);
         if (textAngle > Math.PI / 2 && textAngle < Math.PI * 1.5) textAngle += Math.PI;
         ctx.rotate(textAngle);
-        ctx.fillStyle = TEXT_COLORS[index % TEXT_COLORS.length]; ctx.font = `800 ${labelFont}px "Segoe UI", "Noto Sans", Arial, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillStyle = TEXT_COLORS[index % TEXT_COLORS.length]; ctx.font = `900 ${labelFont}px "Segoe UI", "Noto Sans", Arial, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         const charLimit = items.length > 10 ? 10 : items.length > 6 ? 16 : 25;
         ctx.fillText(truncate(item.name, charLimit), 0, 0, radius * .54);
         ctx.restore();
