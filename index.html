@@ -80,6 +80,11 @@
     .team-card.selected { border-color: #afa5de; box-shadow: 0 0 0 3px rgba(164, 154, 221, .15); }
     .team-top { display: flex; align-items: center; gap: 8px; padding: 10px; }
     .team-collapse { flex: 1; display: flex; align-items: center; gap: 9px; min-width: 0; background: transparent; border: 0; text-align: left; padding: 0; }
+    .entity-avatar { position: relative; flex: 0 0 auto; width: 34px; height: 34px; display: grid; place-items: center; overflow: hidden; padding: 0; border: 1px solid rgba(119, 103, 177, .16); border-radius: 11px; color: #675d9b; background: linear-gradient(145deg, #eeeaff, #fbeaf1); font-size: 13px; font-weight: 900; }
+    .entity-avatar.member-avatar { width: 27px; height: 27px; border-radius: 9px; font-size: 11px; }
+    .entity-avatar img { width: 100%; height: 100%; display: block; object-fit: cover; }
+    .entity-avatar::after { content: "+"; position: absolute; right: -1px; bottom: -1px; width: 14px; height: 14px; display: grid; place-items: center; border-radius: 7px 0 0 0; color: white; background: rgba(70, 60, 105, .82); font-size: 11px; line-height: 1; opacity: 0; transition: opacity .18s; }
+    .entity-avatar:hover::after, .entity-avatar:focus-visible::after { opacity: 1; }
     .chevron { color: var(--muted); font-size: 11px; width: 12px; transition: transform .2s; }
     .is-collapsed .chevron { transform: rotate(-90deg); }
     .team-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 800; font-size: 14px; }
@@ -89,8 +94,7 @@
     .mini-button:hover { background: #f4f1fb; color: var(--lavender); }
     .mini-button.delete:hover { background: #fbe8ed; color: var(--danger); }
     .member-list { padding: 0 10px 9px 30px; }
-    .member-row { display: flex; align-items: center; min-height: 32px; gap: 6px; color: #58546e; font-size: 13px; }
-    .member-dot { height: 6px; width: 6px; border-radius: 50%; background: #b3a9df; flex: 0 0 auto; }
+    .member-row { display: flex; align-items: center; min-height: 36px; gap: 6px; color: #58546e; font-size: 13px; }
     .member-name { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
     .member-empty { color: #9994aa; font-size: 12px; padding: 4px 0; }
     .add-member { width: 100%; margin: 7px 0 1px; min-height: 31px; color: #5c5493; font-size: 12px; font-weight: 800; background: #f3f0fd; border: 0; border-radius: 9px; }
@@ -168,7 +172,9 @@
     .modal-kicker { color: #8277b3; font-size: 12px; text-align: center; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
     .modal-result { margin: 9px 0 2px; text-align: center; font-size: clamp(25px, 5vw, 34px); line-height: 1.16; font-weight: 900; overflow-wrap: anywhere; }
     .modal-detail { margin: 8px 0 23px; text-align: center; color: var(--muted); }
-    .result-symbol { width: 64px; height: 64px; display: grid; place-items: center; margin: -52px auto 14px; border-radius: 20px; background: linear-gradient(135deg, #a79cdb, #e69db5); color: white; font-size: 31px; box-shadow: 0 10px 20px rgba(126, 105, 179, .3); }
+    .result-symbol { width: 76px; height: 76px; display: grid; place-items: center; margin: -60px auto 14px; overflow: hidden; border: 4px solid #fffdf9; border-radius: 24px; background: linear-gradient(135deg, #a79cdb, #e69db5); color: white; font-size: 31px; box-shadow: 0 10px 20px rgba(126, 105, 179, .3); }
+    .result-symbol.has-image { background: #fff; }
+    .result-symbol img { width: 100%; height: 100%; display: block; object-fit: cover; }
     .modal-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 9px; }
     .modal-actions button { min-height: 42px; }
     #settingsBackdrop { z-index: 45; }
@@ -282,7 +288,7 @@
 
   <div id="resultBackdrop" class="modal-backdrop" aria-hidden="true">
     <section class="modal" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
-      <div class="result-symbol" aria-hidden="true">✦</div>
+      <div id="resultVisual" class="result-symbol" aria-hidden="true"><img id="resultImage" alt="" hidden /><span id="resultFallback">✦</span></div>
       <p id="resultKicker" class="modal-kicker">Kết quả vòng quay</p>
       <h2 id="resultTitle" class="modal-result"></h2>
       <p id="resultDetail" class="modal-detail"></p>
@@ -347,6 +353,7 @@
       </div>
     </section>
   </div>
+  <input id="entityImageInput" class="file-input" type="file" accept="image/png,image/jpeg,image/webp" />
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script>
@@ -368,19 +375,20 @@
       availableCounter: $('#availableCounter'), restoreAll: $('#restoreAllButton'), history: $('#historyContent'),
       undo: $('#undoButton'), clearHistory: $('#clearHistoryButton'), sound: $('#soundButton'), export: $('#exportButton'),
       import: $('#importButton'), importInput: $('#importInput'), resultBackdrop: $('#resultBackdrop'), resultKicker: $('#resultKicker'),
-      resultTitle: $('#resultTitle'), resultDetail: $('#resultDetail'), resultActions: $('#resultActions'),
+      resultTitle: $('#resultTitle'), resultDetail: $('#resultDetail'), resultActions: $('#resultActions'), resultVisual: $('#resultVisual'), resultImage: $('#resultImage'), resultFallback: $('#resultFallback'),
       dialogBackdrop: $('#dialogBackdrop'), dialogTitle: $('#dialogTitle'), dialogMessage: $('#dialogMessage'),
       dialogLabel: $('#dialogLabel'), dialogInput: $('#dialogInput'), dialogError: $('#dialogError'), dialogActions: $('#dialogActions'), toast: $('#toast'),
-      logoButton: $('#logoButton'), logoInput: $('#logoInput'), brandLogo: $('#brandLogo')
+      logoButton: $('#logoButton'), logoInput: $('#logoInput'), brandLogo: $('#brandLogo'), entityImageInput: $('#entityImageInput')
     };
 
     const uid = () => (window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`);
     const normalizeText = (value) => String(value || '').trim().replace(/\s+/g, ' ');
     const nameKey = (value) => normalizeText(value).toLocaleLowerCase('vi');
     const memberKey = (teamId, memberId) => `${teamId}:${memberId}`;
+    const normalizeImageData = (value, maxLength = 500000) => typeof value === 'string' && /^data:image\/(png|jpeg|webp);base64,/i.test(value) && value.length <= maxLength ? value : '';
     const makeSamples = () => Array.from({ length: 4 }, (_, teamIndex) => ({
-      id: uid(), name: `Team ${teamIndex + 1}`,
-      members: Array.from({ length: 3 }, (_, memberIndex) => ({ id: uid(), name: `Thành viên ${memberIndex + 1}` }))
+      id: uid(), name: `Team ${teamIndex + 1}`, imageData: '',
+      members: Array.from({ length: 3 }, (_, memberIndex) => ({ id: uid(), name: `Thành viên ${memberIndex + 1}`, imageData: '' }))
     }));
     const initialState = () => ({
       teams: makeSamples(), history: [], excludedTeams: [], excludedMembers: [],
@@ -417,9 +425,9 @@
           const memberId = typeof member.id === 'string' && /^[A-Za-z0-9_-]+$/.test(member.id) ? member.id : uid();
           if (seenMemberIds.has(memberId)) throw new Error(`Team ${teamName} có mã thành viên bị trùng.`);
           seenMemberIds.add(memberId);
-          return { id: memberId, name: memberName };
+          return { id: memberId, name: memberName, imageData: normalizeImageData(member && member.imageData) };
         }) : [];
-        return { id: teamId, name: teamName, members };
+        return { id: teamId, name: teamName, imageData: normalizeImageData(team && team.imageData), members };
       });
       const teamIds = new Set(teams.map(t => t.id));
       const validTeamId = (id) => typeof id === 'string' && teamIds.has(id);
@@ -441,7 +449,7 @@
         settings: {
           excludeAfterSpin: Boolean(source.settings && source.settings.excludeAfterSpin),
           sound: !(source.settings && source.settings.sound === false),
-          logoData: source.settings && typeof source.settings.logoData === 'string' && /^data:image\/(png|jpeg|webp);base64,/i.test(source.settings.logoData) && source.settings.logoData.length < 2000000 ? source.settings.logoData : ''
+          logoData: normalizeImageData(source.settings && source.settings.logoData, 2000000)
         },
         rotations: { team: Number(source.rotations && source.rotations.team) || 0, member: Number(source.rotations && source.rotations.member) || 0 }
       };
@@ -452,8 +460,10 @@
     let openDialog = null;
     let toastTimer = null;
     let audioContext = null;
+    let pendingImageTarget = null;
     const collapsedTeams = new Set();
     let activeResultRecord = null;
+    const wheelImageCache = new Map();
 
     function persist() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
     function isDisabled() { return spinning; }
@@ -495,6 +505,16 @@
 
     function setButtonDisabled(button, disabled) { button.disabled = disabled; }
 
+    function avatarMarkup(item, type, teamId, memberId, disabled) {
+      const action = type === 'team' ? 'image-team' : 'image-member';
+      const memberAttribute = memberId ? ` data-member-id="${memberId}"` : '';
+      const content = item.imageData
+        ? `<img src="${escapeHtml(item.imageData)}" alt="" />`
+        : `<span>${escapeHtml(Array.from(item.name)[0] || '?')}</span>`;
+      const verb = item.imageData ? 'Đổi ảnh' : 'Thêm ảnh';
+      return `<button class="entity-avatar${type === 'member' ? ' member-avatar' : ''}" type="button" data-action="${action}" data-team-id="${teamId}"${memberAttribute} title="${verb} cho ${escapeHtml(item.name)}" aria-label="${verb} cho ${escapeHtml(item.name)}" ${disabled ? 'disabled' : ''}>${content}</button>`;
+    }
+
     function renderTeams() {
       const disabled = isDisabled();
       els.teamSummary.textContent = `${state.teams.length} team · ${state.teams.reduce((sum, team) => sum + team.members.length, 0)} thành viên`;
@@ -505,12 +525,13 @@
           const collapsed = collapsedTeams.has(team.id);
           const selected = team.id === state.selectedTeamId ? ' selected' : '';
           const memberRows = team.members.length ? team.members.map(member => `
-            <div class="member-row" title="${escapeHtml(member.name)}"><span class="member-dot"></span><span class="member-name">${escapeHtml(member.name)}</span>
+            <div class="member-row" title="${escapeHtml(member.name)}">${avatarMarkup(member, 'member', team.id, member.id, disabled)}<span class="member-name">${escapeHtml(member.name)}</span>
               <button class="mini-button" type="button" data-action="rename-member" data-team-id="${team.id}" data-member-id="${member.id}" title="Sửa tên thành viên" aria-label="Sửa ${escapeHtml(member.name)}" ${disabled ? 'disabled' : ''}>✎</button>
               <button class="mini-button delete" type="button" data-action="delete-member" data-team-id="${team.id}" data-member-id="${member.id}" title="Xóa thành viên" aria-label="Xóa ${escapeHtml(member.name)}" ${disabled ? 'disabled' : ''}>×</button>
             </div>`).join('') : '<div class="member-empty">Chưa có thành viên.</div>';
           return `<article class="team-card${selected}${collapsed ? ' is-collapsed' : ''}">
             <div class="team-top">
+              ${avatarMarkup(team, 'team', team.id, '', disabled)}
               <button class="team-collapse" type="button" data-action="collapse" data-team-id="${team.id}" aria-expanded="${!collapsed}">
                 <span class="chevron">▼</span><span class="team-name" title="${escapeHtml(team.name)}">${escapeHtml(team.name)}</span><span class="count">${team.members.length}</span>
               </button>
@@ -524,6 +545,26 @@
         }).join('');
       }
       [els.addTeam, els.restoreSample, els.newSession, els.startNew, els.restoreAll, els.undo, els.clearHistory, els.export, els.import, els.settings].forEach(button => setButtonDisabled(button, disabled));
+    }
+
+    function getWheelImage(source) {
+      if (!source) return null;
+      let image = wheelImageCache.get(source);
+      if (!image) {
+        image = new Image(); image.decoding = 'async';
+        image.onload = () => drawWheel();
+        image.src = source; wheelImageCache.set(source, image);
+        if (wheelImageCache.size > 80) { const latest = image; wheelImageCache.clear(); wheelImageCache.set(source, latest); }
+      }
+      return image.complete && image.naturalWidth ? image : null;
+    }
+
+    function drawWheelPortrait(ctx, image, x, y, size) {
+      const sourceSize = Math.min(image.naturalWidth, image.naturalHeight);
+      const sourceX = (image.naturalWidth - sourceSize) / 2; const sourceY = (image.naturalHeight - sourceSize) / 2;
+      ctx.save(); ctx.beginPath(); ctx.arc(x, y, size / 2, 0, Math.PI * 2); ctx.clip();
+      ctx.drawImage(image, sourceX, sourceY, sourceSize, sourceSize, x - size / 2, y - size / 2, size, size); ctx.restore();
+      ctx.beginPath(); ctx.arc(x, y, size / 2, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(255,255,255,.92)'; ctx.lineWidth = Math.max(2, size * .08); ctx.stroke();
     }
 
     function drawWheel() {
@@ -543,7 +584,13 @@
         ctx.beginPath(); ctx.moveTo(center, center); ctx.arc(center, center, radius, start, end); ctx.closePath(); ctx.fillStyle = COLORS[index % COLORS.length]; ctx.fill();
         ctx.strokeStyle = 'rgba(255,255,255,.88)'; ctx.lineWidth = 1.5; ctx.stroke();
         const middle = start + segment / 2;
-        const labelRadius = radius * .68;
+        const wheelImage = getWheelImage(item.imageData);
+        if (wheelImage) {
+          const portraitSize = items.length > 10 ? Math.max(15, radius * .07) : items.length > 6 ? radius * .105 : radius * .145;
+          const portraitRadius = radius * (items.length > 8 ? .48 : .46);
+          drawWheelPortrait(ctx, wheelImage, center + Math.cos(middle) * portraitRadius, center + Math.sin(middle) * portraitRadius, portraitSize);
+        }
+        const labelRadius = radius * (item.imageData ? .73 : .68);
         ctx.save(); ctx.translate(center + Math.cos(middle) * labelRadius, center + Math.sin(middle) * labelRadius);
         let textAngle = (middle + Math.PI / 2) % (Math.PI * 2);
         if (textAngle > Math.PI / 2 && textAngle < Math.PI * 1.5) textAngle += Math.PI;
@@ -625,6 +672,57 @@
           const canvas = document.createElement('canvas'); canvas.width = Math.max(1, Math.round(image.width * scale)); canvas.height = Math.max(1, Math.round(image.height * scale));
           const context = canvas.getContext('2d'); context.drawImage(image, 0, 0, canvas.width, canvas.height);
           state.settings.logoData = canvas.toDataURL('image/webp', .88); persist(); renderLogo(); showToast('Đã cập nhật logo.');
+        };
+        image.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function resolveImageTarget(target) {
+      if (!target) return null;
+      const team = teamById(target.teamId);
+      return target.type === 'team' ? team : memberById(team, target.memberId);
+    }
+
+    function requestEntityImage(type, teamId, memberId = '') {
+      if (!ensureNotSpinning()) return;
+      const target = { type, teamId, memberId }; const entity = resolveImageTarget(target);
+      if (!entity) return;
+      pendingImageTarget = target;
+      if (!entity.imageData) { els.entityImageInput.click(); return; }
+      openDialog = { kind: 'image' }; els.dialogTitle.textContent = `Ảnh của ${entity.name}`;
+      els.dialogMessage.textContent = 'Bạn có thể chọn ảnh khác hoặc xóa ảnh hiện tại.';
+      els.dialogInput.hidden = true; els.dialogLabel.hidden = true; els.dialogError.textContent = ''; els.dialogActions.innerHTML = '';
+      els.dialogActions.append(button('Hủy', 'outline-button', () => { pendingImageTarget = null; closeDialog(); }));
+      els.dialogActions.append(button('Xóa ảnh', 'danger-button', () => {
+        closeDialog(); pendingImageTarget = null; entity.imageData = ''; wheelImageCache.clear(); persist(); render(); showToast(`Đã xóa ảnh của ${entity.name}.`);
+      }));
+      els.dialogActions.append(button('Chọn ảnh khác', 'primary-button', () => { closeDialog(); els.entityImageInput.click(); }));
+      els.dialogBackdrop.classList.add('is-open'); els.dialogBackdrop.setAttribute('aria-hidden', 'false');
+    }
+
+    function uploadEntityImage(file) {
+      const target = pendingImageTarget; pendingImageTarget = null;
+      if (!file || !target) return;
+      if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) { showToast('Vui lòng chọn ảnh PNG, JPG hoặc WebP.', 'error'); return; }
+      if (file.size > 5 * 1024 * 1024) { showToast('Ảnh không được lớn hơn 5 MB.', 'error'); return; }
+      const reader = new FileReader();
+      reader.onerror = () => showToast('Không thể đọc ảnh đã chọn.', 'error');
+      reader.onload = () => {
+        const image = new Image();
+        image.onerror = () => showToast('File ảnh không hợp lệ.', 'error');
+        image.onload = () => {
+          const entity = resolveImageTarget(target); if (!entity) { showToast('Team hoặc thành viên không còn tồn tại.', 'error'); return; }
+          const side = 240; const sourceSize = Math.min(image.naturalWidth, image.naturalHeight);
+          const sourceX = (image.naturalWidth - sourceSize) / 2; const sourceY = (image.naturalHeight - sourceSize) / 2;
+          const canvas = document.createElement('canvas'); canvas.width = side; canvas.height = side;
+          const context = canvas.getContext('2d'); context.drawImage(image, sourceX, sourceY, sourceSize, sourceSize, 0, 0, side, side);
+          const imageData = canvas.toDataURL('image/webp', .8);
+          if (!normalizeImageData(imageData)) { showToast('Không thể tối ưu ảnh này. Hãy thử ảnh khác.', 'error'); return; }
+          const previousImage = entity.imageData; entity.imageData = imageData;
+          try { persist(); }
+          catch (_) { entity.imageData = previousImage; showToast('Bộ nhớ trình duyệt không còn đủ chỗ cho ảnh mới.', 'error'); return; }
+          wheelImageCache.clear(); render(); showToast(`Đã cập nhật ảnh của ${entity.name}.`);
         };
         image.src = reader.result;
       };
@@ -759,6 +857,10 @@
     function button(label, className, handler, disabled = false) { const b = document.createElement('button'); b.type = 'button'; b.className = className; b.textContent = label; b.disabled = disabled; b.addEventListener('click', handler); return b; }
     function showResult(record) {
       activeResultRecord = record; const isTeam = record.type === 'team';
+      const resultTeam = teamById(record.teamId); const resultEntity = isTeam ? teamById(record.resultId) : memberById(resultTeam, record.resultId);
+      const resultImage = resultEntity && resultEntity.imageData;
+      els.resultVisual.classList.toggle('has-image', Boolean(resultImage)); els.resultImage.hidden = !resultImage; els.resultFallback.hidden = Boolean(resultImage);
+      if (resultImage) els.resultImage.src = resultImage; else els.resultImage.removeAttribute('src');
       els.resultKicker.textContent = isTeam ? 'Team được chọn' : 'Người được chọn';
       els.resultTitle.textContent = record.resultName;
       els.resultDetail.textContent = isTeam ? 'Sẵn sàng chọn thành viên của team này.' : `${record.teamName} · Một lựa chọn mới cho buổi SECI.`;
@@ -809,7 +911,7 @@
       if (!ensureNotSpinning()) return;
       showPrompt({ title: 'Thêm team mới', message: 'Nhập tên để tạo team mới.', label: 'Tên team', confirmLabel: 'Tạo team',
         validate: name => !name ? 'Tên team không được để trống.' : hasTeamName(name) ? 'Tên team này đã tồn tại.' : true,
-        onConfirm: name => updateData(() => state.teams.push({ id: uid(), name, members: [] }), `Đã tạo ${name}.`) });
+        onConfirm: name => updateData(() => state.teams.push({ id: uid(), name, imageData: '', members: [] }), `Đã tạo ${name}.`) });
     }
     function renameTeam(teamId) {
       const team = teamById(teamId); if (!team || !ensureNotSpinning()) return;
@@ -826,7 +928,7 @@
       const team = teamById(teamId); if (!team || !ensureNotSpinning()) return;
       showPrompt({ title: 'Thêm thành viên', message: `Thêm người vào ${team.name}.`, label: 'Tên thành viên', confirmLabel: 'Thêm',
         validate: name => !name ? 'Tên thành viên không được để trống.' : team.members.some(member => nameKey(member.name) === nameKey(name)) ? 'Tên này đã có trong team.' : true,
-        onConfirm: name => updateData(() => team.members.push({ id: uid(), name }), `Đã thêm ${name}.`) });
+        onConfirm: name => updateData(() => team.members.push({ id: uid(), name, imageData: '' }), `Đã thêm ${name}.`) });
     }
     function renameMember(teamId, memberId) {
       const team = teamById(teamId); const member = memberById(team, memberId); if (!team || !member || !ensureNotSpinning()) return;
@@ -844,6 +946,7 @@
       const control = event.target.closest('[data-action]'); if (!control) return;
       const { action, teamId, memberId } = control.dataset;
       if (action === 'collapse') { collapsedTeams.has(teamId) ? collapsedTeams.delete(teamId) : collapsedTeams.add(teamId); renderTeams(); return; }
+      if (action === 'image-team') requestEntityImage('team', teamId); if (action === 'image-member') requestEntityImage('member', teamId, memberId);
       if (action === 'rename-team') renameTeam(teamId); if (action === 'delete-team') deleteTeam(teamId); if (action === 'add-member') addMember(teamId);
       if (action === 'rename-member') renameMember(teamId, memberId); if (action === 'delete-member') deleteMember(teamId, memberId);
     }
@@ -965,7 +1068,7 @@
     }
     function exportData() {
       if (!ensureNotSpinning()) return;
-      const payload = { version: 1, exportedAt: new Date().toISOString(), data: state }; const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const payload = { version: 2, exportedAt: new Date().toISOString(), data: state }; const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob); const anchor = document.createElement('a'); anchor.href = url; anchor.download = `vong-quay-seci-${new Date().toISOString().slice(0, 10)}.json`; document.body.appendChild(anchor); anchor.click(); anchor.remove(); URL.revokeObjectURL(url); showToast('Đã xuất file dữ liệu JSON.');
     }
     function importData(file) {
@@ -987,6 +1090,7 @@
     els.excludeSwitch.addEventListener('click', () => { if (!ensureNotSpinning()) return; state.settings.excludeAfterSpin = !state.settings.excludeAfterSpin; persist(); render(); showToast(state.settings.excludeAfterSpin ? 'Đã bật loại kết quả sau khi quay.' : 'Đã tắt loại kết quả sau khi quay.'); });
     els.sound.addEventListener('click', () => { state.settings.sound = !state.settings.sound; persist(); updateSoundButton(); if (state.settings.sound) playSound('result'); });
     els.logoButton.addEventListener('click', () => els.logoInput.click()); els.logoInput.addEventListener('change', event => { uploadLogo(event.target.files[0]); event.target.value = ''; });
+    els.entityImageInput.addEventListener('change', event => { uploadEntityImage(event.target.files[0]); event.target.value = ''; });
     els.export.addEventListener('click', exportData); els.import.addEventListener('click', () => { if (ensureNotSpinning()) els.importInput.click(); }); els.importInput.addEventListener('change', event => { importData(event.target.files[0]); event.target.value = ''; });
     els.resultBackdrop.addEventListener('click', event => { if (event.target === els.resultBackdrop) closeResult(); }); els.dialogBackdrop.addEventListener('click', event => { if (event.target === els.dialogBackdrop) closeDialog(); }); els.settingsBackdrop.addEventListener('click', event => { if (event.target === els.settingsBackdrop) closeSettings(); });
     document.addEventListener('keydown', event => { if (event.key === 'Escape') { if (els.resultBackdrop.classList.contains('is-open')) closeResult(); else if (els.dialogBackdrop.classList.contains('is-open')) closeDialog(); else if (els.settingsBackdrop.classList.contains('is-open')) closeSettings(); } });
