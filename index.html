@@ -632,30 +632,100 @@
     }
     function ensureNotSpinning() { if (spinning) { showToast('Vui lòng chờ vòng quay kết thúc.', 'error'); return false; } return true; }
 
-    function playSound(type) {
-      if (!state.settings.sound) return;
+    function getAudioContext() {
+      if (!state.settings.sound) return null;
       try {
-        audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
-        if (audioContext.state === 'suspended') audioContext.resume();
-        const now = audioContext.currentTime; const oscillator = audioContext.createOscillator(); const gain = audioContext.createGain();
-        oscillator.type = type === 'result' ? 'sine' : 'triangle'; oscillator.frequency.setValueAtTime(type === 'result' ? 523 : 190, now);
-        if (type === 'result') oscillator.frequency.exponentialRampToValueAtTime(784, now + .16);
-        gain.gain.setValueAtTime(.0001, now); gain.gain.exponentialRampToValueAtTime(.075, now + .02); gain.gain.exponentialRampToValueAtTime(.0001, now + (type === 'result' ? .34 : .14));
-        oscillator.connect(gain).connect(audioContext.destination); oscillator.start(now); oscillator.stop(now + (type === 'result' ? .36 : .16));
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return null;
+        audioContext ||= new AudioContextClass();
+        if (audioContext.state === 'suspended') audioContext.resume().catch(() => {});
+        return audioContext;
+      } catch (_) { return null; }
+    }
+
+    function playSound(type) {
+      const context = getAudioContext();
+      if (!context) return;
+      try {
+        const now = context.currentTime;
+        if (type === 'result') {
+          // Hợp âm mở dần tạo cảm giác chiến thắng, rõ hơn tiếng báo kết quả cũ.
+          [523.25, 659.25, 783.99].forEach((frequency, index) => {
+            const oscillator = context.createOscillator(); const gain = context.createGain();
+            const start = now + index * .075; const end = start + .58;
+            oscillator.type = index === 0 ? 'triangle' : 'sine';
+            oscillator.frequency.setValueAtTime(frequency, start);
+            oscillator.frequency.exponentialRampToValueAtTime(frequency * 1.015, end);
+            gain.gain.setValueAtTime(.0001, start); gain.gain.exponentialRampToValueAtTime(.042, start + .025); gain.gain.exponentialRampToValueAtTime(.0001, end);
+            oscillator.connect(gain).connect(context.destination); oscillator.start(start); oscillator.stop(end + .02);
+          });
+          return;
+        }
+
+        if (type === 'suspense') {
+          // Hai nhịp tim trong khoảng dừng giả để tăng cảm giác chờ đợi.
+          [0, .24].forEach((delay, index) => {
+            const oscillator = context.createOscillator(); const gain = context.createGain();
+            const start = now + delay; const end = start + .17;
+            oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(82 - index * 6, start); oscillator.frequency.exponentialRampToValueAtTime(48, end);
+            gain.gain.setValueAtTime(.0001, start); gain.gain.exponentialRampToValueAtTime(index ? .055 : .07, start + .018); gain.gain.exponentialRampToValueAtTime(.0001, end);
+            oscillator.connect(gain).connect(context.destination); oscillator.start(start); oscillator.stop(end + .02);
+          });
+          return;
+        }
+
+        const oscillator = context.createOscillator(); const gain = context.createGain();
+        const isForward = type === 'forward'; const isReverse = type === 'reverse';
+        oscillator.type = isForward || isReverse ? 'sawtooth' : 'triangle';
+        const startFrequency = isForward ? 250 : isReverse ? 620 : 210;
+        const endFrequency = isForward ? 720 : isReverse ? 260 : 105;
+        const duration = isForward || isReverse ? .32 : .2;
+        oscillator.frequency.setValueAtTime(startFrequency, now); oscillator.frequency.exponentialRampToValueAtTime(endFrequency, now + duration);
+        gain.gain.setValueAtTime(.0001, now); gain.gain.exponentialRampToValueAtTime(isForward || isReverse ? .032 : .07, now + .018); gain.gain.exponentialRampToValueAtTime(.0001, now + duration);
+        oscillator.connect(gain).connect(context.destination); oscillator.start(now); oscillator.stop(now + duration + .02);
       } catch (_) { /* Một số trình duyệt có thể chặn âm thanh; ứng dụng vẫn hoạt động. */ }
     }
 
     function playWheelTick(progress) {
-      if (!state.settings.sound) return;
+      const context = getAudioContext();
+      if (!context) return;
       try {
-        audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
-        if (audioContext.state === 'suspended') audioContext.resume();
-        const now = audioContext.currentTime; const oscillator = audioContext.createOscillator(); const gain = audioContext.createGain();
-        oscillator.type = 'square'; oscillator.frequency.setValueAtTime(760 - progress * 330, now);
-        const volume = .018 - progress * .007;
-        gain.gain.setValueAtTime(.0001, now); gain.gain.exponentialRampToValueAtTime(Math.max(.006, volume), now + .004); gain.gain.exponentialRampToValueAtTime(.0001, now + .032);
-        oscillator.connect(gain).connect(audioContext.destination); oscillator.start(now); oscillator.stop(now + .036);
+        const now = context.currentTime; const frequency = 1180 - progress * 600; const volume = .042 - progress * .013;
+        [1, .52].forEach((ratio, index) => {
+          const oscillator = context.createOscillator(); const gain = context.createGain();
+          oscillator.type = index ? 'triangle' : 'square'; oscillator.frequency.setValueAtTime(frequency * ratio, now);
+          gain.gain.setValueAtTime(.0001, now); gain.gain.exponentialRampToValueAtTime(volume * (index ? .48 : 1), now + .003); gain.gain.exponentialRampToValueAtTime(.0001, now + .034);
+          oscillator.connect(gain).connect(context.destination); oscillator.start(now); oscillator.stop(now + .039);
+        });
       } catch (_) { /* Giữ vòng quay hoạt động nếu trình duyệt không hỗ trợ Web Audio. */ }
+    }
+
+    function startSpinTension(duration, mode = 'main') {
+      const context = getAudioContext();
+      if (!context) return () => {};
+      try {
+        const now = context.currentTime; const seconds = Math.max(.25, duration / 1000);
+        const filter = context.createBiquadFilter(); const gain = context.createGain();
+        const lowTone = context.createOscillator(); const tensionTone = context.createOscillator();
+        filter.type = 'lowpass'; filter.Q.value = 3.4;
+        filter.frequency.setValueAtTime(mode === 'tease' ? 360 : 240, now);
+        filter.frequency.exponentialRampToValueAtTime(mode === 'tease' ? 920 : 680, now + seconds * .88);
+        lowTone.type = 'sine'; lowTone.frequency.setValueAtTime(43, now); lowTone.frequency.exponentialRampToValueAtTime(mode === 'tease' ? 72 : 56, now + seconds);
+        tensionTone.type = 'sawtooth'; tensionTone.detune.value = -8;
+        tensionTone.frequency.setValueAtTime(mode === 'tease' ? 115 : 74, now);
+        tensionTone.frequency.exponentialRampToValueAtTime(mode === 'tease' ? 210 : 142, now + seconds * .9);
+        gain.gain.setValueAtTime(.0001, now); gain.gain.exponentialRampToValueAtTime(.009, now + .05);
+        gain.gain.exponentialRampToValueAtTime(mode === 'tease' ? .027 : .021, now + seconds * .82);
+        gain.gain.exponentialRampToValueAtTime(.0001, now + seconds);
+        lowTone.connect(gain); tensionTone.connect(filter).connect(gain); gain.connect(context.destination);
+        lowTone.start(now); tensionTone.start(now);
+        let stopped = false;
+        return () => {
+          if (stopped) return; stopped = true;
+          const stopAt = context.currentTime; gain.gain.cancelScheduledValues(stopAt); gain.gain.setTargetAtTime(.0001, stopAt, .025);
+          try { lowTone.stop(stopAt + .12); tensionTone.stop(stopAt + .12); } catch (_) { /* Đã dừng. */ }
+        };
+      } catch (_) { return () => {}; }
     }
 
     function startWheelTicks(duration) {
@@ -805,10 +875,10 @@
       });
     }
 
-    async function moveWheelWithSound(rotation, duration, easing) {
-      const stopTicks = startWheelTicks(duration);
+    async function moveWheelWithSound(rotation, duration, easing, mode = 'main') {
+      const stopTicks = startWheelTicks(duration); const stopTension = startSpinTension(duration, mode);
       try { await moveWheel(rotation, duration, easing); }
-      finally { stopTicks(); }
+      finally { stopTicks(); stopTension(); }
     }
 
     const pause = duration => new Promise(resolve => setTimeout(resolve, duration));
@@ -841,11 +911,13 @@
         state.rotations[tab] = fakeRotation; persist();
         els.spin.textContent = 'SUÝT DỪNG…';
         await moveWheelWithSound(fakeRotation, 3400 + randomIndex(500));
+        playSound('suspense');
         await pause(650 + randomIndex(250));
         finalRotation = fakeRotation + (isReverse ? -segmentDegrees : segmentDegrees);
         state.rotations[tab] = finalRotation; persist();
         els.spin.textContent = isReverse ? 'Ồ, LÙI LẠI…' : 'Ồ, TIẾN THÊM…';
-        await moveWheelWithSound(finalRotation, 1100 + randomIndex(400), 'cubic-bezier(.24,.92,.25,1)');
+        playSound(isReverse ? 'reverse' : 'forward');
+        await moveWheelWithSound(finalRotation, 1100 + randomIndex(400), 'cubic-bezier(.24,.92,.25,1)', 'tease');
       } else {
         finalRotation = rotationTo(targetAngle(selectedIndex), 6 + randomIndex(3));
         state.rotations[tab] = finalRotation; persist();
