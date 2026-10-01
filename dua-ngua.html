@@ -317,6 +317,9 @@
     .m-row > span { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
     .m-ava { width: 28px; height: 28px; padding: 0; display: grid; place-items: center; overflow: hidden; border: 1px solid var(--line); border-radius: 50%; background: #0a3f57; color: #fff; font-size: 11px; font-weight: 900; flex: 0 0 auto; }
     .m-ava img { width: 100%; height: 100%; object-fit: cover; }
+    .m-spoken { min-height: 27px; padding: 0 7px; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: var(--muted); font-size: 11px; font-weight: 800; white-space: nowrap; opacity: .55; }
+    .m-spoken:hover:not(:disabled) { opacity: .9; }
+    .m-spoken.on { opacity: 1; color: #ffb4a8; border-color: rgba(239, 27, 45, .5); background: rgba(239, 27, 45, .12); }
     .m-racer { width: 30px; height: 27px; padding: 0; border: 1px solid var(--line); border-radius: 8px; background: transparent; font-size: 14px; filter: grayscale(1); opacity: .45; }
     .m-racer:hover:not(:disabled) { opacity: .8; }
     .m-racer.on { border-color: rgba(255, 196, 0, .7); background: rgba(255, 196, 0, .16); filter: none; opacity: 1; }
@@ -657,8 +660,8 @@
       return {
         teams, history,
         excludedTeams: Array.from(new Set((source.excludedTeams || []).filter(hasTeam))),
-        // Lần đầu có tính năng này: những người đã phát biểu trong lịch sử cũng tính là đã được chọn.
-        excludedMembers: Array.from(new Set((source.excludedMembers || []).concat(s.excludeChosenMembers === undefined ? history.filter(h => h.type === 'member').map(h => `${h.teamId}:${h.resultId}`) : []).filter(hasMemberKey))),
+        // Chỉ người thật sự được quay trúng (hoặc được đánh dấu tay trong Cài đặt) mới tính là đã phát biểu.
+        excludedMembers: Array.from(new Set((source.excludedMembers || []).filter(hasMemberKey))),
         settings: {
           sound: s.sound !== false, excludeAfterSpin: Boolean(s.excludeAfterSpin), logoData: normalizeImage(s.logoData, 2000000),
           raceSeconds: Number.isFinite(Number(s.raceSeconds)) && s.raceSeconds !== undefined ? clamp(Math.round(Number(s.raceSeconds)), 12, 45) : 20,
@@ -2334,6 +2337,7 @@
         <div class="m-list">${team.members.length ? team.members.map(m => `<div class="m-row${m.isRacer ? ' is-racer' : ''}">
             <button class="m-ava" type="button" data-act="photo" data-team="${team.id}" data-member="${m.id}" title="Ảnh của ${escapeHtml(m.name)}">${photoOf(m) ? `<img src="${escapeHtml(photoOf(m))}" alt="" />` : escapeHtml(initialOf(m.name))}</button>
             <span title="${escapeHtml(m.name)}">${escapeHtml(m.name)}${m.isRacer ? ' · người đua' : ''}</span>
+            ${state.settings.excludeChosenMembers ? (() => { const spoke = state.excludedMembers.includes(memberKey(team.id, m.id)); return `<button class="m-spoken${spoke ? ' on' : ''}" type="button" data-act="spoken" data-team="${team.id}" data-member="${m.id}" aria-pressed="${spoke}" title="${spoke ? `${escapeHtml(m.name)} đã phát biểu – bấm để bỏ đánh dấu` : `Bấm để đánh dấu ${escapeHtml(m.name)} đã phát biểu`}">${spoke ? '🎤 Đã PB' : '🎤'}</button>`; })() : ''}
             <button class="m-racer${m.isRacer ? ' on' : ''}" type="button" data-act="racer" data-team="${team.id}" data-member="${m.id}" aria-pressed="${m.isRacer}" title="${m.isRacer ? `${escapeHtml(m.name)} đang là người cưỡi ngựa ở vòng 1` : `Chọn ${escapeHtml(m.name)} làm người cưỡi ngựa ở vòng 1`}">🏇</button>
             <button class="m-photo" type="button" data-act="photo" data-team="${team.id}" data-member="${m.id}">📷 Ảnh</button>
             <button class="mini" type="button" data-act="rename-member" data-team="${team.id}" data-member="${m.id}" title="Đổi tên">✎</button>
@@ -2409,6 +2413,11 @@
         onConfirm: () => mutate(() => { team.members = team.members.filter(m => m.id !== member.id); }, `Đã xóa ${member.name}.`)
       });
       if (act === 'photo' && member) requestPhoto(team, member);
+      if (act === 'spoken' && member) {
+        const key = memberKey(team.id, member.id); const spoke = state.excludedMembers.includes(key);
+        mutate(() => { state.excludedMembers = spoke ? state.excludedMembers.filter(k => k !== key) : state.excludedMembers.concat(key); },
+          spoke ? `Đã bỏ đánh dấu: ${member.name} chưa phát biểu.` : `Đã đánh dấu ${member.name} đã phát biểu.`);
+      }
       if (act === 'racer' && member && !member.isRacer) {
         mutate(() => { team.members.forEach(m => { m.isRacer = m.id === member.id; }); }, `${member.name} sẽ cưỡi ngựa cho ${team.name} ở vòng 1.`);
       }
