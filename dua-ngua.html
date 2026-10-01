@@ -1,0 +1,2601 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#08131f" />
+  <title>Đua ngựa SECI</title>
+  <style>
+    :root {
+      --bg: #08131f;
+      --panel: #10202f;
+      --panel-2: #152a3d;
+      --line: rgba(160, 196, 224, .16);
+      --text: #e9f2f9;
+      --muted: #93a9bb;
+      --gold: #ffc400;
+      --gold-deep: #c98a00;
+      --sky: #1eb8ff;
+      --red: #ef1b2d;
+      --green: #00b862;
+      --radius: 18px;
+      --arcade: "Bahnschrift", "Segoe UI Black", "Arial Black", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+
+    html { min-width: 320px; background: var(--bg); }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% -10%, rgba(30, 184, 255, .18), transparent 32rem),
+        radial-gradient(circle at 100% 110%, rgba(255, 196, 0, .10), transparent 30rem),
+        var(--bg);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    button, input, select { font: inherit; }
+    button { color: inherit; cursor: pointer; }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    h1, h2, h3, p { margin: 0; }
+
+    .app { max-width: 1480px; margin: 0 auto; padding: 18px 22px 28px; }
+
+    /* ---------- Top bar ---------- */
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 14px; }
+    .brand { display: flex; align-items: center; gap: 13px; min-width: 0; }
+    .brand-mark {
+      position: relative; flex: 0 0 auto; min-width: 50px; height: 50px; padding: 0; overflow: hidden;
+      display: inline-flex; align-items: center; justify-content: center;
+      border: 2px solid rgba(217, 188, 106, .8); border-radius: 15px;
+      background: radial-gradient(circle at 50% 40%, #8c1d26, #5e0f17); color: #d9bc6a;
+      box-shadow: 0 0 0 4px rgba(217, 188, 106, .12);
+    }
+    .brand-mark span { display: grid; place-items: center; }
+    .brand-mark svg { width: 38px; height: 38px; display: block; }
+    .brand-mark img { display: none; height: 46px; width: auto; max-width: 160px; object-fit: contain; }
+    .brand-mark.has-image { background: var(--logo-plate, #fff); }
+    .brand-mark.has-image img { display: block; }
+    .brand-mark.has-image span { display: none; }
+    .brand-mark::after {
+      content: "Đổi"; position: absolute; inset: auto 0 0; padding: 2px 0 3px; color: #fff;
+      background: rgba(0, 0, 0, .6); font: 800 9px/1.2 system-ui; opacity: 0; transition: opacity .18s;
+    }
+    .brand-mark:hover::after, .brand-mark:focus-visible::after { opacity: 1; }
+    .brand h1 {
+      font: 900 clamp(20px, 3vw, 30px)/1.05 var(--arcade); letter-spacing: .06em;
+      background: linear-gradient(180deg, #fff6c9, #ffc400 60%, #ff9d1a); -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .brand p { color: var(--muted); font-size: 13px; margin-top: 2px; }
+
+    .top-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+    .tool {
+      min-height: 40px; padding: 0 13px; border: 1px solid var(--line); border-radius: 12px;
+      background: var(--panel-2); color: var(--text); font-weight: 750; transition: transform .15s, background .15s;
+    }
+    .tool:hover:not(:disabled) { transform: translateY(-2px); background: #1b3550; }
+    .tool.icon { min-width: 40px; padding: 0 10px; font-size: 17px; }
+    .tool.on { border-color: rgba(0, 184, 98, .6); background: rgba(0, 184, 98, .16); }
+    .save-status {
+      align-self: center; padding: 6px 11px; border: 1px solid var(--line); border-radius: 99px; color: var(--muted);
+      background: rgba(255, 255, 255, .04); font-size: 12px; font-weight: 800; white-space: nowrap; cursor: help;
+    }
+    .save-status[data-kind="saved"], .save-status[data-kind="ready"] { color: #7ee2a8; border-color: rgba(0, 184, 98, .45); background: rgba(0, 184, 98, .1); }
+    .save-status[data-kind="saving"] { color: #8fd8ff; border-color: rgba(30, 184, 255, .4); }
+    .save-status[data-kind="error"] { color: #ffb4a8; border-color: rgba(239, 27, 45, .5); background: rgba(239, 27, 45, .12); }
+
+    /* ---------- Stage (arcade screen) ---------- */
+    .stage {
+      position: relative; border-radius: 22px; padding: 6px;
+      background: linear-gradient(180deg, #ffd84a, #ff9d1a 45%, #b55a00);
+      box-shadow: 0 22px 60px rgba(0, 0, 0, .45), 0 0 0 1px rgba(255, 255, 255, .06);
+    }
+    .screen-box {
+      position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 17px;
+      background: #0a2236; container-type: inline-size; user-select: none;
+    }
+    .stage:fullscreen { display: flex; align-items: center; justify-content: center; padding: 0; border-radius: 0; background: #000; }
+    .stage:fullscreen .screen-box { width: min(100vw, 177.78vh); border-radius: 0; }
+    #game { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+    /* HUD */
+    .hud { position: absolute; inset: 0; pointer-events: none; font-family: var(--arcade); }
+    .hud-round {
+      position: absolute; left: 1.6cqw; top: 1.5cqw; padding: .55cqw 1.2cqw; border-radius: 1cqw;
+      background: rgba(6, 18, 30, .78); border: 2px solid rgba(255, 196, 0, .75); color: var(--gold);
+      font-size: clamp(10px, 1.45cqw, 20px); font-weight: 900; letter-spacing: .08em;
+    }
+    .hud-progress {
+      position: absolute; left: 50%; top: 1.5cqw; width: 42cqw; transform: translateX(-50%);
+      padding: .55cqw .9cqw .7cqw; border-radius: 1cqw; background: rgba(6, 18, 30, .72); color: #fff;
+    }
+    .hud-progress-top { display: flex; justify-content: space-between; align-items: baseline; gap: 1cqw; font-size: clamp(9px, 1.1cqw, 15px); font-weight: 900; letter-spacing: .05em; }
+    .hud-progress-top b { color: var(--gold); }
+    .hud-track { position: relative; height: .9cqw; min-height: 6px; margin-top: .45cqw; border-radius: 99px; background: rgba(255, 255, 255, .14); overflow: hidden; }
+    .hud-fill { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: inherit; background: linear-gradient(90deg, #1eb8ff, #00c9c9 40%, #ffc400 80%, #ef1b2d); }
+    .hud-ticks { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(5, 1fr); }
+    .hud-ticks i { border-right: 2px solid rgba(6, 18, 30, .7); }
+    .hud-ticks i:last-child { border-right: 0; }
+
+    .hud-board {
+      position: absolute; right: 1.6cqw; top: 1.5cqw; width: 19cqw; margin: 0; padding: .7cqw; list-style: none;
+      border-radius: 1cqw; background: rgba(6, 18, 30, .74); counter-reset: rank;
+    }
+    .hud-board-title { margin: 0 0 .4cqw .2cqw; color: var(--muted); font-size: clamp(8px, .95cqw, 13px); font-weight: 900; letter-spacing: .1em; }
+    .hud-board li {
+      display: flex; align-items: center; gap: .6cqw; padding: .3cqw .4cqw; border-radius: .6cqw; color: #fff;
+      font-size: clamp(9px, 1.15cqw, 16px); font-weight: 800; transition: background .2s;
+    }
+    .hud-board li + li { margin-top: .2cqw; }
+    .hud-board li.lead { background: rgba(255, 196, 0, .2); }
+    .hud-board li b { width: 1.9cqw; min-width: 15px; height: 1.9cqw; min-height: 15px; display: grid; place-items: center; border-radius: 50%; background: rgba(255, 255, 255, .14); font-size: .85em; }
+    .hud-board li.lead b { background: var(--gold); color: #2b1d00; }
+    .hud-board li i { width: .9cqw; min-width: 7px; height: .9cqw; min-height: 7px; border-radius: 50%; flex: 0 0 auto; }
+    .hud-board li span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+    .hud-ticker {
+      position: absolute; left: 50%; bottom: 2cqw; max-width: 70cqw; transform: translateX(-50%);
+      padding: .7cqw 1.8cqw; border-radius: 99px; background: rgba(6, 18, 30, .82); border: 2px solid rgba(255, 255, 255, .18);
+      color: #fff; font-size: clamp(11px, 1.55cqw, 22px); font-weight: 900; letter-spacing: .02em; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .hud-ticker.pop { animation: tickerPop .45s cubic-bezier(.2, 1.4, .4, 1); }
+    .hud-ticker.win { background: linear-gradient(90deg, #ef1b2d, #ff7a1a); border-color: #ffd84a; }
+    .hud-ticker.zone { border-color: rgba(30, 184, 255, .8); }
+    .hud-ticker.hot { border-color: rgba(255, 196, 0, .9); color: #ffe27a; }
+    @keyframes tickerPop { from { transform: translateX(-50%) scale(.82); opacity: .2; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
+
+    .skip-button {
+      position: absolute; right: 1.6cqw; bottom: 2cqw; pointer-events: auto; padding: .5cqw 1.1cqw; border: 1px solid rgba(255, 255, 255, .3);
+      border-radius: 99px; background: rgba(6, 18, 30, .7); color: #fff; font: 800 clamp(9px, 1.05cqw, 14px)/1.3 var(--arcade);
+    }
+
+    .countdown {
+      position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none;
+      font: 900 18cqw/1 var(--arcade); color: #fff; text-shadow: 0 .6cqw 0 #b55a00, 0 0 4cqw rgba(255, 196, 0, .8);
+      -webkit-text-stroke: .35cqw #3a2400;
+    }
+    .countdown span { animation: countPop .7s cubic-bezier(.2, 1.5, .4, 1) both; }
+    .countdown.go span { font-size: 9cqw; color: var(--gold); }
+    @keyframes countPop { 0% { transform: scale(2.2); opacity: 0; } 30% { opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+
+    @container (max-width: 620px) {
+      .hud-board { display: none; }
+      .hud-progress { width: 52cqw; }
+    }
+
+    /* ---------- Overlay screens inside the stage ---------- */
+    .overlay {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 3cqw;
+      font-family: var(--arcade);
+    }
+    .overlay.top { align-items: flex-start; padding-top: 6.5cqw; }
+    .overlay.bottom { align-items: flex-end; padding-bottom: 2.2cqw; }
+    .overlay.bottom .card { width: min(100%, 78cqw); max-height: 26cqw; padding-top: 1.3cqw; padding-bottom: 1.4cqw; }
+    .overlay.bottom .chips { margin-top: .8cqw; }
+    .overlay.bottom .card-actions { margin-top: 1cqw; }
+    .screen-box[data-mode="lobby"] .hud-ticker { display: none; }
+    .screen-box[data-method="wheel"] .hud-progress, .screen-box[data-method="wheel"] .hud-board { display: none; }
+    /* Vòng quay: thẻ điều khiển là một dải thấp dưới bánh xe. */
+    .overlay.strip { align-items: flex-end; padding: 0 2cqw 1.6cqw; }
+    .overlay.strip .card { display: flex; align-items: center; justify-content: space-between; gap: 2cqw; width: min(100%, 92cqw); padding: 1cqw 1.8cqw; text-align: left; }
+    .overlay.strip .card h2 { font-size: clamp(15px, 2.1cqw, 30px); }
+    .overlay.strip .card .sub { margin-top: .25cqw; }
+    .strip-side { display: flex; flex-direction: column; align-items: flex-end; gap: .7cqw; flex: 0 0 auto; }
+    .overlay.strip .card-actions { margin-top: 0; flex-wrap: nowrap; }
+    .method-toggle { display: inline-flex; margin-top: 1cqw; padding: .3cqw; border-radius: 99px; background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .14); }
+    .strip-side .method-toggle { margin-top: 0; }
+    .method-toggle button { padding: .4cqw 1.2cqw; border: 0; border-radius: 99px; background: transparent; color: #c9d9e6; font: 800 clamp(10px, 1.1cqw, 15px)/1.2 system-ui, sans-serif; }
+    .method-toggle button.on { background: var(--gold); color: #2b1d00; }
+    .screen-box[data-mode="intro"] { cursor: pointer; }
+    .screen-box[data-mode="lobby"] .hud-progress, .screen-box[data-mode="intro"] .hud-progress, .screen-box[data-mode="intro"] .hud-board { display: none; }
+    .overlay.dim { background: radial-gradient(circle at 50% 45%, rgba(4, 12, 20, .35), rgba(4, 12, 20, .82)); }
+    .card {
+      width: min(100%, 64cqw); max-height: 100%; overflow: auto; padding: 1.9cqw 2.6cqw 2.1cqw; text-align: center;
+      border: 2px solid rgba(255, 196, 0, .7); border-radius: 2cqw; color: #fff;
+      background: linear-gradient(180deg, rgba(14, 36, 56, .94), rgba(8, 20, 33, .94));
+      box-shadow: 0 2cqw 5cqw rgba(0, 0, 0, .45), inset 0 0 0 1px rgba(255, 255, 255, .06);
+      animation: cardIn .45s cubic-bezier(.2, 1.2, .3, 1) both;
+    }
+    @keyframes cardIn { from { transform: translateY(2cqw) scale(.94); opacity: 0; } to { transform: none; opacity: 1; } }
+    .kicker { color: var(--gold); font-size: clamp(10px, 1.3cqw, 18px); font-weight: 900; letter-spacing: .22em; }
+    .card h2 { margin-top: .4cqw; font-size: clamp(18px, 3.4cqw, 48px); font-weight: 900; letter-spacing: .04em; line-height: 1.08; overflow-wrap: anywhere; }
+    .card .sub { margin-top: .6cqw; color: #c9d9e6; font-family: system-ui, sans-serif; font-size: clamp(11px, 1.25cqw, 17px); }
+    .card .note { margin-top: .8cqw; color: #ffd76a; font-family: system-ui, sans-serif; font-size: clamp(10px, 1.1cqw, 15px); }
+    .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: .6cqw; margin-top: 1.2cqw; }
+    .chip {
+      display: inline-flex; align-items: center; gap: .55cqw; padding: .45cqw .95cqw; border-radius: 99px;
+      background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .14);
+      font: 800 clamp(10px, 1.2cqw, 16px)/1.2 system-ui, sans-serif;
+    }
+    .chip i { width: 1cqw; min-width: 8px; height: 1cqw; min-height: 8px; border-radius: 50%; }
+    .chip small { color: var(--muted); font-weight: 700; }
+    .chip.out { opacity: .4; text-decoration: line-through; }
+
+    .members { display: flex; flex-wrap: wrap; justify-content: center; gap: 1cqw; margin-top: 1.3cqw; }
+    .member-card {
+      width: 9.5cqw; min-width: 64px; padding: .8cqw .5cqw .7cqw; border-radius: 1.2cqw;
+      background: rgba(255, 255, 255, .07); border: 2px solid var(--c, #fff);
+      animation: memberIn .55s cubic-bezier(.2, 1.4, .4, 1) both; animation-delay: calc(var(--i) * 110ms + 150ms);
+    }
+    @keyframes memberIn { from { transform: translateY(2.5cqw) scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+    .avatar {
+      width: 5.6cqw; min-width: 40px; height: 5.6cqw; min-height: 40px; margin: 0 auto; display: grid; place-items: center; overflow: hidden;
+      border-radius: 50%; border: 3px solid var(--c, #fff); background: #0a3f57; color: #fff; font: 900 clamp(15px, 2.2cqw, 30px)/1 var(--arcade);
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .member-card span { display: block; margin-top: .5cqw; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font: 800 clamp(9px, 1.05cqw, 15px)/1.2 system-ui, sans-serif; }
+    .member-card small { display: block; color: var(--muted); font: 700 clamp(8px, .85cqw, 12px)/1.3 system-ui, sans-serif; }
+
+    .card-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 1cqw; margin-top: 1.6cqw; }
+    .btn-arcade {
+      min-height: 4.2cqw; padding: .7cqw 2.6cqw; border: 0; border-radius: 1.2cqw; color: #2b1d00;
+      background: linear-gradient(180deg, #ffe680, #ffc400 55%, #f0a000);
+      box-shadow: 0 .5cqw 0 #a86a00, 0 1cqw 2cqw rgba(0, 0, 0, .35);
+      font: 900 clamp(13px, 1.75cqw, 25px)/1.1 var(--arcade); letter-spacing: .06em; transition: transform .1s, box-shadow .1s, filter .15s;
+    }
+    .btn-arcade:hover:not(:disabled) { filter: brightness(1.06); transform: translateY(-.15cqw); }
+    .btn-arcade:active:not(:disabled) { transform: translateY(.4cqw); box-shadow: 0 .1cqw 0 #a86a00, 0 .4cqw 1cqw rgba(0, 0, 0, .35); }
+    .btn-arcade.pulse { animation: pulse 1.6s ease-in-out infinite; }
+    @keyframes pulse { 50% { box-shadow: 0 .5cqw 0 #a86a00, 0 0 0 .8cqw rgba(255, 196, 0, .18), 0 1cqw 2cqw rgba(0, 0, 0, .35); } }
+    .btn-ghost {
+      min-height: 4.2cqw; padding: .6cqw 1.8cqw; border: 2px solid rgba(255, 255, 255, .28); border-radius: 1.2cqw;
+      background: rgba(255, 255, 255, .06); color: #fff; font: 800 clamp(11px, 1.3cqw, 18px)/1.1 var(--arcade); letter-spacing: .04em;
+    }
+    .btn-ghost:hover { background: rgba(255, 255, 255, .12); }
+
+    .win-name { color: var(--c, #fff); text-shadow: 0 0 2.4cqw var(--c, #fff), 0 .3cqw 0 rgba(0, 0, 0, .5); }
+    .final-card { width: min(100%, 54cqw); border-color: #ffd84a; background: radial-gradient(circle at 50% 0%, rgba(255, 196, 0, .22), transparent 60%), linear-gradient(180deg, rgba(14, 36, 56, .96), rgba(8, 20, 33, .96)); }
+    .final-avatar { width: 13cqw; min-width: 84px; height: 13cqw; min-height: 84px; margin: 1.2cqw auto .2cqw; border-width: .45cqw; font-size: clamp(30px, 5.6cqw, 80px); box-shadow: 0 0 0 .7cqw rgba(255, 196, 0, .22), 0 0 3cqw rgba(255, 196, 0, .45); }
+    .final-name { font-size: clamp(22px, 4.6cqw, 66px) !important; }
+    .final-team { margin-top: .4cqw; color: #c9d9e6; font: 800 clamp(12px, 1.6cqw, 22px)/1.3 system-ui, sans-serif; }
+    .final-share {
+      display: inline-block; margin-top: 1.1cqw; padding: .5cqw 2cqw; border-radius: 99px; color: #2b1d00; background: var(--gold);
+      font-size: clamp(13px, 2cqw, 28px); font-weight: 900; letter-spacing: .12em; animation: pulse 1.6s ease-in-out infinite;
+    }
+
+    /* ---------- History ---------- */
+    .panel { margin-top: 18px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); overflow: hidden; }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 15px 18px; border-bottom: 1px solid var(--line); }
+    .panel-head h2 { font-size: 16px; }
+    .panel-head p { color: var(--muted); font-size: 12px; margin-top: 2px; }
+    .panel-actions { display: flex; gap: 7px; flex-wrap: wrap; }
+    .history-scroll { overflow-x: auto; }
+    table { width: 100%; min-width: 560px; border-collapse: collapse; }
+    th, td { padding: 11px 15px; border-bottom: 1px solid rgba(160, 196, 224, .09); text-align: left; }
+    th { color: var(--muted); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; background: rgba(255, 255, 255, .02); }
+    td { font-size: 13px; }
+    tbody tr:last-child td { border-bottom: 0; }
+    .tag { display: inline-flex; padding: 3px 9px; border-radius: 99px; font-size: 11px; font-weight: 800; white-space: nowrap; }
+    .tag.team { color: #8fd8ff; background: rgba(30, 184, 255, .14); }
+    .tag.member { color: #ffd76a; background: rgba(255, 196, 0, .14); }
+    .empty { padding: 28px; color: var(--muted); text-align: center; font-size: 13px; }
+
+    /* ---------- Modals ---------- */
+    .backdrop { position: fixed; inset: 0; z-index: 50; display: none; align-items: center; justify-content: center; padding: 16px; background: rgba(2, 8, 14, .62); backdrop-filter: blur(3px); }
+    .backdrop.open { display: flex; animation: fade .18s ease; }
+    @keyframes fade { from { opacity: 0; } }
+    .modal { width: min(100%, 440px); padding: 22px; border: 1px solid var(--line); border-radius: 20px; background: var(--panel); box-shadow: 0 24px 70px rgba(0, 0, 0, .5); }
+    .modal h2 { font-size: 19px; }
+    .modal .msg { margin: 7px 0 14px; color: var(--muted); }
+    .modal label { display: block; margin-bottom: 6px; color: #c9d9e6; font-size: 12px; font-weight: 800; }
+    .input { width: 100%; padding: 10px 12px; border: 1px solid rgba(160, 196, 224, .3); border-radius: 11px; outline: none; color: var(--text); background: #0b1826; }
+    .input:focus { border-color: var(--sky); box-shadow: 0 0 0 3px rgba(30, 184, 255, .18); }
+    .error { min-height: 18px; margin-top: 6px; color: #ff8a7a; font-size: 12px; }
+    .modal-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .btn { min-height: 40px; padding: 0 15px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel-2); color: var(--text); font-weight: 800; }
+    .btn:hover:not(:disabled) { background: #1b3550; }
+    .btn.primary { border: 0; color: #2b1d00; background: linear-gradient(180deg, #ffe680, #ffc400); }
+    .btn.danger { border-color: rgba(239, 27, 45, .45); color: #ff9a90; background: rgba(239, 27, 45, .12); }
+
+    .settings { width: min(1080px, 100%); max-height: calc(100vh - 32px); display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: 20px; background: var(--panel); box-shadow: 0 24px 70px rgba(0, 0, 0, .5); }
+    .settings-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 17px 20px; border-bottom: 1px solid var(--line); }
+    .settings-head h2 { font-size: 19px; }
+    .settings-head p { color: var(--muted); font-size: 13px; margin-top: 2px; }
+    .settings-body { display: grid; grid-template-columns: minmax(320px, 1.25fr) minmax(280px, .75fr); min-height: 0; overflow: auto; }
+    .teams-col { border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
+    .teams-col-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 16px 6px; }
+    .teams-col-head b { font-size: 15px; }
+    .teams-col-head span { color: var(--muted); font-size: 12px; }
+    .team-list { max-height: 520px; overflow: auto; padding: 4px 12px 12px; }
+    .t-card { margin: 8px 0; border: 1px solid var(--line); border-radius: 14px; background: rgba(255, 255, 255, .03); }
+    .t-head { display: flex; align-items: center; gap: 8px; padding: 9px 10px; }
+    .t-head .dot { width: 12px; height: 12px; border-radius: 50%; flex: 0 0 auto; }
+    .t-head b { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .count { padding: 2px 8px; border-radius: 99px; color: var(--muted); background: rgba(255, 255, 255, .07); font-size: 11px; font-weight: 800; }
+    .mini { width: 30px; height: 30px; display: grid; place-items: center; border: 0; border-radius: 8px; background: transparent; color: var(--muted); }
+    .mini:hover:not(:disabled) { background: rgba(255, 255, 255, .08); color: #fff; }
+    .mini.del:hover:not(:disabled) { color: #ff8a7a; }
+    .m-list { padding: 0 10px 10px 30px; }
+    .m-row { display: flex; align-items: center; gap: 7px; min-height: 36px; font-size: 13px; color: #c9d9e6; }
+    .m-row > span { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .m-ava { width: 28px; height: 28px; padding: 0; display: grid; place-items: center; overflow: hidden; border: 1px solid var(--line); border-radius: 50%; background: #0a3f57; color: #fff; font-size: 11px; font-weight: 900; flex: 0 0 auto; }
+    .m-ava img { width: 100%; height: 100%; object-fit: cover; }
+    .m-racer { width: 30px; height: 27px; padding: 0; border: 1px solid var(--line); border-radius: 8px; background: transparent; font-size: 14px; filter: grayscale(1); opacity: .45; }
+    .m-racer:hover:not(:disabled) { opacity: .8; }
+    .m-racer.on { border-color: rgba(255, 196, 0, .7); background: rgba(255, 196, 0, .16); filter: none; opacity: 1; }
+    .m-row.is-racer > span { color: #ffd76a; font-weight: 800; }
+    .m-photo { min-height: 27px; padding: 0 8px; border: 1px solid var(--line); border-radius: 8px; background: rgba(255, 255, 255, .04); color: #8fd8ff; font-size: 11px; font-weight: 800; white-space: nowrap; }
+    .m-add { width: 100%; min-height: 31px; margin-top: 6px; border: 1px dashed rgba(160, 196, 224, .3); border-radius: 9px; background: transparent; color: #8fd8ff; font-size: 12px; font-weight: 800; }
+    .m-empty { color: var(--muted); font-size: 12px; padding: 3px 0; }
+    .options { display: grid; align-content: start; gap: 12px; padding: 16px 18px 20px; }
+    .opt { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px; background: rgba(255, 255, 255, .03); }
+    .opt b { display: block; font-size: 14px; }
+    .opt small { display: block; color: var(--muted); font-size: 12px; }
+    .switch { position: relative; width: 46px; height: 26px; flex: 0 0 auto; border: 0; border-radius: 99px; background: #2a3c4e; transition: background .18s; }
+    .switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform .18s; }
+    .switch[aria-checked="true"] { background: var(--green); }
+    .switch[aria-checked="true"]::after { transform: translateX(20px); }
+    .range-row { display: flex; align-items: center; gap: 10px; }
+    .range-row input { flex: 1; accent-color: var(--gold); }
+    .range-row output { min-width: 46px; text-align: right; font-weight: 900; color: var(--gold); }
+    .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .opt-grid .btn { min-height: 38px; font-size: 12.5px; }
+    .opt-hint { color: var(--muted); font-size: 12px; }
+
+    .toast {
+      position: fixed; left: 50%; bottom: 22px; z-index: 90; max-width: calc(100% - 30px); padding: 10px 16px; border-radius: 12px;
+      color: #fff; background: #23384b; box-shadow: 0 10px 26px rgba(0, 0, 0, .4); font-size: 13px; font-weight: 700;
+      transform: translate(-50%, 24px); opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s;
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .toast.error { background: #8a2a20; }
+    .file-input { display: none; }
+
+    @media (max-width: 760px) {
+      .app { padding: 12px; }
+      .topbar { flex-direction: column; align-items: flex-start; }
+      .top-actions { justify-content: flex-start; }
+      .stage { padding: 4px; border-radius: 16px; }
+      .screen-box { border-radius: 13px; }
+      .settings-body { grid-template-columns: 1fr; }
+      .teams-col { border-right: 0; border-bottom: 1px solid var(--line); }
+      .team-list { max-height: 340px; }
+      .panel-head { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card, .member-card, .countdown span, .hud-ticker.pop { animation: none !important; }
+      .btn-arcade.pulse, .final-share { animation: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <button id="logoButton" class="brand-mark" type="button" title="Bấm để tải logo lên" aria-label="Tải ảnh logo lên">
+          <span id="brandSymbol" aria-hidden="true"></span><img id="brandLogo" alt="Logo" />
+        </button>
+        <input id="logoInput" class="file-input" type="file" accept="image/png,image/jpeg,image/webp" />
+        <div>
+          <h1>ĐUA NGỰA SECI</h1>
+          <p>Vòng 1 đua chọn team – Vòng 2 đua chọn thành viên – Mời bạn chia sẻ</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <span id="saveStatus" class="save-status" role="status" data-kind="local">💾 Chỉ lưu trong trình duyệt</span>
+        <button id="soundButton" class="tool icon" type="button" aria-label="Tắt âm thanh">🔊</button>
+        <button id="fullscreenButton" class="tool" type="button">⛶ Toàn màn hình</button>
+        <button id="settingsButton" class="tool" type="button">⚙ Cài đặt</button>
+      </div>
+    </header>
+
+    <section id="stage" class="stage" aria-label="Màn hình đua ngựa">
+      <div class="screen-box">
+        <canvas id="game" aria-hidden="true"></canvas>
+
+        <div class="hud">
+          <div id="hudRound" class="hud-round">VÒNG 1 · CHỌN TEAM</div>
+          <div class="hud-progress">
+            <div class="hud-progress-top"><span id="hudZone">Quảng trường trung tâm</span><b id="hudPercent">0%</b></div>
+            <div class="hud-track"><div id="hudFill" class="hud-fill"></div><div class="hud-ticks"><i></i><i></i><i></i><i></i><i></i></div></div>
+          </div>
+          <div class="hud-board">
+            <p class="hud-board-title">THỨ HẠNG TRỰC TIẾP</p>
+            <ol id="hudBoard" style="margin:0;padding:0;list-style:none"></ol>
+          </div>
+          <div id="hudTicker" class="hud-ticker" aria-live="polite">Sẵn sàng xuất phát!</div>
+          <button id="skipButton" class="skip-button" type="button" hidden>Tua tới đích ⏭</button>
+          <div id="countdown" class="countdown" aria-live="assertive" hidden><span></span></div>
+        </div>
+
+        <div id="lobbyScreen" class="overlay top" hidden></div>
+        <div id="teamWinScreen" class="overlay dim" hidden></div>
+        <div id="finalScreen" class="overlay dim" hidden></div>
+      </div>
+    </section>
+
+    <section class="panel" aria-label="Lịch sử lựa chọn">
+      <div class="panel-head">
+        <div>
+          <h2>Lịch sử lựa chọn</h2>
+          <p>Kết quả được chốt ngẫu nhiên trước mỗi cuộc đua và lưu tại đây.</p>
+        </div>
+        <div class="panel-actions">
+          <button id="undoButton" class="btn" type="button">↶ Hoàn tác gần nhất</button>
+          <button id="clearHistoryButton" class="btn danger" type="button">Xóa lịch sử</button>
+        </div>
+      </div>
+      <div id="history" class="history-scroll"></div>
+    </section>
+  </main>
+
+  <div id="settingsBackdrop" class="backdrop" aria-hidden="true">
+    <section class="settings" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <header class="settings-head">
+        <div>
+          <h2 id="settingsTitle">Cài đặt cuộc đua</h2>
+          <p>Quản lý team, thành viên và cách vận hành buổi chọn.</p>
+        </div>
+        <button id="closeSettings" class="tool icon" type="button" aria-label="Đóng cài đặt">×</button>
+      </header>
+      <div class="settings-body">
+        <div class="teams-col">
+          <div class="teams-col-head"><div><b>Team &amp; thành viên</b><br /><span id="teamSummary"></span></div><button id="addTeamButton" class="btn primary" type="button">＋ Thêm team</button></div>
+          <div id="teamList" class="team-list"></div>
+        </div>
+        <div class="options">
+          <div class="opt"><div><b>Âm thanh</b><small>Nhạc nền, tiếng vó ngựa, cổ vũ.</small></div><button id="soundSwitch" class="switch" type="button" role="switch" aria-checked="true" aria-label="Âm thanh"></button></div>
+          <div class="opt"><div><b>Loại team đã được chọn</b><small>Team đã thắng vòng 1 không đua lại cho tới khi hết lượt. </small></div><button id="excludeSwitch" class="switch" type="button" role="switch" aria-checked="false" aria-label="Loại team đã được chọn"></button></div>
+          <div class="opt"><div><b>Không quay lại người đã phát biểu</b><small>Ai đã được chọn ở vòng 2 sẽ không trúng lại cho tới khi cả team đều đã phát biểu. Người cưỡi ngựa vẫn được quay như mọi người.</small></div><button id="spokenSwitch" class="switch" type="button" role="switch" aria-checked="true" aria-label="Không quay lại người đã phát biểu"></button></div>
+          <div class="opt" style="display:block">
+            <b>Thời lượng mỗi cuộc đua</b><small>Áp dụng cho cả vòng team và vòng thành viên.</small>
+            <div class="range-row" style="margin-top:8px"><input id="durationRange" type="range" min="12" max="45" step="1" /><output id="durationOut"></output></div>
+          </div>
+          <div class="opt-grid">
+            <button id="restoreExcluded" class="btn" type="button">↺ Khôi phục đã loại</button>
+            <button id="newSession" class="btn" type="button">✦ Phiên mới</button>
+            <button id="exportButton" class="btn" type="button">⇩ Xuất dữ liệu</button>
+            <button id="importButton" class="btn" type="button">⇧ Nhập dữ liệu</button>
+            <button id="legacyButton" class="btn" type="button">⟲ Lấy từ Vòng quay SECI</button>
+            <button id="sampleButton" class="btn danger" type="button">Dữ liệu mẫu</button>
+          </div>
+          <p class="opt-hint">Khi mở qua link IP của serve-lan.py, mọi thay đổi tự lưu vào file <b>du-lieu/dua-ngua.json</b> trên máy chạy server, kèm bản sao lưu trong <b>du-lieu/sao-luu</b>. File xuất/nhập dùng chung định dạng JSON với “Vòng quay SECI”.</p>
+          <input id="importInput" class="file-input" type="file" accept="application/json,.json" />
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="dialogBackdrop" class="backdrop" aria-hidden="true">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+      <h2 id="dialogTitle"></h2>
+      <p id="dialogMessage" class="msg"></p>
+      <label id="dialogLabel" for="dialogInput" hidden></label>
+      <input id="dialogInput" class="input" maxlength="80" autocomplete="off" hidden />
+      <div id="dialogError" class="error" aria-live="polite"></div>
+      <div id="dialogActions" class="modal-actions"></div>
+    </section>
+  </div>
+
+  <input id="photoInput" class="file-input" type="file" accept="image/png,image/jpeg,image/webp" />
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    'use strict';
+
+    /* ======================================================================
+       Đua ngựa SECI – arcade side-scrolling, "đường đua vô hạn".
+       Dữ liệu team/thành viên dùng chung định dạng với Vòng quay SECI.
+       ====================================================================== */
+
+    const STORAGE_KEY = 'seci-dua-ngua-v1';
+    const LEGACY_KEY = 'seci-lucky-wheel-v1';
+    const MUSIC_FOLDER = 'Nhạc đua thuyền';
+    // Nhạc của cuộc đua ngựa (thay cho bg_music.mp3 của đua thuyền).
+    const MUSIC_SRC = 'nhac-dua-ngua/1001.mp3';
+    const WIN_SRC = encodeURI(`${MUSIC_FOLDER}/win.mp3`);
+    const COLORS = ['#ef1b2d', '#ff7a1a', '#ffc400', '#7ed321', '#00b862', '#00c9c9', '#1eb8ff', '#2563ff', '#8b3dff', '#ff2e88'];
+    const MAX_LANES = 8;
+
+    // ---------- Canvas world ----------
+    const W = 1280, H = 720;
+    const SKY_BOTTOM = 334;
+    const PLAZA_BASE = 384;
+    const TRACK_TOP = 404, TRACK_BOTTOM = 650, TRACK_H = TRACK_BOTTOM - TRACK_TOP;
+    const BASE_SPEED = 620;                 // px/s of the road at raceSpeed 1
+    const FACTOR = { sky: .07, city: .25, mid: .6, road: 1, fore: 1.6 };
+    const NOSE = 94;                        // muzzle tip, in horse units
+    const ZONES = [
+      { key: 'square', name: 'Quảng trường trung tâm', from: 0 },
+      { key: 'festival', name: 'Khu lễ hội', from: .2 },
+      { key: 'park', name: 'Công viên', from: .4 },
+      { key: 'arch', name: 'Khu kiến trúc', from: .6 },
+      { key: 'finish', name: 'Khu vực về đích', from: .8 }
+    ];
+    const COATS = [
+      { coat: '#8a4b2a', mane: '#1d130e', sock: false },
+      { coat: '#e9e4dc', mane: '#bfb7aa', sock: false },
+      { coat: '#2d2622', mane: '#0f0c0b', sock: true },
+      { coat: '#c06a2f', mane: '#7c3a17', sock: true },
+      { coat: '#a8a9b1', mane: '#5a5c66', sock: false },
+      { coat: '#d9a65a', mane: '#f6e7c6', sock: false },
+      { coat: '#5c3420', mane: '#140d09', sock: true },
+      { coat: '#b8946a', mane: '#3a2a1c', sock: false }
+    ];
+
+    // ---------- SECI logo ----------
+    // Hình học lấy nguyên từ assets/logo/seci-logo.svg (viewBox -660 -660 1320 1320,
+    // mọi lớp xoay 45°). Thân logo và 4 điểm là các lớp riêng: lúc đứng yên, 4 điểm
+    // nằm đúng chỗ của chúng trên logo; hiệu ứng chỉ di chuyển chính các lớp đó.
+    const LOGO_GOLD = '#D9BC6A';
+    const LOGO_VIEW = 1320;
+    const LOGO_CORE_PATH = 'M-465 -279 -279 -279 -279 -465 279 -465 279 -279 465 -279 465 279 279 279 279 465 -279 465 -279 279 -465 279ZM-377 -191 -377 -44 -141 -44 -141 44 -377 44 -377 191 -279 191 -279 103 -191 103 -191 191 -103 191 -103 279 -191 279 -191 377 -44 377 -44 141 44 141 44 377 191 377 191 279 103 279 103 191 191 191 191 103 279 103 279 191 377 191 377 44 141 44 141 -44 377 -44 377 -191 279 -191 279 -103 191 -103 191 -191 103 -191 103 -279 191 -279 191 -377 44 -377 44 -141 -44 -141 -44 -377 -191 -377 -191 -279 -103 -279 -103 -191 -191 -191 -191 -103 -279 -103 -279 -191Z';
+    const LOGO_CORE = new Path2D(LOGO_CORE_PATH);
+    const LOGO_POINT_SIDE = 116;            // <rect width="116" height="116">
+    // Tâm của từng <rect> (±407, ±407) sau khi xoay 45° quanh gốc tọa độ.
+    const LOGO_POINT_REACH = 407 * Math.SQRT2;
+    const LOGO_POINTS = {
+      top: { x: 0, y: -LOGO_POINT_REACH, dx: 0, dy: -1, label: 'phía trên' },
+      right: { x: LOGO_POINT_REACH, y: 0, dx: 1, dy: 0, label: 'bên phải' },
+      bottom: { x: 0, y: LOGO_POINT_REACH, dx: 0, dy: 1, label: 'phía dưới' },
+      left: { x: -LOGO_POINT_REACH, y: 0, dx: -1, dy: 0, label: 'bên trái' }
+    };
+    // Mapping điểm → team: phần tử thứ i sinh ra TEAM i + 1. Đổi thứ tự mảng để đổi mapping.
+    const LOGO_POINT_TO_TEAM = ['top', 'right', 'bottom', 'left'];
+    const LOGO_HOME = { x: 640, y: 214, size: 290 };
+
+    // ---------- Small helpers ----------
+    const $ = selector => document.querySelector(selector);
+    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const smooth = (a, b, t) => { const x = clamp((t - a) / (b - a), 0, 1); return x * x * (3 - 2 * x); };
+    const easeOutBack = x => { const k = 1.70158; return 1 + (k + 1) * Math.pow(x - 1, 3) + k * Math.pow(x - 1, 2); };
+    const easeInOut = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+    const bezier = (a, b, c, t) => (1 - t) * (1 - t) * a + 2 * (1 - t) * t * b + t * t * c;
+    const rand = (a, b) => a + (b - a) * Math.random();
+    const pick = list => list[Math.floor(Math.random() * list.length)];
+    const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
+    const reducedMotion = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function prng(seed) {
+      let state = seed >>> 0;
+      return () => {
+        state = (state + 0x6d2b79f5) >>> 0;
+        let r = Math.imul(state ^ (state >>> 15), state | 1);
+        r ^= r + Math.imul(r ^ (r >>> 7), r | 61);
+        return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+    /** Unbiased integer in [0, n) from Web Crypto (rejection sampling). */
+    function secureIndex(n) {
+      const range = 0x100000000; const limit = Math.floor(range / n) * n; const sample = new Uint32Array(1);
+      do { crypto.getRandomValues(sample); } while (sample[0] >= limit);
+      return sample[0] % n;
+    }
+    function secureSeed() { const sample = new Uint32Array(1); crypto.getRandomValues(sample); return sample[0]; }
+    function secureShuffle(list) {
+      const result = list.slice();
+      for (let i = result.length - 1; i > 0; i--) { const j = secureIndex(i + 1); [result[i], result[j]] = [result[j], result[i]]; }
+      return result;
+    }
+    const hexRgb = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+    function mix(a, b, t) { const x = hexRgb(a), y = hexRgb(b); return `rgb(${x.map((v, i) => Math.round(v + (y[i] - v) * t)).join(',')})`; }
+    const shade = (hex, amount) => amount >= 0 ? mix(hex, '#ffffff', amount) : mix(hex, '#000000', -amount);
+    function inkFor(hex) {
+      const lin = hexRgb(hex).map(v => { const c = v / 255; return c <= .03928 ? c / 12.92 : Math.pow((c + .055) / 1.055, 2.4); });
+      const lum = .2126 * lin[0] + .7152 * lin[1] + .0722 * lin[2];
+      return (lum + .05) / .078 >= 1.05 / (lum + .05) ? '#08202f' : '#ffffff';
+    }
+    function escapeHtml(value) { return String(value).replace(/[&<>'"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' })[ch]); }
+    const initialOf = name => Array.from(String(name || '?'))[0] || '?';
+
+    // ---------- Data ----------
+    const uid = () => (window.crypto && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${secureSeed().toString(16)}`);
+    const normalizeText = value => String(value || '').trim().replace(/\s+/g, ' ');
+    const nameKey = value => normalizeText(value).toLocaleLowerCase('vi');
+    const memberKey = (teamId, memberId) => `${teamId}:${memberId}`;
+    const validId = value => typeof value === 'string' && /^[A-Za-z0-9_-]+$/.test(value);
+    const normalizeImage = (value, max = 500000) => typeof value === 'string' && /^data:image\/(png|jpeg|webp);base64,/i.test(value) && value.length <= max ? value : '';
+    // Ảnh cũng có thể là đường dẫn tới file trong dự án, ví dụ "./assets/A1.png".
+    const normalizeImagePath = value => typeof value === 'string' && !value.includes('..') && /^(\.\/)?[^:?#\\<>"']+\.(png|jpe?g|webp|svg)$/i.test(value.trim()) ? value.trim() : '';
+    const photoOf = member => (member && (member.imageData || member.image)) || '';
+
+    // Mỗi team đúng một người đua ở vòng 1 (isRacer); chưa ai được đánh dấu thì là người đầu tiên.
+    function fixRacers(team) {
+      const index = Math.max(0, team.members.findIndex(member => member.isRacer));
+      team.members.forEach((member, i) => { member.isRacer = i === index; });
+      return team;
+    }
+    const racerOf = team => (team && team.members.find(member => member.isRacer)) || null;
+    const supportersOf = team => (team ? team.members.filter(member => !member.isRacer) : []);
+
+    function sampleTeams() {
+      return Array.from({ length: 4 }, (_, t) => ({
+        id: uid(), name: `Team ${t + 1}`, imageData: '',
+        members: Array.from({ length: 4 }, (_, m) => ({ id: uid(), name: `Thành viên ${t * 4 + m + 1}`, imageData: '', isRacer: m === 0 }))
+      }));
+    }
+    const defaultSettings = () => ({ sound: true, excludeAfterSpin: false, logoData: '', raceSeconds: 20, round2Method: 'wheel', excludeChosenMembers: true });
+    // sample: dữ liệu mẫu chưa ai sửa – không bao giờ được đẩy lên máy chủ đè dữ liệu thật.
+    const initialState = () => ({ teams: sampleTeams(), history: [], excludedTeams: [], excludedMembers: [], settings: defaultSettings(), pending: null, savedAt: 0, sample: true });
+
+    function normalizeData(raw) {
+      const source = raw && raw.data ? raw.data : raw;
+      if (!source || !Array.isArray(source.teams)) throw new Error('Dữ liệu không có danh sách team hợp lệ.');
+      const teamNames = new Set(), teamIds = new Set();
+      const teams = source.teams.map(team => {
+        const name = normalizeText(team && team.name);
+        if (!name) throw new Error('Mỗi team phải có tên.');
+        if (teamNames.has(nameKey(name))) throw new Error(`Tên team bị trùng: ${name}.`);
+        teamNames.add(nameKey(name));
+        let id = validId(team.id) ? team.id : uid(); if (teamIds.has(id)) id = uid(); teamIds.add(id);
+        const memberNames = new Set(), memberIds = new Set();
+        const members = (Array.isArray(team.members) ? team.members : []).map(member => {
+          const memberName = normalizeText(member && member.name);
+          if (!memberName) throw new Error(`Team ${name} có thành viên không hợp lệ.`);
+          if (memberNames.has(nameKey(memberName))) throw new Error(`Team ${name} có tên thành viên trùng nhau.`);
+          memberNames.add(nameKey(memberName));
+          let memberId = validId(member.id) ? member.id : uid(); if (memberIds.has(memberId)) memberId = uid(); memberIds.add(memberId);
+          const result = { id: memberId, name: memberName, imageData: normalizeImage(member.imageData), isRacer: member.isRacer === true };
+          const path = normalizeImagePath(member.image); if (path) result.image = path;
+          return result;
+        });
+        return fixRacers({ id, name, imageData: normalizeImage(team.imageData), members });
+      });
+      const hasTeam = id => teams.some(team => team.id === id);
+      const hasMemberKey = key => { const [teamId, ...rest] = String(key).split(':'); const memberId = rest.join(':'); return teams.some(t => t.id === teamId && t.members.some(m => m.id === memberId)); };
+      const history = (Array.isArray(source.history) ? source.history : []).filter(h => h && (h.type === 'team' || h.type === 'member')).map(h => ({
+        id: typeof h.id === 'string' ? h.id : uid(), type: h.type, method: typeof h.method === 'string' ? h.method : 'wheel',
+        resultId: String(h.resultId || ''), resultName: normalizeText(h.resultName) || 'Không rõ',
+        teamId: String(h.teamId || ''), teamName: normalizeText(h.teamName) || 'Không rõ',
+        time: typeof h.time === 'string' ? h.time : new Date().toISOString(), eliminated: Boolean(h.eliminated)
+      }));
+      const s = source.settings || {};
+      const p = source.pending;
+      const pending = p && (p.round === 'team' || p.round === 'member') && typeof p.winnerId === 'string' && typeof p.teamId === 'string'
+        ? { round: p.round, method: p.method === 'wheel' ? 'wheel' : 'horse', winnerId: p.winnerId, teamId: p.teamId, createdAt: typeof p.createdAt === 'string' ? p.createdAt : new Date().toISOString() }
+        : null;
+      return {
+        teams, history,
+        excludedTeams: Array.from(new Set((source.excludedTeams || []).filter(hasTeam))),
+        // Lần đầu có tính năng này: những người đã phát biểu trong lịch sử cũng tính là đã được chọn.
+        excludedMembers: Array.from(new Set((source.excludedMembers || []).concat(s.excludeChosenMembers === undefined ? history.filter(h => h.type === 'member').map(h => `${h.teamId}:${h.resultId}`) : []).filter(hasMemberKey))),
+        settings: {
+          sound: s.sound !== false, excludeAfterSpin: Boolean(s.excludeAfterSpin), logoData: normalizeImage(s.logoData, 2000000),
+          raceSeconds: Number.isFinite(Number(s.raceSeconds)) && s.raceSeconds !== undefined ? clamp(Math.round(Number(s.raceSeconds)), 12, 45) : 20,
+          round2Method: s.round2Method === 'horse' ? 'horse' : 'wheel',
+          excludeChosenMembers: s.excludeChosenMembers !== false
+        },
+        pending,
+        savedAt: Number(source.savedAt) || 0,
+        sample: source.sample === true
+      };
+    }
+
+    // Lấy team, thành viên, ảnh và logo từ Vòng quay SECI; lịch sử của trang đó không mang theo.
+    function readLegacy() {
+      const raw = localStorage.getItem(LEGACY_KEY);
+      if (!raw) return null;
+      const data = normalizeData(JSON.parse(raw));
+      return { ...data, history: [], excludedTeams: [], excludedMembers: [], pending: null };
+    }
+
+    let bootMessage = '';
+    function loadState() {
+      try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) return normalizeData(JSON.parse(raw)); } catch (_) { /* fall through */ }
+      try { const legacy = readLegacy(); if (legacy && legacy.teams.length) { bootMessage = 'Đã lấy danh sách team từ Vòng quay SECI.'; return legacy; } } catch (_) { /* fall through */ }
+      return initialState();
+    }
+
+    let state = loadState();
+    // Lưu hai nơi: trình duyệt (tức thì) và file trên máy chạy serve-lan.py (xem "LƯU VÀO MÁY CHỦ").
+    function writeLocal() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); return true; } catch (_) { return false; }
+    }
+    function persist() {
+      state.savedAt = Date.now(); state.sample = false;
+      const local = writeLocal();
+      if (sync.enabled) { scheduleServerSave(); return true; }
+      if (!local) showToast('Bộ nhớ trình duyệt đã đầy – thay đổi mới chưa được lưu.', 'error');
+      return local;
+    }
+    const sync = { enabled: false, version: 0, timer: null, busy: false, dirty: false, initial: false };
+    writeLocal();
+
+    const teamById = id => state.teams.find(team => team.id === id) || null;
+    const memberById = (team, id) => (team && team.members.find(member => member.id === id)) || null;
+    function availableTeams() {
+      const left = state.teams.filter(team => !state.settings.excludeAfterSpin || !state.excludedTeams.includes(team.id));
+      return left.length || !state.settings.excludeAfterSpin ? left : state.teams;
+    }
+    // Vòng 2 luôn gồm TOÀN BỘ thành viên của team, kể cả người vừa cưỡi ngựa ở vòng 1:
+    // không lọc theo isRacer, không loại người đã được chọn – mỗi người cùng một xác suất.
+    // Vòng 2: mọi thành viên của team, kể cả người vừa cưỡi ngựa. Chỉ người ĐÃ PHÁT BIỂU ở lần
+    // trước mới không quay lại (khi bật tùy chọn); hết người thì cả team được quay lại từ đầu.
+    function availableMembers(team) {
+      if (!team) return [];
+      if (!state.settings.excludeChosenMembers) return team.members.slice();
+      const left = team.members.filter(m => !state.excludedMembers.includes(memberKey(team.id, m.id)));
+      return left.length ? left : team.members.slice();
+    }
+    const spokenMembers = team => (team && state.settings.excludeChosenMembers ? team.members.filter(m => state.excludedMembers.includes(memberKey(team.id, m.id))) : []);
+    function recycleExhausted(round) {
+      if (!state.settings.excludeAfterSpin) return;
+      if (round === 'team' && state.teams.length && state.teams.every(t => state.excludedTeams.includes(t.id))) state.excludedTeams = [];
+    }
+    function recycleSpoken(team) {
+      if (team && team.members.length && team.members.every(m => state.excludedMembers.includes(memberKey(team.id, m.id)))) {
+        state.excludedMembers = state.excludedMembers.filter(key => !key.startsWith(`${team.id}:`));
+      }
+    }
+    function cleanReferences() {
+      state.teams.forEach(fixRacers);
+      const ids = new Set(state.teams.map(team => team.id));
+      state.excludedTeams = state.excludedTeams.filter(id => ids.has(id));
+      state.excludedMembers = state.excludedMembers.filter(key => { const [teamId, ...rest] = key.split(':'); return Boolean(memberById(teamById(teamId), rest.join(':'))); });
+    }
+
+    // ---------- DOM ----------
+    const els = {
+      canvas: $('#game'), stage: $('#stage'), screenBox: $('.screen-box'), brandSymbol: $('#brandSymbol'), saveStatus: $('#saveStatus'), hudRound: $('#hudRound'), hudZone: $('#hudZone'), hudPercent: $('#hudPercent'), hudFill: $('#hudFill'),
+      hudBoard: $('#hudBoard'), hudTicker: $('#hudTicker'), skip: $('#skipButton'), countdown: $('#countdown'),
+      lobby: $('#lobbyScreen'), teamWin: $('#teamWinScreen'), final: $('#finalScreen'),
+      sound: $('#soundButton'), fullscreen: $('#fullscreenButton'), settings: $('#settingsButton'),
+      logoButton: $('#logoButton'), logoInput: $('#logoInput'), brandLogo: $('#brandLogo'),
+      history: $('#history'), undo: $('#undoButton'), clearHistory: $('#clearHistoryButton'),
+      settingsBackdrop: $('#settingsBackdrop'), closeSettings: $('#closeSettings'), teamList: $('#teamList'), teamSummary: $('#teamSummary'), addTeam: $('#addTeamButton'),
+      soundSwitch: $('#soundSwitch'), excludeSwitch: $('#excludeSwitch'), spokenSwitch: $('#spokenSwitch'), durationRange: $('#durationRange'), durationOut: $('#durationOut'),
+      restoreExcluded: $('#restoreExcluded'), newSession: $('#newSession'), exportButton: $('#exportButton'), importButton: $('#importButton'), importInput: $('#importInput'),
+      legacyButton: $('#legacyButton'), sampleButton: $('#sampleButton'),
+      dialogBackdrop: $('#dialogBackdrop'), dialogTitle: $('#dialogTitle'), dialogMessage: $('#dialogMessage'), dialogLabel: $('#dialogLabel'),
+      dialogInput: $('#dialogInput'), dialogError: $('#dialogError'), dialogActions: $('#dialogActions'), photoInput: $('#photoInput'), toast: $('#toast')
+    };
+    const ctx = els.canvas.getContext('2d');
+    let viewScale = 1;
+
+    let toastTimer = null;
+    function showToast(message, type = '') {
+      clearTimeout(toastTimer); els.toast.textContent = message; els.toast.className = `toast ${type}`.trim();
+      requestAnimationFrame(() => els.toast.classList.add('show'));
+      toastTimer = setTimeout(() => els.toast.classList.remove('show'), 3300);
+    }
+
+    // Images (member photos, logo) drawn on the canvas.
+    const imageCache = new Map();
+    function imageFor(data) {
+      if (!data) return null;
+      if (!imageCache.has(data)) { const img = new Image(); img.src = data; imageCache.set(data, img); }
+      const img = imageCache.get(data);
+      return img.complete && img.naturalWidth ? img : null;
+    }
+
+    // ======================================================================
+    // LƯU VÀO MÁY CHỦ – du-lieu/dua-ngua.json trên máy chạy serve-lan.py
+    // ======================================================================
+    const SERVER_API = 'api/data/dua-ngua';
+    const LEGACY_API = 'api/data/vong-quay';
+    const LEGACY_HASH_KEY = 'seci-dua-ngua-legacy-backup';
+
+    function setSaveStatus(kind) {
+      const text = {
+        local: ['💾 Chỉ lưu trong trình duyệt', 'Mở trang qua serve-lan.py (link IP) để dữ liệu được lưu thành file trên máy chủ.'],
+        ready: ['☁ Máy chủ sẵn sàng lưu', 'Thay đổi đầu tiên sẽ được lưu vào du-lieu/dua-ngua.json trên máy chủ.'],
+        saving: ['⏳ Đang lưu…', 'Đang ghi dữ liệu lên máy chủ.'],
+        saved: ['☁ Đã lưu vào máy chủ', 'Dữ liệu nằm ở du-lieu/dua-ngua.json trên máy chạy server; bản cũ được sao lưu trong du-lieu/sao-luu.'],
+        error: ['⚠ Chưa lưu được – đang thử lại', 'Không kết nối được máy chủ. Dữ liệu vẫn được giữ trong trình duyệt và sẽ tự lưu lại khi có kết nối.']
+      }[kind];
+      els.saveStatus.textContent = text[0]; els.saveStatus.title = text[1]; els.saveStatus.dataset.kind = kind;
+    }
+    function scheduleServerSave(delay = 500) {
+      sync.dirty = true; clearTimeout(sync.timer);
+      sync.timer = setTimeout(flushServerSave, delay);
+    }
+    async function flushServerSave() {
+      if (!sync.enabled || !sync.dirty) return;
+      if (sync.busy) { clearTimeout(sync.timer); sync.timer = setTimeout(flushServerSave, 300); return; }
+      sync.busy = true; sync.dirty = false; setSaveStatus('saving');
+      let retry = 0;
+      try {
+        const res = await fetch(SERVER_API, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ baseVersion: sync.version, reason: sync.initial ? 'initial' : 'change', data: state })
+        });
+        if (res.status === 409) {
+          // Máy khác vừa lưu trước: lấy bản đó, giữ kết quả đua của máy này, rồi lưu lại.
+          mergeServerRecord(await res.json()); sync.dirty = true;
+          showToast('Dữ liệu vừa được cập nhật từ một máy khác.');
+        } else if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        else { const out = await res.json(); sync.version = out.version; sync.initial = false; }
+      } catch (_) { sync.dirty = true; retry = 4000; }
+      sync.busy = false;
+      if (sync.dirty) { if (retry) setSaveStatus('error'); clearTimeout(sync.timer); sync.timer = setTimeout(flushServerSave, retry || 200); }
+      else setSaveStatus('saved');
+    }
+    // Bản trên máy chủ làm gốc, nhưng không bỏ kết quả đua nào máy này có mà máy chủ chưa có.
+    function mergeServerRecord(record) {
+      if (!record || !record.data) return;
+      let incoming; try { incoming = normalizeData(record.data); } catch (_) { return; }
+      sync.version = Number(record.version) || 0;
+      const known = new Set(incoming.history.map(h => h.id));
+      incoming.history = incoming.history.concat(state.history.filter(h => !known.has(h.id)))
+        .sort((a, b) => String(a.time).localeCompare(String(b.time)));
+      if (state.pending && !incoming.pending) incoming.pending = state.pending;
+      incoming.sample = false;
+      state = incoming; writeLocal(); refreshAfterServerChange();
+    }
+    function refreshAfterServerChange() {
+      renderHistory(); renderLogo(); syncControls();
+      if (els.settingsBackdrop.classList.contains('open')) renderSettings();
+      if (game.mode === 'lobby') { if (game.round === 'member' && teamById(game.teamId)) enterMemberLobby(game.teamId); else enterTeamLobby(); }
+    }
+    const sameContent = (a, b) => JSON.stringify([a.teams, a.history]) === JSON.stringify([b.teams, b.history]);
+
+    async function fetchRecord(url) {
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const record = await res.json();
+      if (!record || typeof record.version !== 'number') throw new Error('not a data API');
+      return record;
+    }
+    async function connectServer() {
+      if (!/^https?:$/.test(location.protocol)) { setSaveStatus('local'); return; }
+      let record;
+      try { record = await fetchRecord(SERVER_API); } catch (_) { setSaveStatus('local'); return; }
+      sync.enabled = true; sync.version = record.version;
+      const server = record.data;
+      if (!server) {
+        // Máy chủ chưa có gì: đẩy dữ liệu của trình duyệt này lên (trừ dữ liệu mẫu chưa sửa).
+        if (state.sample) setSaveStatus('ready');
+        else { sync.initial = true; scheduleServerSave(0); showToast('Đang lưu dữ liệu của trình duyệt này lên máy chủ…'); }
+      } else if (state.sample) {
+        mergeServerRecord(record); setSaveStatus('saved'); showToast('Đã tải dữ liệu từ máy chủ.');
+      } else if (state.savedAt > (Number(record.savedAt) || 0)) {
+        scheduleServerSave(0);
+      } else if (!state.savedAt && !sameContent(state, normalizeData(server))) {
+        // Dữ liệu cũ trong trình duyệt (trước khi có lưu máy chủ) khác bản trên máy chủ:
+        // đẩy lên, máy chủ sao lưu bản của nó trước khi ghi đè.
+        sync.initial = true; state.savedAt = Date.now(); writeLocal(); scheduleServerSave(0);
+      } else {
+        mergeServerRecord(record); setSaveStatus('saved');
+      }
+      backupLegacyData();
+    }
+    // Khi tab được mở lại: lấy bản mới hơn từ máy chủ nếu có (tránh tab cũ ghi đè dữ liệu mới).
+    async function refreshFromServer() {
+      if (!sync.enabled || sync.busy || sync.dirty || isBusy()) return;
+      try {
+        const record = await fetchRecord(SERVER_API);
+        if (record.data && record.version > sync.version && !sync.dirty) mergeServerRecord(record);
+        setSaveStatus('saved');
+      } catch (_) { /* giữ nguyên, lần lưu sau sẽ thử lại */ }
+      backupLegacyData();
+    }
+    // Sao lưu luôn dữ liệu của Vòng quay SECI (cùng trình duyệt) thành du-lieu/vong-quay.json.
+    async function backupLegacyData() {
+      try {
+        const raw = localStorage.getItem(LEGACY_KEY); if (!raw) return;
+        let hash = 2166136261; for (let i = 0; i < raw.length; i++) { hash ^= raw.charCodeAt(i); hash = Math.imul(hash, 16777619); }
+        const fingerprint = `${raw.length}:${hash >>> 0}`;
+        if (localStorage.getItem(LEGACY_HASH_KEY) === fingerprint) return;
+        const data = JSON.parse(raw); if (!data || !Array.isArray(data.teams)) return;
+        const current = await fetchRecord(LEGACY_API);
+        const res = await fetch(LEGACY_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ baseVersion: current.version, reason: 'initial', data }) });
+        if (res.ok) localStorage.setItem(LEGACY_HASH_KEY, fingerprint);
+      } catch (_) { /* chỉ là bản sao lưu phụ */ }
+    }
+
+    // ======================================================================
+    // AUDIO
+    // ======================================================================
+    let audioCtx = null, noiseBuffer = null, music = null, winAudio = null;
+    function audio() {
+      if (!state.settings.sound) return null;
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null;
+        audioCtx ||= new AC(); if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => { });
+        return audioCtx;
+      } catch (_) { return null; }
+    }
+    function tone(freq, dur, type = 'sine', vol = .05, delay = 0, slideTo = 0) {
+      const ac = audio(); if (!ac) return;
+      try {
+        const t0 = ac.currentTime + delay; const osc = ac.createOscillator(); const gain = ac.createGain();
+        osc.type = type; osc.frequency.setValueAtTime(freq, t0);
+        if (slideTo) osc.frequency.exponentialRampToValueAtTime(slideTo, t0 + dur);
+        gain.gain.setValueAtTime(.0001, t0); gain.gain.exponentialRampToValueAtTime(vol, t0 + .012); gain.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+        osc.connect(gain).connect(ac.destination); osc.start(t0); osc.stop(t0 + dur + .03);
+      } catch (_) { /* âm thanh là tùy chọn */ }
+    }
+    function noise(dur, vol, freq, type = 'lowpass', attack = .005) {
+      const ac = audio(); if (!ac) return;
+      try {
+        if (!noiseBuffer) {
+          noiseBuffer = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate);
+          const data = noiseBuffer.getChannelData(0); for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+        }
+        const t0 = ac.currentTime; const src = ac.createBufferSource(); const filter = ac.createBiquadFilter(); const gain = ac.createGain();
+        src.buffer = noiseBuffer; filter.type = type; filter.frequency.value = freq; filter.Q.value = type === 'bandpass' ? .8 : .7;
+        gain.gain.setValueAtTime(.0001, t0); gain.gain.exponentialRampToValueAtTime(vol, t0 + attack); gain.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+        src.connect(filter).connect(gain).connect(ac.destination); src.start(t0); src.stop(t0 + dur + .05);
+      } catch (_) { /* bỏ qua */ }
+    }
+    const hoofBeat = vol => { noise(.08, vol, 380); tone(68, .09, 'sine', vol * .8); };
+    const cheer = () => { noise(2.2, .09, 1300, 'bandpass', .35); noise(1.6, .05, 2600, 'bandpass', .2); };
+    function chord() { [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, .7, i ? 'sine' : 'triangle', .045, i * .07)); }
+    function startMusic() {
+      stopMusic(0);
+      try {
+        // Bài dài 60 giây; lặp lại nếu cuộc đua được chỉnh dài hơn.
+        music = new Audio(MUSIC_SRC); music.loop = true; music.volume = .6; music.muted = !state.settings.sound;
+        const played = music.play(); if (played && played.catch) played.catch(() => { });
+      } catch (_) { music = null; }
+    }
+    function stopMusic(fadeMs = 900) {
+      const track = music; music = null; if (!track) return;
+      if (!fadeMs || track.paused) { try { track.pause(); } catch (_) { } return; }
+      const from = track.volume; const started = performance.now();
+      const step = () => {
+        const r = Math.min(1, (performance.now() - started) / fadeMs);
+        try { track.volume = Math.max(0, from * (1 - r)); } catch (_) { }
+        if (r < 1) requestAnimationFrame(step); else try { track.pause(); } catch (_) { }
+      };
+      requestAnimationFrame(step);
+    }
+    function playWin() {
+      if (!state.settings.sound) return;
+      try {
+        winAudio ||= new Audio(WIN_SRC); winAudio.currentTime = 0; winAudio.volume = .9;
+        const played = winAudio.play(); if (played && played.catch) played.catch(chord);
+      } catch (_) { chord(); }
+    }
+
+    // ======================================================================
+    // PRE-RENDERED ART (road tiles, distant city)
+    // ======================================================================
+    function offscreen(w, h, painter, scale = 2) {
+      const canvas = document.createElement('canvas'); canvas.width = Math.ceil(w * scale); canvas.height = Math.ceil(h * scale);
+      const c = canvas.getContext('2d'); c.scale(scale, scale); painter(c); return canvas;
+    }
+    function rr(c, x, y, w, h, r) {
+      r = Math.max(0, Math.min(r, w / 2, h / 2));
+      c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath();
+    }
+    function circle(c, x, y, r, fill) { c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); if (fill) { c.fillStyle = fill; c.fill(); } }
+
+    const TILE_W = 200;
+    const ROAD_STYLES = {
+      square: { base: '#bdb7ad', joint: '#8e887f', sw: 100, sh: 41, stagger: true, tone: .07 },
+      festival: { base: '#c8714f', joint: '#8b4630', sw: 40, sh: 20.5, stagger: true, tone: .1 },
+      park: { base: '#d9cba6', joint: '#ae9f78', sw: 50, sh: 30.75, stagger: true, tone: .06, moss: true },
+      arch: { base: '#ece7de', joint: '#c3bbad', sw: 100, sh: 61.5, stagger: false, tone: .04, inlay: true },
+      finish: { base: '#b9564a', joint: '#7d362d', sw: 50, sh: 24.6, stagger: true, tone: .08 }
+    };
+    const roadTiles = {};
+    Object.entries(ROAD_STYLES).forEach(([key, style]) => {
+      roadTiles[key] = offscreen(TILE_W, TRACK_H, c => {
+        c.fillStyle = style.joint; c.fillRect(0, 0, TILE_W, TRACK_H);
+        const cols = TILE_W / style.sw; const rows = Math.round(TRACK_H / style.sh);
+        for (let row = 0; row < rows; row++) {
+          const y = row * style.sh; const offset = style.stagger && row % 2 ? style.sw / 2 : 0;
+          for (let col = -1; col <= cols; col++) {
+            const x = col * style.sw + offset;
+            const wrapped = ((col % cols) + cols) % cols;
+            const hash = Math.abs(Math.sin((wrapped + 1) * 12.9898 + (row + 1) * 78.233) * 43758.5453) % 1;
+            c.fillStyle = shade(style.base, (hash - .5) * style.tone * 2);
+            c.fillRect(x + 1.2, y + 1.2, style.sw - 2.4, style.sh - 2.4);
+            if (style.inlay) {
+              c.fillStyle = 'rgba(176, 160, 128, .35)';
+              c.beginPath(); c.moveTo(x + style.sw / 2, y + 10); c.lineTo(x + style.sw - 14, y + style.sh / 2); c.lineTo(x + style.sw / 2, y + style.sh - 10); c.lineTo(x + 14, y + style.sh / 2); c.closePath(); c.fill();
+            }
+            if (style.moss && hash > .82) { c.fillStyle = 'rgba(96, 150, 70, .35)'; c.fillRect(x + 2, y + style.sh - 6, style.sw * .6, 4); }
+          }
+        }
+        // Far side of the course sits in the rail's shadow; the near side catches light.
+        const shadow = c.createLinearGradient(0, 0, 0, TRACK_H);
+        shadow.addColorStop(0, 'rgba(20, 30, 40, .32)'); shadow.addColorStop(.12, 'rgba(20, 30, 40, .06)');
+        shadow.addColorStop(.85, 'rgba(255, 255, 255, 0)'); shadow.addColorStop(1, 'rgba(255, 255, 255, .08)');
+        c.fillStyle = shadow; c.fillRect(0, 0, TILE_W, TRACK_H);
+      });
+    });
+
+    // The distant skyline is one seamless strip: nothing crosses its edges.
+    const CITY_W = 2560, CITY_H = 250, CITY_TOP = SKY_BOTTOM - CITY_H + 6;
+    const cityStrip = offscreen(CITY_W, CITY_H, c => {
+      const r = prng(20260908); const b = CITY_H;
+      const haze = '#a8cbe0', near = '#7ea7c2', window = 'rgba(255, 255, 255, .35)';
+      for (let x = 10; x < CITY_W - 90; x += 70 + r() * 60) { const h = 50 + r() * 90; c.fillStyle = haze; c.fillRect(x, b - h, 60 + r() * 40, h); }
+      const landmark = (x, kind) => {
+        c.fillStyle = near;
+        if (kind === 'tower') { c.fillRect(x, b - 150, 46, 150); c.fillRect(x + 8, b - 185, 30, 35); c.fillRect(x + 20, b - 228, 6, 43); circle(c, x + 23, b - 190, 13, near); }
+        if (kind === 'dome') { c.fillRect(x, b - 90, 130, 90); circle(c, x + 65, b - 92, 44, near); c.fillRect(x + 62, b - 160, 6, 30); c.fillRect(x - 10, b - 100, 150, 12); }
+        if (kind === 'flag') {
+          c.fillRect(x, b - 40, 90, 40); c.fillRect(x + 12, b - 70, 66, 30); c.fillRect(x + 24, b - 96, 42, 26); c.fillRect(x + 34, b - 150, 22, 54); c.fillRect(x + 43, b - 205, 4, 55);
+          c.fillStyle = '#da251d'; c.fillRect(x + 47, b - 205, 40, 26); c.fillStyle = '#ffcd00'; circle(c, x + 66, b - 192, 6, '#ffcd00');
+        }
+        if (kind === 'pagoda') { for (let i = 0; i < 5; i++) { const w = 80 - i * 12; c.fillRect(x + (80 - w) / 2, b - 30 - i * 30, w, 22); c.beginPath(); c.moveTo(x + (80 - w) / 2 - 12, b - 30 - i * 30); c.lineTo(x + 40, b - 46 - i * 30); c.lineTo(x + (80 + w) / 2 + 12, b - 30 - i * 30); c.fill(); } c.fillRect(x + 38, b - 190, 4, 40); }
+        if (kind === 'wheel') {
+          c.strokeStyle = near; c.lineWidth = 4; c.beginPath(); c.arc(x + 80, b - 105, 78, 0, Math.PI * 2); c.stroke();
+          for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6; c.beginPath(); c.moveTo(x + 80, b - 105); c.lineTo(x + 80 + Math.cos(a) * 78, b - 105 + Math.sin(a) * 78); c.lineWidth = 2; c.stroke(); circle(c, x + 80 + Math.cos(a) * 78, b - 105 + Math.sin(a) * 78, 7, near); }
+          c.fillRect(x + 50, b - 105, 6, 105); c.fillRect(x + 104, b - 105, 6, 105);
+        }
+        if (kind === 'obelisk') { c.beginPath(); c.moveTo(x, b); c.lineTo(x + 10, b - 170); c.lineTo(x + 16, b - 190); c.lineTo(x + 22, b - 170); c.lineTo(x + 32, b); c.fill(); }
+      };
+      const plan = [['tower', 120], ['dome', 420], ['flag', 760], ['pagoda', 1050], ['wheel', 1360], ['obelisk', 1640], ['dome', 1880], ['tower', 2240]];
+      let cursor = 30;
+      plan.forEach(([kind, at]) => {
+        for (; cursor < at - 20; cursor += 46 + r() * 30) {
+          const h = 60 + r() * 110; const w = 36 + r() * 30; c.fillStyle = near; c.fillRect(cursor, b - h, w, h);
+          c.fillStyle = window; for (let wy = b - h + 10; wy < b - 12; wy += 16) for (let wx = cursor + 6; wx < cursor + w - 8; wx += 11) if (r() > .35) c.fillRect(wx, wy, 5, 7);
+        }
+        landmark(at, kind); cursor = at + 175;
+      });
+      for (; cursor < CITY_W - 60; cursor += 46 + r() * 30) { const h = 60 + r() * 100; c.fillStyle = near; c.fillRect(cursor, b - h, 36 + r() * 20, h); }
+      c.fillStyle = near; c.fillRect(0, b - 14, CITY_W, 14);
+    });
+
+    // ======================================================================
+    // SCENE: infinite scrolling layers
+    // ======================================================================
+    const MID_W = {
+      stage: 270, fountain: 180, banner: 70, flags: 130, crowd: 170, stall: 150, balloons: 90, lights: 230,
+      tree: 120, pond: 220, bench: 90, bridge: 210, building: 300, statue: 100, gate: 230, lamp: 46, grandstand: 330, finishBanner: 170
+    };
+    const ZONE_MID = {
+      square: ['stage', 'fountain', 'banner', 'flags', 'crowd', 'banner', 'tree'],
+      festival: ['stall', 'balloons', 'lights', 'crowd', 'stall', 'flags', 'balloons'],
+      park: ['tree', 'tree', 'pond', 'bench', 'bridge', 'tree', 'lamp'],
+      arch: ['building', 'statue', 'gate', 'lamp', 'building', 'tree'],
+      finish: ['grandstand', 'flags', 'finishBanner', 'crowd', 'grandstand', 'flags']
+    };
+    const FORE_W = { lampTall: 60, flagTall: 90, bush: 170, sign: 190, column: 60 };
+    const ZONE_FORE = {
+      square: ['lampTall', 'bush', 'sign', 'flagTall', 'bush'],
+      festival: ['flagTall', 'bush', 'lampTall', 'sign', 'flagTall'],
+      park: ['bush', 'bush', 'lampTall', 'column', 'bush'],
+      arch: ['column', 'lampTall', 'bush', 'sign', 'column'],
+      finish: ['flagTall', 'flagTall', 'sign', 'bush', 'flagTall']
+    };
+    const SHIRTS = ['#ef1b2d', '#1eb8ff', '#ffc400', '#00b862', '#ff7a1a', '#8b3dff', '#ff2e88', '#ffffff', '#2563ff', '#00c9c9'];
+    const SKINS = ['#f2c9a0', '#e0ac7e', '#c68a5c', '#f6d5b5'];
+
+    const scene = {
+      time: 0, scroll: { sky: 0, city: 0, mid: 0, road: 0, fore: 0 },
+      mid: { items: [], next: 0 }, fore: { items: [], next: 0 }, road: { tiles: [], next: 0 },
+      clouds: Array.from({ length: 8 }, (_, i) => ({ x: i * 220 + rand(0, 120), y: rand(40, 190), s: rand(.6, 1.25) })),
+      dust: [], lines: [], confetti: [], shake: 0, flash: 0, hype: 0, startLine: null, gateX: null,
+      fansFar: { items: [], next: 0, cursor: 0 }, fansNear: { items: [], next: 0, cursor: 0 }
+    };
+
+    function zoneIndexAt(progress) { let index = 0; ZONES.forEach((zone, i) => { if (progress >= zone.from) index = i; }); return index; }
+    function spawnZone() {
+      if (game.mode === 'racing') return ZONES[zoneIndexAt(game.progress + .02)].key;
+      if (game.mode === 'finishing' || game.mode === 'result') return 'finish';
+      return 'square';
+    }
+
+    function spawnLayers() {
+      const zone = spawnZone();
+      const road = scene.road;
+      while (road.next - scene.scroll.road < W + TILE_W) { road.tiles.push({ x: road.next, type: zone }); road.next += TILE_W; }
+      road.tiles = road.tiles.filter(tile => tile.x + TILE_W > scene.scroll.road - 4);
+
+      const mid = scene.mid;
+      while (mid.next - scene.scroll.mid < W + 420) {
+        const type = pick(ZONE_MID[zone]);
+        mid.items.push({ type, x: mid.next, w: MID_W[type], seed: Math.random(), dy: rand(-6, 4), color: pick(COLORS) });
+        mid.next += MID_W[type] + rand(24, 100);
+      }
+      mid.items = mid.items.filter(item => item.x + item.w + 60 > scene.scroll.mid);
+
+      const fore = scene.fore;
+      while (fore.next - scene.scroll.fore < W + 300) {
+        const type = pick(ZONE_FORE[zone]);
+        fore.items.push({ type, x: fore.next, w: FORE_W[type], seed: Math.random(), color: pick(COLORS), label: zone });
+        fore.next += FORE_W[type] + rand(260, 640);
+      }
+      fore.items = fore.items.filter(item => item.x + item.w + 80 > scene.scroll.fore);
+
+      // Cổ động viên: lặp lại các nhóm thành viên không cưỡi ngựa ở cả hai hàng rào.
+      if (game.fanGroups.length) {
+        spawnFans(scene.fansFar, scene.scroll.road, 130, 380);
+        spawnFans(scene.fansNear, scene.scroll.fore, 420, 900);
+      }
+    }
+    function spawnFans(layer, scroll, gapMin, gapMax) {
+      while (layer.next - scroll < W + 300) {
+        const group = game.fanGroups[layer.cursor++ % game.fanGroups.length];
+        layer.items.push({ x: layer.next, group, seed: Math.random(), born: scene.time });
+        layer.next += group.members.length * FAN_SPACING + 40 + rand(gapMin, gapMax);
+      }
+      layer.items = layer.items.filter(item => item.x + item.group.members.length * FAN_SPACING + 60 > scroll);
+    }
+    // Gọi khi cuộc đua vòng 1 bắt đầu: nhóm cổ vũ của từng team đang đua.
+    function startFans() {
+      game.fanGroups = game.round !== 'team' ? [] : game.racers.map((r, index) => {
+        const team = teamById(r.id);
+        return { index, color: r.color, ink: r.ink, teamName: r.name, members: supportersOf(team).map(m => ({ name: m.name, photo: photoOf(m) })) };
+      }).filter(group => group.members.length);
+      const offset = Math.floor(Math.random() * Math.max(1, game.fanGroups.length));
+      scene.fansFar = { items: [], next: scene.scroll.road + 40, cursor: offset };
+      scene.fansNear = { items: [], next: scene.scroll.fore + 160, cursor: offset + 1 };
+      spawnLayers();
+    }
+
+    function resetScene() {
+      Object.keys(scene.scroll).forEach(key => { scene.scroll[key] = 0; });
+      scene.mid = { items: [], next: -260 }; scene.fore = { items: [], next: 120 }; scene.road = { tiles: [], next: -TILE_W };
+      scene.dust = []; scene.lines = []; scene.confetti = []; scene.shake = 0; scene.flash = 0; scene.hype = 0; scene.gateX = null;
+      scene.startLine = 612;
+      game.fanGroups = []; scene.fansFar = { items: [], next: 0, cursor: 0 }; scene.fansNear = { items: [], next: 0, cursor: 0 };
+      spawnLayers();
+    }
+
+    function advanceScene(dt) {
+      const distance = BASE_SPEED * game.speed * dt;
+      Object.keys(scene.scroll).forEach(key => { scene.scroll[key] += distance * FACTOR[key]; });
+      spawnLayers();
+    }
+
+    // ---------- Midground objects ----------
+    function drawCrowd(c, x, b, count, seed, spread = 17) {
+      const t = scene.time; const hype = scene.hype;
+      for (let i = 0; i < count; i++) {
+        const row = i % 2; const px = x + 10 + i * spread; const base = b - row * 14;
+        const bounce = Math.abs(Math.sin(t * (3 + hype * 6) + i * 1.7 + seed * 9)) * (1.5 + hype * 10);
+        const shirt = SHIRTS[(i + Math.floor(seed * 10)) % SHIRTS.length]; const skin = SKINS[(i * 3 + Math.floor(seed * 7)) % SKINS.length];
+        c.fillStyle = shirt; rr(c, px - 7, base - 30 - bounce, 14, 26, 5); c.fill();
+        circle(c, px, base - 37 - bounce, 6.5, skin);
+        if (hype > .25 || (i + Math.floor(t * 2)) % 5 === 0) {
+          c.strokeStyle = skin; c.lineWidth = 3; c.lineCap = 'round';
+          c.beginPath(); c.moveTo(px - 6, base - 26 - bounce); c.lineTo(px - 11, base - 46 - bounce + Math.sin(t * 9 + i) * 3); c.moveTo(px + 6, base - 26 - bounce); c.lineTo(px + 11, base - 46 - bounce + Math.cos(t * 9 + i) * 3); c.stroke();
+        }
+      }
+    }
+    function waveFlag(c, px, top, w, h, color, phase) {
+      const t = scene.time; c.fillStyle = color; c.beginPath(); c.moveTo(px, top);
+      for (let k = 0; k <= 4; k++) c.lineTo(px + k * w / 4, top + Math.sin(t * 7 + k * .9 + phase) * 3);
+      for (let k = 4; k >= 0; k--) c.lineTo(px + k * w / 4, top + h * (1 - k * .06) + Math.sin(t * 7 + k * .9 + phase) * 3);
+      c.closePath(); c.fill();
+    }
+
+    const MID_DRAW = {
+      stage(c, x, b, o) {
+        const w = 270; const t = scene.time;
+        c.fillStyle = '#2b3440'; c.fillRect(x + 6, b - 176, 9, 176); c.fillRect(x + w - 15, b - 176, 9, 176); c.fillRect(x + 4, b - 180, w - 8, 11);
+        const g = c.createLinearGradient(x, b - 164, x, b - 48); g.addColorStop(0, '#0a9ee8'); g.addColorStop(1, '#064f70');
+        c.fillStyle = g; c.fillRect(x + 22, b - 164, w - 44, 116);
+        const logo = imageFor(state.settings.logoData);
+        if (logo) {
+          const box = 92; const ratio = Math.min((w - 70) / logo.naturalWidth, box / logo.naturalHeight);
+          const lw = logo.naturalWidth * ratio, lh = logo.naturalHeight * ratio;
+          c.fillStyle = '#fff'; rr(c, x + w / 2 - lw / 2 - 6, b - 154, lw + 12, lh + 8, 8); c.fill();
+          c.drawImage(logo, x + w / 2 - lw / 2, b - 150, lw, lh);
+        } else {
+          drawLogo(c, x + 78, b - 106, 92, LOGO_POINT_TO_TEAM, 1, false);
+          c.fillStyle = '#fff'; c.font = '900 44px Bahnschrift, "Segoe UI", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('SECI', x + 180, b - 118);
+          c.font = '800 12px "Segoe UI", sans-serif'; c.fillStyle = '#ffd84a'; c.fillText('ĐUA NGỰA', x + 180, b - 82);
+        }
+        c.fillStyle = '#7a2e22'; c.fillRect(x, b - 46, w, 46); c.fillStyle = '#a8432f'; c.fillRect(x, b - 46, w, 7);
+        for (let i = 0; i < 7; i++) { const on = (Math.floor(t * 4) + i) % 3 === 0; circle(c, x + 34 + i * 34, b - 172, on ? 7 : 5, on ? '#fff3a0' : '#c9a23a'); }
+      },
+      fountain(c, x, b) {
+        const t = scene.time; const cx = x + 90;
+        c.strokeStyle = 'rgba(160, 222, 255, .85)'; c.lineWidth = 4; c.lineCap = 'round';
+        const jet = 92 + Math.sin(t * 5) * 8;
+        c.beginPath(); c.moveTo(cx, b - 52); c.lineTo(cx, b - jet - 10); c.stroke();
+        [-1, 1].forEach(side => { c.beginPath(); c.moveTo(cx, b - jet + 4); c.quadraticCurveTo(cx + side * 40, b - jet - 20, cx + side * 62, b - 30); c.stroke(); });
+        for (let i = 0; i < 6; i++) circle(c, cx + Math.sin(t * 3 + i) * 50, b - 30 - ((t * 60 + i * 15) % 50), 2.5, 'rgba(220, 245, 255, .9)');
+        c.fillStyle = '#cfc8bb'; c.fillRect(cx - 9, b - 60, 18, 40);
+        c.fillStyle = '#d8d2c6'; c.beginPath(); c.moveTo(x + 6, b - 30); c.lineTo(x + 174, b - 30); c.lineTo(x + 160, b); c.lineTo(x + 20, b); c.closePath(); c.fill();
+        c.fillStyle = '#7fcdf0'; c.fillRect(x + 14, b - 30, 152, 7);
+      },
+      banner(c, x, b, o) {
+        c.fillStyle = '#4a5563'; c.fillRect(x + 8, b - 190, 5, 190); circle(c, x + 10.5, b - 192, 5, '#ffc400');
+        c.fillStyle = o.color; c.beginPath(); c.moveTo(x + 13, b - 182); c.lineTo(x + 62, b - 182); c.lineTo(x + 62, b - 60); c.lineTo(x + 37.5, b - 74); c.lineTo(x + 13, b - 60); c.closePath(); c.fill();
+        c.fillStyle = 'rgba(255, 255, 255, .9)'; c.fillRect(x + 13, b - 176, 49, 5);
+        c.fillStyle = inkFor(o.color); c.font = '900 20px Bahnschrift, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+        ['S', 'E', 'C', 'I'].forEach((letter, i) => c.fillText(letter, x + 37.5, b - 156 + i * 22));
+      },
+      flags(c, x, b, o) {
+        [[15, 150], [62, 178], [109, 150]].forEach(([dx, h], i) => {
+          c.fillStyle = '#56606c'; c.fillRect(x + dx, b - h, 4, h);
+          waveFlag(c, x + dx + 4, b - h + 2, 40, 26, COLORS[(i * 3 + Math.floor(o.seed * 10)) % COLORS.length], i + o.seed * 6);
+        });
+      },
+      crowd(c, x, b, o) { drawCrowd(c, x, b, 10, o.seed); },
+      stall(c, x, b, o) {
+        c.fillStyle = '#6b4a2f'; c.fillRect(x + 8, b - 112, 6, 112); c.fillRect(x + 136, b - 112, 6, 112);
+        c.fillStyle = '#9c6b3d'; c.fillRect(x + 4, b - 48, 142, 48); c.fillStyle = '#b8824c'; c.fillRect(x + 4, b - 48, 142, 6);
+        for (let i = 0; i < 6; i++) { c.fillStyle = i % 2 ? '#ffffff' : o.color; c.beginPath(); c.moveTo(x + i * 25, b - 112); c.lineTo(x + 25 + i * 25, b - 112); c.lineTo(x + 25 + i * 25, b - 86); c.arc(x + 12.5 + i * 25, b - 86, 12.5, 0, Math.PI); c.closePath(); c.fill(); }
+        c.fillStyle = shade(o.color, -.25); c.fillRect(x - 4, b - 122, 158, 12);
+        for (let i = 0; i < 7; i++) circle(c, x + 22 + i * 18, b - 54, 6, SHIRTS[(i + 2) % SHIRTS.length]);
+      },
+      balloons(c, x, b, o) {
+        const t = scene.time; const ax = x + 45, ay = b - 18;
+        c.fillStyle = '#56606c'; c.fillRect(ax - 6, ay, 12, 18);
+        for (let i = 0; i < 6; i++) {
+          const bx = ax + Math.sin(i * 1.9 + o.seed * 5) * 32 + Math.sin(t * 1.6 + i) * 4; const by = b - 120 - (i % 3) * 22 + Math.sin(t * 2 + i) * 5;
+          c.strokeStyle = 'rgba(70, 80, 90, .6)'; c.lineWidth = 1; c.beginPath(); c.moveTo(ax, ay); c.lineTo(bx, by + 16); c.stroke();
+          c.fillStyle = SHIRTS[(i + Math.floor(o.seed * 10)) % 8]; c.beginPath(); c.ellipse(bx, by, 13, 16, 0, 0, Math.PI * 2); c.fill();
+          circle(c, bx - 4, by - 6, 3.5, 'rgba(255, 255, 255, .55)');
+        }
+      },
+      lights(c, x, b) {
+        const t = scene.time;
+        c.fillStyle = '#4a5563'; c.fillRect(x + 4, b - 150, 6, 150); c.fillRect(x + 220, b - 150, 6, 150);
+        c.strokeStyle = '#33404d'; c.lineWidth = 2; c.beginPath(); c.moveTo(x + 7, b - 146); c.quadraticCurveTo(x + 115, b - 92, x + 223, b - 146); c.stroke();
+        for (let i = 1; i < 14; i++) {
+          const u = i / 14; const px = (1 - u) * (1 - u) * (x + 7) + 2 * u * (1 - u) * (x + 115) + u * u * (x + 223); const py = (1 - u) * (1 - u) * (b - 146) + 2 * u * (1 - u) * (b - 92) + u * u * (b - 146);
+          const on = (i + Math.floor(t * 5)) % 3 !== 0; const color = SHIRTS[i % 7];
+          if (on) circle(c, px, py + 7, 9, 'rgba(255, 240, 160, .25)');
+          circle(c, px, py + 7, 5, on ? color : shade(color, -.45));
+        }
+      },
+      tree(c, x, b, o) {
+        const s = .8 + o.seed * .4; const cx = x + 60;
+        c.fillStyle = '#6b4a2f'; c.fillRect(cx - 7, b - 64 * s, 14, 64 * s);
+        [[0, -100, 40], [-26, -82, 30], [26, -84, 32], [0, -130, 28]].forEach(([dx, dy, r], i) => circle(c, cx + dx * s, b + dy * s, r * s, i === 3 ? '#4fa34a' : (i % 2 ? '#3e8f3d' : '#47993f')));
+        circle(c, cx - 12 * s, b - 112 * s, 12 * s, 'rgba(255, 255, 255, .12)');
+      },
+      pond(c, x, b) {
+        const t = scene.time;
+        c.fillStyle = '#9aa29b'; c.beginPath(); c.ellipse(x + 110, b - 8, 110, 17, 0, 0, Math.PI * 2); c.fill();
+        c.fillStyle = '#5fb3d9'; c.beginPath(); c.ellipse(x + 110, b - 8, 102, 13, 0, 0, Math.PI * 2); c.fill();
+        c.strokeStyle = 'rgba(255, 255, 255, .55)'; c.lineWidth = 2;
+        for (let i = 0; i < 3; i++) { const rx = 20 + ((t * 18 + i * 25) % 70); c.beginPath(); c.ellipse(x + 60 + i * 50, b - 8, rx * .5, rx * .08, 0, 0, Math.PI * 2); c.stroke(); }
+        c.strokeStyle = '#4f8f3a'; c.lineWidth = 3; for (let i = 0; i < 5; i++) { c.beginPath(); c.moveTo(x + 8 + i * 6, b - 10); c.lineTo(x + 4 + i * 7, b - 40 - i * 3); c.stroke(); }
+      },
+      bench(c, x, b) {
+        c.fillStyle = '#5a3a24'; c.fillRect(x + 10, b - 22, 6, 22); c.fillRect(x + 74, b - 22, 6, 22);
+        c.fillStyle = '#9c6b3d'; c.fillRect(x + 4, b - 26, 82, 7); c.fillRect(x + 6, b - 50, 78, 6); c.fillRect(x + 6, b - 40, 78, 6);
+      },
+      bridge(c, x, b) {
+        c.fillStyle = '#5fb3d9'; c.beginPath(); c.ellipse(x + 105, b - 5, 110, 10, 0, 0, Math.PI * 2); c.fill();
+        c.strokeStyle = '#b5432f'; c.lineWidth = 11; c.beginPath(); c.moveTo(x, b - 6); c.quadraticCurveTo(x + 105, b - 86, x + 210, b - 6); c.stroke();
+        c.lineWidth = 3; c.strokeStyle = '#d0644a';
+        for (let i = 1; i < 10; i++) { const u = i / 10; const px = x + u * 210; const py = (1 - u) * (1 - u) * (b - 6) + 2 * u * (1 - u) * (b - 86) + u * u * (b - 6); c.beginPath(); c.moveTo(px, py - 5); c.lineTo(px, py - 26); c.stroke(); }
+        c.beginPath(); c.moveTo(x + 10, b - 30); c.quadraticCurveTo(x + 105, b - 112, x + 200, b - 30); c.stroke();
+      },
+      building(c, x, b) {
+        const w = 300;
+        c.fillStyle = '#e2d2b2'; c.beginPath(); c.moveTo(x - 8, b - 176); c.lineTo(x + w / 2, b - 226); c.lineTo(x + w + 8, b - 176); c.closePath(); c.fill();
+        c.fillStyle = '#efe4cf'; c.fillRect(x, b - 176, w, 176); c.fillStyle = '#d6c3a0'; c.fillRect(x - 6, b - 180, w + 12, 9);
+        for (let i = 0; i < 7; i++) { const cx = x + 18 + i * 44; c.fillStyle = '#fbf6ec'; c.fillRect(cx, b - 166, 16, 140); c.fillStyle = 'rgba(120, 100, 70, .18)'; c.fillRect(cx + 11, b - 166, 5, 140); }
+        c.fillStyle = 'rgba(70, 60, 50, .35)'; for (let i = 0; i < 6; i++) c.fillRect(x + 40 + i * 44, b - 140, 14, 40);
+        c.fillStyle = '#d9cdb5'; c.fillRect(x - 8, b - 26, w + 16, 10); c.fillRect(x - 16, b - 16, w + 32, 16);
+        circle(c, x + w / 2, b - 197, 12, '#c9a23a');
+      },
+      statue(c, x, b) {
+        c.fillStyle = '#bdb6a8'; c.fillRect(x + 18, b - 22, 64, 22); c.fillStyle = '#d0c9bb'; c.fillRect(x + 28, b - 62, 44, 40); c.fillRect(x + 22, b - 66, 56, 6);
+        c.fillStyle = '#4f6b5a'; c.fillRect(x + 42, b - 118, 16, 52); circle(c, x + 50, b - 126, 10, '#4f6b5a');
+        c.strokeStyle = '#4f6b5a'; c.lineWidth = 6; c.lineCap = 'round'; c.beginPath(); c.moveTo(x + 56, b - 110); c.lineTo(x + 74, b - 150); c.stroke();
+      },
+      gate(c, x, b) {
+        const roof = (cx, y, w) => { c.fillStyle = '#3b3f4a'; c.beginPath(); c.moveTo(cx - w / 2 - 14, y - 4); c.quadraticCurveTo(cx - w / 2, y + 4, cx - w / 2 + 8, y + 2); c.lineTo(cx + w / 2 - 8, y + 2); c.quadraticCurveTo(cx + w / 2, y + 4, cx + w / 2 + 14, y - 4); c.lineTo(cx + w / 2 - 6, y - 22); c.lineTo(cx - w / 2 + 6, y - 22); c.closePath(); c.fill(); };
+        c.fillStyle = '#a8322a'; [10, 70, 152, 212].forEach((dx, i) => c.fillRect(x + dx, b - (i === 1 || i === 2 ? 150 : 108), 10, i === 1 || i === 2 ? 150 : 108));
+        roof(x + 40, b - 108, 70); roof(x + 192, b - 108, 70); roof(x + 116, b - 150, 104);
+        c.fillStyle = '#c9a23a'; c.fillRect(x + 90, b - 134, 52, 20); c.fillStyle = '#7a1e17'; c.fillRect(x + 94, b - 130, 44, 12);
+      },
+      lamp(c, x, b) {
+        c.fillStyle = '#2f3a46'; c.fillRect(x + 20, b - 132, 6, 132); c.fillRect(x + 14, b - 6, 18, 6);
+        circle(c, x + 23, b - 140, 15, 'rgba(255, 240, 170, .3)'); circle(c, x + 23, b - 140, 9, '#fff6c8');
+      },
+      grandstand(c, x, b, o) {
+        const w = 330;
+        c.fillStyle = '#5b6573'; c.fillRect(x + 6, b - 170, 6, 170); c.fillRect(x + w - 12, b - 170, 6, 170);
+        for (let i = 0; i < 6; i++) { c.fillStyle = i % 2 ? '#ffffff' : '#ef1b2d'; c.fillRect(x + i * (w / 6), b - 182, w / 6, 16); }
+        for (let tier = 0; tier < 4; tier++) { c.fillStyle = tier % 2 ? '#8792a0' : '#9aa5b2'; c.fillRect(x + 4 + tier * 6, b - 34 - tier * 30, w - 8 - tier * 12, 34); }
+        for (let tier = 0; tier < 4; tier++) drawCrowd(c, x + 8 + tier * 6, b - 26 - tier * 30, 18 - tier, o.seed + tier * .13, 17);
+      },
+      finishBanner(c, x, b) {
+        c.fillStyle = '#4a5563'; c.fillRect(x + 6, b - 160, 6, 160); c.fillRect(x + 158, b - 160, 6, 160);
+        c.fillStyle = '#ffffff'; c.fillRect(x + 12, b - 158, 146, 46);
+        for (let i = 0; i < 18; i++) { c.fillStyle = '#111'; c.fillRect(x + 12 + i * 8.1, b - 158 + (i % 2) * 5, 8.1, 5); c.fillRect(x + 12 + i * 8.1, b - 117 - (i % 2) * 5, 8.1, 5); }
+        c.fillStyle = '#ef1b2d'; c.font = '900 20px Bahnschrift, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('VỀ ĐÍCH', x + 85, b - 135);
+      }
+    };
+
+    const FORE_DRAW = {
+      lampTall(c, x) {
+        c.fillStyle = '#1d2630'; c.fillRect(x + 24, 360, 11, H - 360); c.fillRect(x + 24, 360, 44, 7);
+        circle(c, x + 66, 376, 20, 'rgba(255, 240, 170, .25)'); circle(c, x + 66, 376, 11, '#fff6c8');
+      },
+      flagTall(c, x, o) {
+        c.fillStyle = '#28323d'; c.fillRect(x + 10, 392, 7, H - 392); circle(c, x + 13.5, 390, 6, '#ffc400');
+        waveFlag(c, x + 17, 398, 74, 42, o.color, o.seed * 7);
+      },
+      bush(c, x, o) {
+        const base = H + 6;
+        [[30, 36], [72, 48], [118, 40], [150, 30]].forEach(([dx, r], i) => circle(c, x + dx, base - r * .55, r, i % 2 ? '#2f7a32' : '#378a38'));
+        circle(c, x + 64, base - 52, 13, 'rgba(255, 255, 255, .1)');
+        if (o.seed > .5) for (let i = 0; i < 5; i++) circle(c, x + 30 + i * 26, base - 40 - (i % 2) * 14, 4.5, SHIRTS[(i + 1) % 7]);
+      },
+      sign(c, x, o) {
+        c.fillStyle = '#28323d'; c.fillRect(x + 22, 640, 7, 80); c.fillRect(x + 160, 640, 7, 80);
+        c.fillStyle = '#0a2a42'; rr(c, x, 612, 190, 52, 8); c.fill(); c.strokeStyle = '#ffc400'; c.lineWidth = 3; c.stroke();
+        c.fillStyle = '#ffc400'; c.font = '900 22px Bahnschrift, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+        const text = { square: 'SECI DERBY', festival: 'LỄ HỘI', park: 'CÔNG VIÊN', arch: 'QUẢNG TRƯỜNG', finish: 'VỀ ĐÍCH ▶' }[o.label] || 'SECI';
+        c.fillText(text, x + 95, 639);
+      },
+      column(c, x) {
+        c.fillStyle = '#d9d2c4'; c.fillRect(x + 12, 588, 34, H - 588); c.fillStyle = '#efe9dd'; c.fillRect(x + 6, 578, 46, 12); c.fillStyle = 'rgba(0, 0, 0, .12)'; c.fillRect(x + 36, 590, 10, H - 590);
+        circle(c, x + 29, 568, 11, '#c9a23a');
+      }
+    };
+
+    // ---------- Cổ động viên ở hàng rào ----------
+    const FAN_SPACING = 50;
+    function drawFanGroup(c, item, x, base, s, sign = true) {
+      const group = item.group; const t = scene.time;
+      const alpha = clamp((scene.time - item.born) / .5, 0, 1); if (alpha <= 0) return;
+      const racer = game.racers[group.index];
+      const live = game.mode === 'racing' || game.mode === 'finishing';
+      const leading = live && racer && racer.rank === 1;
+      const won = (game.mode === 'finishing' || game.mode === 'result') && racer && game.winner === group.index;
+      const energy = 2.5 + (leading ? 6 : 0) + (won ? 10 : 0) + scene.hype * 4;
+      const width = group.members.length * FAN_SPACING * s;
+      c.save(); c.globalAlpha *= alpha;
+      // Bảng cổ vũ của team, giơ cao trên đầu nhóm.
+      const signY = base - 112 * s - (leading || won ? 6 * s : 0) + Math.sin(t * 5 + item.seed * 9) * 2 * s;
+      if (sign) {
+      c.strokeStyle = '#5a4632'; c.lineWidth = 3 * s;
+      c.beginPath(); c.moveTo(x + 14 * s, signY + 18 * s); c.lineTo(x + 18 * s, base - 70 * s); c.moveTo(x + width - 14 * s, signY + 18 * s); c.lineTo(x + width - 18 * s, base - 70 * s); c.stroke();
+      c.fillStyle = group.color; rr(c, x, signY, width, 22 * s, 5 * s); c.fill();
+      c.strokeStyle = 'rgba(255, 255, 255, .7)'; c.lineWidth = 1.5 * s; c.stroke();
+      c.fillStyle = group.ink; c.font = `900 ${Math.round(12 * s)}px Bahnschrift, "Segoe UI", sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
+      let name = group.teamName;
+      while (c.measureText(`${name} CỐ LÊN!`).width > width - 10 * s && name.length > 2) name = name.slice(0, -2) + '…';
+      c.fillText(`${name} CỐ LÊN!`, x + width / 2, signY + 11.5 * s);
+      }
+      c.textAlign = 'center'; c.textBaseline = 'middle';
+      group.members.forEach((member, k) => {
+        const fx = x + (k + .5) * FAN_SPACING * s;
+        const jump = Math.abs(Math.sin(t * (4.5 + energy * .25) + k * 1.3 + item.seed * 6)) * energy * s;
+        const top = base - 42 * s - jump;
+        c.fillStyle = group.color; rr(c, fx - 14 * s, top, 28 * s, 42 * s, 9 * s); c.fill();
+        c.fillStyle = 'rgba(255, 255, 255, .25)'; c.fillRect(fx - 14 * s, top + 14 * s, 28 * s, 4 * s);
+        c.strokeStyle = '#f0c49a'; c.lineWidth = 5 * s; c.lineCap = 'round';
+        const wave = Math.sin(t * 9 + k * 2 + item.seed * 5) * 6 * s;
+        c.beginPath(); c.moveTo(fx - 12 * s, top + 8 * s); c.lineTo(fx - 22 * s, top - 18 * s + wave); c.moveTo(fx + 12 * s, top + 8 * s); c.lineTo(fx + 22 * s, top - 18 * s - wave); c.stroke();
+        const headY = top - 15 * s; const radius = 16 * s;
+        const face = member.photo ? imageFor(member.photo) : null;
+        circle(c, fx, headY, radius + 2.5 * s, group.color);
+        if (face) {
+          c.save(); c.beginPath(); c.arc(fx, headY, radius, 0, Math.PI * 2); c.clip();
+          c.drawImage(face, fx - radius, headY - radius, radius * 2, radius * 2); c.restore();
+        } else {
+          circle(c, fx, headY, radius, '#0a3f57');
+          c.fillStyle = '#fff'; c.font = `900 ${Math.round(15 * s)}px Bahnschrift, sans-serif`; c.fillText(initialOf(member.name), fx, headY + 1);
+        }
+      });
+      c.restore();
+    }
+    function drawFans(c, layer, scroll, base, s, sign) {
+      layer.items.forEach(item => {
+        const x = item.x - scroll; const width = item.group.members.length * FAN_SPACING * s;
+        if (x > W + 20 || x + width < -20) return;
+        drawFanGroup(c, item, x, base, s, sign);
+      });
+    }
+
+    // ======================================================================
+    // HORSE
+    // ======================================================================
+    function legAngles(kind, angle, g) {
+      const s = Math.sin(angle), co = Math.cos(angle);
+      if (kind === 'fore') { const a1 = g * (.62 * s + .1); return [a1, a1 - g * 1.35 * Math.max(0, co)]; }
+      const a1 = g * (.55 * s - .1); return [a1, a1 + g * (.95 * Math.max(0, -co) - .2)];
+    }
+    function drawLeg(c, hx, hy, kind, angle, g, color, lower, hoof) {
+      const [a1, a2] = legAngles(kind, angle, g);
+      const l1 = kind === 'fore' ? 26 : 27, l2 = kind === 'fore' ? 26 : 27;
+      const kx = hx + Math.sin(a1) * l1, ky = hy + Math.cos(a1) * l1;
+      const fx = kx + Math.sin(a2) * l2, fy = ky + Math.cos(a2) * l2;
+      c.lineCap = 'round';
+      c.strokeStyle = color; c.lineWidth = kind === 'fore' ? 10 : 12; c.beginPath(); c.moveTo(hx, hy); c.lineTo(kx, ky); c.stroke();
+      c.strokeStyle = lower; c.lineWidth = 6.5; c.beginPath(); c.moveTo(kx, ky); c.lineTo(fx, fy); c.stroke();
+      c.fillStyle = hoof; c.beginPath(); c.ellipse(fx + 1.5, fy, 5, 3.6, a2, 0, Math.PI * 2); c.fill();
+    }
+
+    function drawHorse(c, r, x, y, s, g) {
+      const t = scene.time; const p = r.phase * Math.PI * 2;
+      const coat = r.coat.coat, mane = r.coat.mane;
+      const far = shade(coat, -.28); const lowerNear = r.coat.sock ? '#f3efe8' : shade(coat, -.08); const lowerFar = r.coat.sock ? '#cfc9be' : shade(coat, -.34);
+      const bob = g ? -Math.abs(Math.sin(p)) * 7 * g : Math.sin(t * 1.6 + r.phase * 6) * .8;
+      const lean = (g ? -.035 * Math.sin(p * 2) * g : 0) - clamp(r.surge, -1, 1) * .05;
+
+      // shadow stays on the ground
+      c.fillStyle = 'rgba(10, 20, 30, .22)'; c.beginPath(); c.ellipse(x + 4 * s, y + 2, (58 - Math.abs(bob) * 1.5) * s, 7 * s, 0, 0, Math.PI * 2); c.fill();
+
+      c.save(); c.translate(x, y + bob * s); c.scale(s, s); c.rotate(lean);
+      // far legs
+      drawLeg(c, 32, -50, 'fore', p + Math.PI * 2 * .48, g, far, lowerFar, '#1b1512');
+      drawLeg(c, -34, -54, 'hind', p, g, far, lowerFar, '#1b1512');
+      // tail
+      const tw = (Math.sin(p + .5) * 7 + Math.sin(t * 3) * 2) * Math.max(.25, g);
+      c.strokeStyle = mane; c.lineCap = 'round';
+      c.lineWidth = 10; c.beginPath(); c.moveTo(-56, -76); c.quadraticCurveTo(-80, -78 + tw * .3, -94, lerp(-34, -64, g) + tw); c.stroke();
+      c.lineWidth = 5; c.beginPath(); c.moveTo(-58, -72); c.quadraticCurveTo(-84, -64, -92, lerp(-26, -46, g) + tw * .8); c.stroke();
+      // body
+      c.fillStyle = coat;
+      c.beginPath(); c.ellipse(-30, -65, 27, 23, -.15, 0, Math.PI * 2); c.fill();
+      c.beginPath(); c.ellipse(0, -62, 45, 20, 0, 0, Math.PI * 2); c.fill();
+      c.beginPath(); c.ellipse(31, -63, 23, 22, .2, 0, Math.PI * 2); c.fill();
+      c.fillStyle = 'rgba(0, 0, 0, .12)'; c.beginPath(); c.ellipse(0, -48, 40, 7, 0, 0, Math.PI * 2); c.fill();
+      c.fillStyle = 'rgba(255, 255, 255, .13)'; c.beginPath(); c.ellipse(-8, -76, 34, 5, 0, 0, Math.PI * 2); c.fill();
+      // neck and head
+      const headBob = g ? Math.sin(p + 1.2) * 4 * g : Math.sin(t * 1.3 + r.phase * 4) * 1.5;
+      const hx = 66, hy = -100 + headBob; const tilt = .62 + (g ? Math.sin(p + 1.2) * .06 : 0);
+      c.fillStyle = coat; c.beginPath(); c.moveTo(14, -80); c.lineTo(42, -50); c.lineTo(hx + 8, hy + 10); c.lineTo(hx - 8, hy - 8); c.closePath(); c.fill();
+      c.save(); c.translate(hx, hy); c.rotate(tilt);
+      c.fillStyle = coat; c.beginPath(); c.ellipse(12, 0, 21, 10, 0, 0, Math.PI * 2); c.fill();
+      c.fillStyle = shade(coat, -.12); c.beginPath(); c.ellipse(29, 1.5, 8.5, 7.5, 0, 0, Math.PI * 2); c.fill();
+      c.fillStyle = coat; c.beginPath(); c.moveTo(-5, -7); c.lineTo(-2, -20); c.lineTo(4, -8); c.closePath(); c.fill();
+      circle(c, 6, -3, 2.4, '#111'); circle(c, 6.8, -3.8, .8, '#fff'); circle(c, 33, -.5, 1.6, '#2a1a12');
+      c.restore();
+      // mane
+      c.strokeStyle = mane; c.lineWidth = 7; c.beginPath(); c.moveTo(hx - 8, hy - 9);
+      for (let i = 1; i <= 4; i++) c.lineTo(lerp(hx - 8, 14, i / 4) - 4 - Math.sin(p + i) * 3 * g, lerp(hy - 9, -82, i / 4) - 3);
+      c.stroke();
+      // near legs
+      drawLeg(c, 28, -50, 'fore', p + Math.PI * 2 * .6, g, coat, lowerNear, '#1b1512');
+      drawLeg(c, -30, -54, 'hind', p + Math.PI * 2 * .12, g, coat, lowerNear, '#1b1512');
+      // saddle cloth with lane number
+      c.fillStyle = r.color; rr(c, -16, -86, 34, 26, 4); c.fill();
+      c.fillStyle = r.ink; c.font = '900 17px Bahnschrift, "Segoe UI", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(String(r.number), 1, -72);
+      c.fillStyle = '#3a2416'; rr(c, -12, -90, 30, 7, 3); c.fill();
+      // jockey (crouched, steadier than the horse)
+      c.save(); c.translate(0, -bob * .35);
+      const mouthX = hx + Math.cos(tilt) * 26 - Math.sin(tilt) * 6, mouthY = hy + Math.sin(tilt) * 26 + Math.cos(tilt) * 6;
+      c.lineCap = 'round';
+      c.strokeStyle = '#f4f1ea'; c.lineWidth = 9; c.beginPath(); c.moveTo(2, -92); c.lineTo(15, -80); c.stroke();
+      c.strokeStyle = '#1b1b1f'; c.lineWidth = 7; c.beginPath(); c.moveTo(15, -80); c.lineTo(5, -68); c.stroke();
+      c.strokeStyle = r.color; c.lineWidth = 16; c.beginPath(); c.moveTo(0, -94); c.lineTo(22, -108); c.stroke();
+      c.strokeStyle = 'rgba(255, 255, 255, .85)'; c.lineWidth = 3; c.beginPath(); c.moveTo(4, -104); c.lineTo(18, -96); c.stroke();
+      c.strokeStyle = shade(r.color, -.15); c.lineWidth = 7; c.beginPath(); c.moveTo(22, -105); c.lineTo(34, -97); c.lineTo(47, -95); c.stroke();
+      c.strokeStyle = 'rgba(40, 25, 15, .8)'; c.lineWidth = 1.5; c.beginPath(); c.moveTo(48, -95); c.lineTo(mouthX, mouthY); c.stroke();
+      circle(c, 48, -95, 3.6, '#f0c49a');
+      const face = r.image ? imageFor(r.image) : null;
+      if (face) {
+        // Mặt thật của người đua, viền mũ màu team.
+        c.save(); c.beginPath(); c.arc(32, -114, 11, 0, Math.PI * 2); c.clip();
+        c.drawImage(face, 21, -125, 22, 22); c.restore();
+        c.strokeStyle = r.color; c.lineWidth = 3.5; c.beginPath(); c.arc(32, -114, 12, 0, Math.PI * 2); c.stroke();
+        c.fillStyle = r.color; c.beginPath(); c.arc(32, -114, 12.5, Math.PI * 1.12, Math.PI * 1.88); c.fill();
+      } else {
+        circle(c, 32, -113, 7.5, '#f0c49a');
+        c.fillStyle = r.color; c.beginPath(); c.arc(31, -114, 9, Math.PI * 1.05, Math.PI * 2.05); c.fill();
+        c.fillStyle = '#1b1b1f'; c.fillRect(32, -115, 9, 3);
+      }
+      c.restore();
+      c.restore();
+    }
+
+    // Name tag rides behind the horse, inside its own lane.
+    function drawTag(c, r, x, y, s, laneH) {
+      const avatar = r.image ? imageFor(r.image) : null;
+      const font = Math.round(clamp(15 * s + 2, 12, 18));
+      c.font = `800 ${font}px "Segoe UI", system-ui, sans-serif`;
+      let label = r.riderName ? `${r.name} · ${r.riderName}` : r.name; const maxW = 190;
+      while (c.measureText(label).width > maxW && label.length > 2) label = label.slice(0, -2) + '…';
+      const badge = font + 8; const textW = c.measureText(label).width; const avaW = avatar ? badge + 4 : 0;
+      const w = badge + avaW + textW + 18; const h = badge + 2;
+      const right = x - 62 * s; const left = right - w; const top = y - Math.min(laneH * .5, 40 * s) - h / 2;
+      c.globalAlpha = .94;
+      c.fillStyle = 'rgba(6, 18, 30, .78)'; rr(c, left, top, w, h, h / 2); c.fill();
+      c.strokeStyle = r.color; c.lineWidth = 2.5; c.stroke();
+      c.globalAlpha = 1;
+      const leading = r.rank === 1 && (game.mode === 'racing' || game.mode === 'finishing' || game.mode === 'result');
+      circle(c, left + h / 2, top + h / 2, badge / 2, leading ? '#ffc400' : r.color);
+      c.fillStyle = leading ? '#2b1d00' : r.ink; c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.font = `900 ${font - 1}px Bahnschrift, sans-serif`; c.fillText(String(game.mode === 'lobby' || game.mode === 'countdown' ? r.number : r.rank), left + h / 2, top + h / 2 + .5);
+      if (avatar) {
+        const ax = left + badge + 4 + badge / 2; c.save(); c.beginPath(); c.arc(ax, top + h / 2, badge / 2, 0, Math.PI * 2); c.clip();
+        c.drawImage(avatar, ax - badge / 2, top + h / 2 - badge / 2, badge, badge); c.restore();
+      }
+      c.fillStyle = '#fff'; c.textAlign = 'left'; c.font = `800 ${font}px "Segoe UI", system-ui, sans-serif`;
+      c.fillText(label, left + badge + avaW + 9, top + h / 2 + .5);
+    }
+
+    // ======================================================================
+    // SECI LOGO INTRO – 4 điểm vốn có trên logo sinh ra 4 team
+    // ======================================================================
+    function drawLogoPoint(c, x, y, side, spin, fill, glow) {
+      c.save(); c.translate(x, y); c.rotate(Math.PI / 4 + spin);
+      if (glow > 0) { c.shadowColor = `rgba(255, 226, 140, ${(.9 * glow).toFixed(3)})`; c.shadowBlur = side * 1.2 * glow * viewScale; }
+      c.fillStyle = fill; c.fillRect(-side / 2, -side / 2, side, side);
+      c.restore();
+    }
+    // Logo nguyên bản: thân + những điểm còn nằm trên logo, đúng hình học của file SVG.
+    function drawLogo(c, cx, cy, size, attached, alpha = 1, plate = true) {
+      if (alpha <= 0) return;
+      const k = size / LOGO_VIEW;
+      c.save(); c.globalAlpha *= alpha;
+      if (plate) {
+        const g = c.createRadialGradient(cx, cy - size * .12, size * .05, cx, cy, size * .62);
+        g.addColorStop(0, '#8c1d26'); g.addColorStop(1, '#55101a');
+        circle(c, cx, cy, size * .6, null); c.fillStyle = g; c.fill();
+        c.strokeStyle = 'rgba(217, 188, 106, .55)'; c.lineWidth = 3; c.stroke();
+      }
+      c.translate(cx, cy); c.scale(k, k); c.fillStyle = LOGO_GOLD;
+      c.save(); c.rotate(Math.PI / 4); c.fill(LOGO_CORE); c.restore();
+      attached.forEach(key => { const p = LOGO_POINTS[key]; drawLogoPoint(c, p.x, p.y, LOGO_POINT_SIDE, 0, LOGO_GOLD, 0); });
+      c.restore();
+    }
+
+    const INTRO = { glow: .75, detach: 1.75, fly: 2.45, flyDur: 1.05, morph: 3.5, morphDur: .85, split: 3.95, splitDur: .6, enter: 5.35, enterDur: .75, stagger: .1 };
+
+    function playLogoIntro() {
+      return new Promise(resolve => {
+        const n = game.racers.length;
+        const used = LOGO_POINT_TO_TEAM.slice(0, Math.min(4, n));
+        const spacing = Math.min(262, 1140 / n);
+        game.intro = {
+          startAt: performance.now(), t: 0, resolve, used, skipped: false, cues: {},
+          end: INTRO.enter + INTRO.stagger * (n - 1) + INTRO.enterDur + .45,
+          // Điểm không sinh ra team nào (khi ít hơn 4 team) vẫn nằm yên trên logo.
+          attached: LOGO_POINT_TO_TEAM.filter(key => !used.includes(key)),
+          side: LOGO_POINT_SIDE * LOGO_HOME.size / LOGO_VIEW,
+          cards: game.racers.map((_, i) => ({ slotX: 640 + (i - (n - 1) / 2) * spacing, slotY: 486, w: Math.min(226, spacing - 18), h: 98, landed: false }))
+        };
+        game.mode = 'intro'; syncControls();
+      });
+    }
+    function skipIntro() {
+      const intro = game.intro; if (!intro || intro.skipped) return;
+      intro.skipped = true; intro.startAt = performance.now() - intro.end * 1000;
+    }
+    function introCues(intro) {
+      const t = intro.t; const n = game.racers.length; const cue = (key, at, fn) => { if (t >= at && !intro.cues[key]) { intro.cues[key] = true; if (!intro.skipped) fn(); } };
+      cue('logo', 0, () => say('Logo SECI…', 'zone', true));
+      cue('glow', INTRO.glow, () => { tone(1318.5, .6, 'sine', .022); tone(1975.5, .5, 'sine', .012, .12); say(`${intro.used.length} điểm trên logo bắt đầu phát sáng…`, 'hot', true); });
+      cue('detach', INTRO.detach, () => { noise(.55, .045, 900, 'bandpass', .12); say('…tách khỏi logo và bay ra!', 'hot', true); });
+      cue('fly', INTRO.fly, () => noise(.8, .05, 1500, 'bandpass', .2));
+      cue('morph', INTRO.morph, () => { game.racers.forEach((_, i) => tone(523.25 * Math.pow(2, i / 6), .2, 'triangle', .04, i * .08)); say(`…và trở thành ${n} TEAM!`, 'hot', true); });
+      cue('enter', INTRO.enter, () => say('Các team tiến vào trường đua!', 'zone', true));
+    }
+    function updateIntro(now) {
+      const intro = game.intro;
+      intro.t = (now - intro.startAt) / 1000 * (reducedMotion() ? 1.6 : 1);
+      introCues(intro);
+      intro.cards.forEach((card, i) => {
+        if (card.landed || intro.t < INTRO.enter + i * INTRO.stagger + INTRO.enterDur) return;
+        card.landed = true;
+        const r = game.racers[i]; if (!r) return;
+        r.revealAt = now;
+        const geom = laneGeom(i, game.racers.length);
+        if (!reducedMotion()) for (let k = 0; k < 12; k++) scene.dust.push({ x: r.x + rand(-50, 40) * geom.s, y: geom.y - rand(0, 10), vx: rand(-90, 90), vy: -rand(20, 80), r: rand(5, 10) * geom.s, life: 0, max: rand(.4, .7) });
+        if (!intro.skipped) hoofBeat(.05);
+      });
+      if (intro.t >= intro.end) { game.intro = null; intro.resolve(); }
+    }
+
+    function drawTeamCard(c, x, y, m, scale, alpha, card, r, i, side) {
+      if (alpha <= 0) return;
+      // Hình thoi xoay thẳng thành hình vuông trước, rồi mới nở ra thành thẻ team.
+      const turn = smooth(0, .32, m);
+      const grow = easeOutBack(clamp((m - .3) / .7, 0, 1));
+      const square = side * lerp(1, 1.35, turn);
+      const w = Math.max(square, lerp(square, card.w, grow)), h = Math.max(square, lerp(square, card.h, grow));
+      const lift = smooth(.3, 1, m);
+      c.save(); c.globalAlpha *= alpha; c.translate(x, y); c.scale(scale, scale);
+      c.rotate((1 - turn) * Math.PI / 4);
+      rr(c, -w / 2, -h / 2, w, h, lerp(0, 16, smooth(.2, .8, m)));
+      c.shadowColor = `rgba(0, 0, 0, ${(.4 * lift).toFixed(3)})`; c.shadowBlur = 20 * lift * viewScale; c.shadowOffsetY = 6 * lift * viewScale;
+      c.fillStyle = m < .25 ? LOGO_GOLD : mix(LOGO_GOLD, r.color, smooth(.25, .75, m)); c.fill();
+      c.shadowColor = 'transparent';
+      if (m > .45) { c.strokeStyle = `rgba(217, 188, 106, ${smooth(.45, 1, m).toFixed(3)})`; c.lineWidth = 3.5; c.stroke(); }
+      const text = smooth(.55, 1, m);
+      if (text > 0) {
+        c.globalAlpha *= text; c.fillStyle = r.ink; c.textAlign = 'center'; c.textBaseline = 'middle';
+        const fit = (value, max) => { let out = value; while (c.measureText(out).width > max && out.length > 2) out = out.slice(0, -2) + '…'; return out; };
+        const rider = r.riderName ? `🏇 ${r.riderName}` : '';
+        if (nameKey(r.name) === `team ${i + 1}`) {
+          c.font = '900 32px Bahnschrift, "Arial Black", sans-serif'; c.fillText(`TEAM ${i + 1}`, 0, rider ? -8 : 2);
+        } else {
+          c.font = '900 14px Bahnschrift, sans-serif'; c.fillText(`TEAM ${i + 1}`, 0, -h / 2 + 18);
+          let size = 24;
+          c.font = `900 ${size}px "Segoe UI", system-ui, sans-serif`;
+          while (c.measureText(r.name).width > w - 22 && size > 14) { size -= 1; c.font = `900 ${size}px "Segoe UI", system-ui, sans-serif`; }
+          c.fillText(fit(r.name, w - 22), 0, rider ? 0 : 13);
+        }
+        if (rider) { c.font = '800 14px "Segoe UI", system-ui, sans-serif'; c.fillText(fit(rider, w - 20), 0, h / 2 - 16); }
+      }
+      c.restore();
+    }
+
+    function drawIntro(c) {
+      const intro = game.intro; if (!intro) return;
+      const t = intro.t; const n = game.racers.length; const k = LOGO_HOME.size / LOGO_VIEW;
+      const dim = .72 * smooth(0, .45, t) * (1 - smooth(intro.end - 1.1, intro.end - .25, t));
+      if (dim > 0) { c.fillStyle = `rgba(4, 12, 22, ${dim.toFixed(3)})`; c.fillRect(-30, -30, W + 60, H + 60); }
+      // Thân logo giữ nguyên tại chỗ; chỉ khi các điểm đã rời đi nó mới lùi lên làm tiêu đề.
+      const lift = smooth(2.7, 3.6, t);
+      drawLogo(c, LOGO_HOME.x, lerp(LOGO_HOME.y, 128, lift), LOGO_HOME.size * lerp(1, .6, lift), intro.attached, 1 - smooth(intro.end - 1.4, intro.end - .6, t));
+      if (t < INTRO.morph) {
+        const glow = smooth(INTRO.glow, INTRO.glow + .55, t) * (.72 + .28 * Math.sin((t - INTRO.glow) * 7.5));
+        intro.used.forEach((key, j) => {
+          const p = LOGO_POINTS[key]; const card = intro.cards[j];
+          // Vị trí xuất phát = đúng vị trí của điểm trên logo.
+          const homeX = LOGO_HOME.x + p.x * k, homeY = LOGO_HOME.y + p.y * k;
+          const out = easeInOut(clamp((t - INTRO.detach) / .65, 0, 1)) * 34;
+          const ox = homeX + p.dx * out, oy = homeY + p.dy * out;
+          let x = ox, y = oy, spin = 0;
+          if (t >= INTRO.fly) {
+            const f = easeInOut(clamp((t - INTRO.fly) / INTRO.flyDur, 0, 1));
+            x = bezier(ox, ox + p.dx * 210, card.slotX, f); y = bezier(oy, oy + p.dy * 210, card.slotY, f); spin = f * Math.PI / 2;
+          }
+          drawLogoPoint(c, x, y, intro.side, spin, glow > 0 ? mix(LOGO_GOLD, '#fff1c2', glow * .55) : LOGO_GOLD, glow);
+        });
+        return;
+      }
+      intro.cards.forEach((card, i) => {
+        const r = game.racers[i]; if (!r) return;
+        let x = card.slotX, y = card.slotY, alpha = 1, scale = 1, m = clamp((t - INTRO.morph) / INTRO.morphDur, 0, 1);
+        if (i >= 4) {
+          // Hơn 4 team: một điểm tách đôi, team mới tách ra từ team sinh ra trước đó.
+          const split = clamp((t - INTRO.split) / INTRO.splitDur, 0, 1); if (split <= 0) return;
+          x = lerp(intro.cards[i % 4].slotX, card.slotX, easeInOut(split)); m = split; alpha = smooth(0, .3, split);
+        }
+        const e = clamp((t - (INTRO.enter + i * INTRO.stagger)) / INTRO.enterDur, 0, 1);
+        if (e > 0) {
+          if (card.landed) return;
+          const geom = laneGeom(i, n); const tx = xFor(0) - 8, ty = geom.y - 58 * geom.s; const f = easeInOut(e);
+          x = bezier(card.slotX, (card.slotX + tx) / 2, tx, f); y = bezier(card.slotY, card.slotY - 110, ty, f);
+          scale = lerp(1, .2, f); alpha *= 1 - smooth(.78, 1, e);
+        }
+        drawTeamCard(c, x, y, m, scale, alpha, card, r, i, intro.side);
+      });
+    }
+
+    // ======================================================================
+    // RACE SCRIPT – winner chosen first, then a story that hides it
+    // ======================================================================
+    function catmull(p0, p1, p2, p3, u) {
+      return .5 * (2 * p1 + (-p0 + p2) * u + (2 * p0 - 5 * p1 + 4 * p2 - p3) * u * u + (-p0 + 3 * p1 - 3 * p2 + p3) * u * u * u);
+    }
+    function createPlan(n, winner, seed) {
+      const rnd = prng(seed); const r = (a, b) => a + (b - a) * rnd();
+      const T = [0, .07, .15, .25, .35, .45, .55, .65, .72, .8, .875, .95, 1];
+      const order = Array.from({ length: n }, (_, i) => i);
+      for (let i = n - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+      // Three leaders take turns in the middle of the race. Any of them may be
+      // the winner, so "the horse that never led" is not a tell.
+      const A = order[0], B = order[1], C = n > 2 ? order[2] : order[0];
+      const trio = [winner];
+      if (C !== winner) trio.push(C);
+      order.forEach(i => { if (trio.length < Math.min(3, n) && !trio.includes(i)) trio.push(i); });
+      const keys = T.map(t => Array.from({ length: n }, (_, i) => {
+        if (t === 0) return 0;
+        if (t <= .25) return r(-.2, .2);                                   // cả đoàn sát nhau
+        if (t <= .45) return i === A ? r(.62, .8) : (t === .45 && i === B ? r(.3, .45) : r(-.6, .25));
+        if (t <= .65) return i === B ? r(.62, .8) : i === A ? r(.1, .38) : (t === .65 && i === C ? r(.32, .48) : r(-.65, .22));
+        if (t < .8) return i === C ? r(.62, .8) : i === B ? r(.18, .42) : r(-.65, .18);
+        if (t < 1) return trio.includes(i) ? r(.46, .58) : r(-.78, -.15); // ba ngựa ngang nhau
+        if (i === winner) return 1;                                         // bứt tốc về đích
+        const place = trio.indexOf(i); return place === 1 ? .64 : place === 2 ? .5 : r(-.8, -.2);
+      }));
+      const wobble = Array.from({ length: n }, () => ({ f1: r(14, 26), p1: r(0, 6.28), f2: r(30, 48), p2: r(0, 6.28) }));
+      return {
+        n, winner,
+        evaluate(progress) {
+          const t = clamp(progress, 0, 1); let k = 0;
+          while (k < T.length - 2 && t > T[k + 1]) k++;
+          const u = (t - T[k]) / (T[k + 1] - T[k]);
+          const fade = smooth(0, .06, t) * (1 - smooth(.9, .975, t));
+          return Array.from({ length: n }, (_, i) => {
+            const v = catmull(keys[Math.max(0, k - 1)][i], keys[k][i], keys[k + 1][i], keys[Math.min(T.length - 1, k + 2)][i], u);
+            return v + (Math.sin(t * wobble[i].f1 + wobble[i].p1) * .045 + Math.sin(t * wobble[i].f2 + wobble[i].p2) * .025) * fade;
+          });
+        }
+      };
+    }
+    function raceSpeed(t) {
+      const launch = t <= 0 ? 0 : .15 + .85 * smooth(0, .045, t);
+      const tension = .4 * smooth(.25, .38, t) + .06 * Math.sin(t * 38) * smooth(.25, .3, t) * (1 - smooth(.76, .8, t));
+      return (1 + tension + .4 * smooth(.8, .9, t)) * launch;
+    }
+    const xFor = offset => W * (.30 + (clamp(offset, -1.1, 1.1) + 1) / 2 * .20);
+    function laneGeom(i, n) {
+      const laneH = TRACK_H / n;
+      let s = clamp(.6 + laneH / 155, .7, 1.05);
+      s *= .93 + .09 * (n > 1 ? i / (n - 1) : 1);
+      return { y: TRACK_TOP + laneH * (i + .8), s, laneH };
+    }
+
+    // ======================================================================
+    // GAME FLOW
+    // ======================================================================
+    const game = {
+      mode: 'lobby', round: 'team', teamId: null, pool: [], racers: [], plan: null, winner: -1,
+      progress: 0, startAt: 0, duration: 20000, speed: 0, finishAt: 0, record: null,
+      leader: -1, orderKey: '', boardAt: 0, msgAt: 0, zone: 0, flags: {}, hoofClock: 0, intro: null, fanGroups: [], wheel: null
+    };
+    const isBusy = () => ['intro', 'countdown', 'racing', 'finishing', 'spin', 'spun'].includes(game.mode);
+
+    function makeRacer(item, index, round) {
+      const color = COLORS[index % COLORS.length];
+      // Vòng 1: ngựa là team, người cưỡi là thành viên isRacer của team đó.
+      const rider = round === 'team' ? racerOf(item) : item;
+      return {
+        id: item.id, name: item.name, color, ink: inkFor(color), number: index + 1,
+        coat: COATS[(index * 3 + (round === 'member' ? 2 : 0)) % COATS.length],
+        riderName: round === 'team' && rider ? rider.name : '',
+        image: photoOf(rider), phase: Math.random(), offset: 0, prev: 0, surge: 0, rank: index + 1, x: xFor(0),
+        // Vòng 1: đường đua trống cho tới khi team được sinh ra từ logo và chạy vào làn.
+        reveal: round === 'team' ? 0 : 1, revealAt: null
+      };
+    }
+    function setRacers(items, round) {
+      game.racers = items.map((item, index) => makeRacer(item, index, round));
+      renderBoard(game.racers.map((_, i) => i));
+    }
+
+    function hideOverlays() { [els.lobby, els.teamWin, els.final].forEach(el => { el.hidden = true; }); }
+    function setHudRound() { els.hudRound.textContent = game.round === 'team' ? 'VÒNG 1 · CHỌN TEAM' : 'VÒNG 2 · CHỌN THÀNH VIÊN'; }
+    function setProgressHud(progress) {
+      els.hudFill.style.width = `${(progress * 100).toFixed(1)}%`;
+      els.hudPercent.textContent = `${Math.round(progress * 100)}%`;
+      els.hudZone.textContent = ZONES[zoneIndexAt(Math.min(progress, .999))].name;
+    }
+    function renderBoard(order) {
+      els.hudBoard.innerHTML = order.map((index, rank) => {
+        const r = game.racers[index]; if (!r) return '';
+        return `<li class="${rank === 0 && game.mode !== 'lobby' ? 'lead' : ''}"><b>${rank + 1}</b><i style="background:${r.color}"></i><span>${escapeHtml(r.name)}</span></li>`;
+      }).join('');
+    }
+    function say(text, kind = '', force = false) {
+      const now = performance.now();
+      if (!force && now - game.msgAt < 1300) return;
+      game.msgAt = now; els.hudTicker.textContent = text;
+      els.hudTicker.className = `hud-ticker ${kind}`.trim(); void els.hudTicker.offsetWidth; els.hudTicker.classList.add('pop');
+    }
+
+    function enterTeamLobby() {
+      game.mode = 'lobby'; game.round = 'team'; game.teamId = null; game.record = null; game.progress = 0;
+      game.pool = availableTeams();
+      setRacers(game.pool.slice(0, MAX_LANES), 'team'); resetScene(); setHudRound(); setProgressHud(0);
+      hideOverlays(); renderLobby(); say('Sẵn sàng xuất phát!', '', true); syncControls();
+    }
+    function enterMemberLobby(teamId) {
+      const team = teamById(teamId); if (!team) { enterTeamLobby(); return; }
+      // Màu của team ở vòng 1 được giữ cho vòng quay.
+      const previous = game.racers.find(r => r.id === teamId) || (game.wheel && game.wheel.teamId === teamId ? game.wheel : null);
+      const color = previous ? previous.color : COLORS[Math.max(0, state.teams.indexOf(team)) % COLORS.length];
+      game.mode = 'lobby'; game.round = 'member'; game.teamId = teamId; game.record = null; game.progress = 0;
+      game.pool = availableMembers(team);
+      const wheelMode = state.settings.round2Method !== 'horse';
+      game.wheel = wheelMode ? makeWheel(team, color, game.wheel) : null;
+      setRacers(wheelMode ? [] : game.pool.slice(0, MAX_LANES), 'member'); resetScene(); setHudRound(); setProgressHud(0);
+      hideOverlays(); renderLobby(); say(`Vòng 2 · ${team.name}`, 'zone', true); syncControls();
+    }
+    const percentLabel = n => `${Math.round(1000 / Math.max(1, n)) / 10}`.replace('.', ',');
+    function methodToggle() {
+      const wheel = state.settings.round2Method !== 'horse';
+      return `<div class="method-toggle" role="group" aria-label="Hình thức vòng 2"><button type="button" data-go="method-wheel" class="${wheel ? 'on' : ''}" aria-pressed="${wheel}">◉ Vòng quay</button><button type="button" data-go="method-horse" class="${wheel ? '' : 'on'}" aria-pressed="${!wheel}">🏇 Đua ngựa</button></div>`;
+    }
+
+    function renderLobby() {
+      const isTeam = game.round === 'team'; const team = teamById(game.teamId);
+      const pool = game.pool; const shown = game.racers;
+      let body = '';
+      if (isTeam) {
+        const excluded = state.settings.excludeAfterSpin ? state.teams.filter(t => !pool.includes(t)) : [];
+        body = `<p class="kicker">VÒNG 1</p><h2>ĐUA NGỰA CHỌN TEAM</h2>
+          <p class="sub">${pool.length} team · bấm bắt đầu để các điểm trên logo SECI sinh ra những chiến mã</p>
+          <div class="chips">${pool.map((t, i) => { const rider = racerOf(t); return `<span class="chip"><i style="background:${i < MAX_LANES ? COLORS[i % COLORS.length] : '#56606c'}"></i>${escapeHtml(t.name)} <small>${rider ? `🏇 ${escapeHtml(rider.name)} · ` : ''}${t.members.length} TV</small></span>`; }).join('')}${excluded.map(t => `<span class="chip out">${escapeHtml(t.name)}</span>`).join('')}</div>
+          <p class="sub" style="margin-top:.5cqw">Mỗi team 1 người cưỡi ngựa 🏇, các thành viên còn lại đứng hàng rào cổ vũ.</p>`;
+        if (pool.length > MAX_LANES) body += `<p class="note">Có ${pool.length} team – khi bắt đầu sẽ bốc thăm ngẫu nhiên ${MAX_LANES} team vào đường đua.</p>`;
+        if (excluded.length) body += `<p class="note">Đang tạm loại ${excluded.length} team đã được chọn trước đó.</p>`;
+      } else if (game.wheel) {
+        // Vòng quay: danh sách thành viên nằm ngay trên bánh xe, thẻ chỉ là một dải điều khiển.
+        const rider = racerOf(team);
+        const spoken = spokenMembers(team).filter(m => !pool.includes(m));
+        const fair = (pool.length > 1 ? `${pool.length} người còn lượt · mỗi người ${percentLabel(pool.length)}%` : `${pool.length} người còn lượt`)
+          + (spoken.length ? ` · đã phát biểu (vẫn hiện, không trúng): ${spoken.map(m => escapeHtml(m.name)).join(', ')}` : '');
+        body = `<div class="strip-copy"><p class="kicker">VÒNG 2 · ${escapeHtml(team ? team.name : '')}</p><h2>QUAY CHỌN NGƯỜI CHIA SẺ</h2>
+          <p class="sub">${fair}${rider && pool.includes(rider) && pool.length > 1 ? ` – ${escapeHtml(rider.name)} vừa cưỡi ngựa vẫn có cơ hội như mọi người` : ''}</p></div>`;
+        if (!pool.length) body += `<p class="note">Team này chưa có thành viên. Hãy thêm thành viên trong Cài đặt.</p>`;
+      } else {
+        body = `<p class="kicker">VÒNG 2 · ${escapeHtml(team ? team.name : '')}</p><h2>${shown.length > 1 ? `${shown.length} THÀNH VIÊN · ${shown.length} CHIẾN MÃ` : 'CHỌN THÀNH VIÊN'}</h2>
+          <div class="members">${shown.map((r, i) => { const member = memberById(team, r.id); return `<div class="member-card" style="--c:${r.color};--i:${i}"><div class="avatar">${r.image ? `<img src="${escapeHtml(r.image)}" alt="" />` : escapeHtml(initialOf(r.name))}</div><span>${escapeHtml(r.name)}</span><small>${member && member.isRacer ? '🏇 vừa đua vòng 1' : `Ngựa số ${r.number}`}</small></div>`; }).join('')}</div>`;
+        if (pool.length > MAX_LANES) body += `<p class="note">Team có ${pool.length} thành viên – khi bắt đầu sẽ bốc thăm ngẫu nhiên ${MAX_LANES} người vào đường đua.</p>`;
+        body += methodToggle();
+      }
+      els.lobby.className = `overlay ${isTeam ? 'bottom' : (game.wheel ? 'strip' : 'top')}`;
+      let actions = '';
+      if (!isTeam && game.wheel) {
+        if (pool.length) actions = `<button class="btn-arcade pulse" type="button" data-go="spin">QUAY ▶</button>`;
+        else actions = `<button class="btn-ghost" type="button" data-go="settings">⚙ Mở cài đặt</button>`;
+        actions += `<button class="btn-ghost" type="button" data-go="round1">◀ Về vòng 1</button>`;
+        els.lobby.innerHTML = `<div class="card">${body}<div class="strip-side">${methodToggle()}<div class="card-actions">${actions}</div></div></div>`;
+        els.lobby.hidden = false;
+        return;
+      }
+      if (pool.length >= 2) actions = `<button class="btn-arcade pulse" type="button" data-go="start">BẮT ĐẦU ĐUA ▶</button>`;
+      else if (!isTeam && pool.length === 1) actions = `<button class="btn-arcade pulse" type="button" data-go="solo">CÔNG BỐ NGƯỜI ĐƯỢC CHỌN ▶</button>`;
+      else body += `<p class="note">${isTeam ? 'Cần ít nhất 2 team để đua. Hãy thêm team trong Cài đặt.' : 'Team này chưa có thành viên. Hãy thêm thành viên trong Cài đặt.'}</p>`;
+      if (pool.length < 2) actions += `<button class="btn-ghost" type="button" data-go="settings">⚙ Mở cài đặt</button>`;
+      if (!isTeam) actions += `<button class="btn-ghost" type="button" data-go="round1">◀ Về vòng 1</button>`;
+      els.lobby.innerHTML = `<div class="card">${body}<div class="card-actions">${actions}</div></div>`;
+      els.lobby.hidden = false;
+    }
+
+    async function startRace() {
+      if (game.mode !== 'lobby') return;
+      if (game.round === 'member' && game.wheel) { spinWheel(); return; }
+      const team = game.round === 'member' ? teamById(game.teamId) : null;
+      recycleExhausted(game.round, team);
+      const items = game.round === 'team' ? availableTeams() : availableMembers(team);
+      if (items.length < 2) { showToast('Cần ít nhất 2 người đua.', 'error'); return; }
+      const field = items.length > MAX_LANES ? secureShuffle(items).slice(0, MAX_LANES) : items.slice();
+      const winner = secureIndex(field.length);
+      // Kết quả được chốt và lưu trước khi chạy hoạt ảnh; tải lại trang không đổi được kết quả.
+      state.pending = { round: game.round, winnerId: field[winner].id, teamId: game.round === 'team' ? field[winner].id : team.id, createdAt: new Date().toISOString() };
+      persist();
+      setRacers(field, game.round); resetScene();
+      game.plan = createPlan(field.length, winner, secureSeed()); game.winner = winner;
+      game.duration = state.settings.raceSeconds * 1000; game.progress = 0; game.flags = {}; game.leader = -1; game.orderKey = ''; game.zone = 0; game.hoofClock = 0;
+      hideOverlays(); setProgressHud(0);
+      // Nhạc đua phát từ đầu ngay khi bấm "Bắt đầu đua" (trong cú bấm nên trình duyệt cho phép).
+      audio(); startMusic();
+      if (game.round === 'team') await playLogoIntro();
+      startFans();
+      game.mode = 'countdown'; syncControls();
+      say('Các chiến mã vào vị trí…', '', true);
+      for (const n of ['3', '2', '1']) { showCountdown(n); tone(660, .16, 'square', .045); await pause(reducedMotion() ? 350 : 750); }
+      showCountdown('XUẤT PHÁT!', true); tone(990, .3, 'square', .05); tone(1320, .35, 'square', .035, .05);
+      game.mode = 'racing'; game.startAt = performance.now(); els.skip.hidden = false; syncControls();
+      say('XUẤT PHÁT! Cả đoàn bám sát nhau!', 'hot', true);
+      await pause(650); els.countdown.hidden = true;
+    }
+    function showCountdown(text, go = false) {
+      els.countdown.hidden = false; els.countdown.classList.toggle('go', go);
+      els.countdown.innerHTML = `<span>${escapeHtml(text)}</span>`;
+    }
+
+    // ======================================================================
+    // VÒNG 2 – VÒNG QUAY THÀNH VIÊN (toàn bộ thành viên, mỗi người 1/n)
+    // ======================================================================
+    const TAU = Math.PI * 2;
+    const WHEEL = { x: 640, y: 306, r: 212 };
+    function makeWheel(team, color, previous) {
+      return {
+        teamId: team.id, color, items: wheelItems(team), winner: -1, flick: 0, lastIndex: -1,
+        rot: previous && previous.teamId === team.id ? previous.rot : 0, from: 0, to: 0, start: 0, duration: 6200, doneAt: 0
+      };
+    }
+    // Bánh xe luôn hiện đủ cả team; người đã phát biểu vẫn nằm trên bánh xe nhưng không thể trúng.
+    const wheelItems = team => { const open = availableMembers(team); return team.members.map(m => ({ id: m.id, name: m.name, photo: photoOf(m), isRacer: m.isRacer, spoken: !open.includes(m) })); };
+    const wheelIndexAt = (w, rot = w.rot) => { const n = w.items.length; if (!n) return -1; const seg = TAU / n; return Math.floor((((-rot) % TAU + TAU) % TAU) / seg) % n; };
+
+    function spinWheel() {
+      const w = game.wheel; const team = teamById(game.teamId);
+      if (!w || !team || game.mode !== 'lobby') return;
+      w.items = wheelItems(team);                       // đủ cả team, không lọc isRacer
+      const n = w.items.length; if (!n) return;
+      // Chỉ bốc trong những người chưa phát biểu, mỗi người cùng xác suất.
+      const open = w.items.map((item, i) => i).filter(i => !w.items[i].spoken);
+      if (!open.length) return;
+      const winner = open[secureIndex(open.length)];
+      state.pending = { round: 'member', method: 'wheel', winnerId: w.items[winner].id, teamId: team.id, createdAt: new Date().toISOString() };
+      persist();
+      // Dừng ở một điểm ngẫu nhiên bên trong ô thắng (chỉ để trông tự nhiên, không ảnh hưởng kết quả).
+      const seg = TAU / n; const target = -(winner + .5) * seg + (Math.random() - .5) * .62 * seg;
+      const norm = ((w.rot % TAU) + TAU) % TAU; const delta = (((target - norm) % TAU) + TAU) % TAU;
+      w.from = w.rot; w.to = w.rot + delta + TAU * (5 + secureIndex(3)); w.winner = winner;
+      w.start = performance.now(); w.duration = reducedMotion() ? 3200 : 6200; w.lastIndex = wheelIndexAt(w);
+      hideOverlays(); audio(); game.mode = 'spin'; syncControls();
+      say('Vòng quay đang chạy… ai sẽ là người chia sẻ?', 'hot', true);
+      noise(.6, .05, 900, 'bandpass', .05);
+    }
+    function updateWheel(now, dt) {
+      const w = game.wheel; if (!w) return;
+      w.flick = Math.max(0, w.flick - dt * 7);
+      if (game.mode === 'spin') {
+        const t = clamp((now - w.start) / w.duration, 0, 1);
+        w.rot = w.from + (w.to - w.from) * (1 - Math.pow(1 - t, 4));   // nhanh rồi chậm dần
+        const index = wheelIndexAt(w);
+        if (index !== w.lastIndex) { w.lastIndex = index; w.flick = 1; tone(1500 - 700 * t, .035, 'square', .026); }
+        if (t >= 1) {
+          game.mode = 'spun'; w.doneAt = now; syncControls();
+          game.record = commitPending();
+          playWin(); cheer(); spawnConfetti(); scene.flash = reducedMotion() ? .3 : .6; scene.hype = 1;
+          if (game.record) say(`${game.record.resultName} được chọn!`, 'win', true);
+        }
+      } else if (game.mode === 'spun' && now - w.doneAt > 1900) {
+        if (game.record) showFinal(game.record); else enterMemberLobby(game.teamId);
+      }
+    }
+    function drawWheel(c) {
+      const w = game.wheel; if (!w || game.round !== 'member') return;
+      const { x, y, r } = WHEEL; const t = scene.time; const n = w.items.length;
+      const spinning = game.mode === 'spin';
+      const vignette = c.createRadialGradient(x, y, r * .6, x, y, W * .72);
+      vignette.addColorStop(0, 'rgba(4, 12, 22, .3)'); vignette.addColorStop(1, 'rgba(4, 12, 22, .78)');
+      c.fillStyle = vignette; c.fillRect(-30, -30, W + 60, H + 60);
+      circle(c, x, y + 10, r + 32, 'rgba(0, 0, 0, .35)');
+      circle(c, x, y, r + 30, '#55101a');
+      c.strokeStyle = LOGO_GOLD; c.lineWidth = 4; c.beginPath(); c.arc(x, y, r + 28, 0, TAU); c.stroke();
+      c.beginPath(); c.arc(x, y, r + 3, 0, TAU); c.stroke();
+      for (let k = 0; k < 28; k++) {
+        const a = k / 28 * TAU; const on = (k + Math.floor(t * (spinning ? 14 : 3))) % 2 === 0;
+        if (on) circle(c, x + Math.cos(a) * (r + 16), y + Math.sin(a) * (r + 16), 8, 'rgba(255, 240, 170, .3)');
+        circle(c, x + Math.cos(a) * (r + 16), y + Math.sin(a) * (r + 16), 4.5, on ? '#fff3b0' : '#9a7430');
+      }
+      if (!n) {
+        circle(c, x, y, r, '#0e2a40');
+      } else {
+        const seg = TAU / n;
+        c.save(); c.translate(x, y); c.rotate(w.rot);
+        for (let i = 0; i < n; i++) {
+          const item = w.items[i]; const start = -Math.PI / 2 + i * seg; const mid = start + seg / 2;
+          const fill = n > 1 && i % 2 === 1 ? '#0e2a40' : (n > 1 && n % 2 === 1 && i === n - 1 ? LOGO_GOLD : w.color);
+          const ink = fill === '#0e2a40' ? '#ffffff' : (fill === LOGO_GOLD ? '#3a2400' : inkFor(fill));
+          c.beginPath(); c.moveTo(0, 0); c.arc(0, 0, r, start, start + seg); c.closePath();
+          c.fillStyle = item.spoken ? '#3b4652' : fill; c.fill();
+          if ((game.mode === 'spun' || game.mode === 'result') && i === w.winner) { c.fillStyle = `rgba(255, 244, 190, ${(.28 + .18 * Math.sin(t * 9)).toFixed(3)})`; c.fill(); }
+          if (n > 1) { c.strokeStyle = LOGO_GOLD; c.lineWidth = 3; c.stroke(); }
+          const half = n === 1 ? Math.PI / 2 : Math.min(seg / 2, Math.PI / 2);
+          // Ảnh thành viên gần vành, tên phía trong; cả hai đứng thẳng khi ô nằm dưới kim.
+          const pr = Math.min(46, r * Math.sin(half) * .4);
+          c.save(); c.rotate(mid + Math.PI / 2); c.translate(0, -r * .67);
+          if (item.spoken) c.globalAlpha = .4;
+          circle(c, 0, 0, pr + 3.5, LOGO_GOLD);
+          const face = item.photo ? imageFor(item.photo) : null;
+          if (face) { c.save(); c.beginPath(); c.arc(0, 0, pr, 0, TAU); c.clip(); c.drawImage(face, -pr, -pr, pr * 2, pr * 2); c.restore(); }
+          else { circle(c, 0, 0, pr, '#0a3f57'); c.fillStyle = '#fff'; c.font = `900 ${Math.round(pr)}px Bahnschrift, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(initialOf(item.name), 0, 1); }
+          if (item.isRacer) { circle(c, pr * .78, -pr * .78, 11, '#ffc400'); c.font = '13px "Segoe UI Emoji", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('🏇', pr * .78, -pr * .78 + 1); }
+          c.globalAlpha = 1;
+          if (item.spoken) {
+            c.save(); c.rotate(-.22); c.strokeStyle = '#ffb4a8'; c.lineWidth = 2.5; rr(c, -48, -12, 96, 24, 5); c.stroke();
+            c.fillStyle = '#ffb4a8'; c.font = '900 12px Bahnschrift, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('ĐÃ PHÁT BIỂU', 0, 1); c.restore();
+          }
+          c.translate(0, r * .67 - r * .36);
+          const maxW = n === 1 ? r * 1.2 : 2 * r * .36 * Math.sin(half) * .9;
+          let size = 19; c.font = `900 ${size}px "Segoe UI", system-ui, sans-serif`;
+          while (c.measureText(item.name).width > maxW && size > 11) { size -= 1; c.font = `900 ${size}px "Segoe UI", system-ui, sans-serif`; }
+          let label = item.name; while (c.measureText(label).width > maxW && label.length > 2) label = label.slice(0, -2) + '…';
+          c.fillStyle = item.spoken ? 'rgba(255, 255, 255, .45)' : ink; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(label, 0, 0);
+          c.restore();
+        }
+        c.restore();
+      }
+      drawLogo(c, x, y, 100, LOGO_POINT_TO_TEAM, 1, true);
+      // Kim chỉ ở đỉnh, giật nhẹ mỗi lần qua một ô.
+      c.save(); c.translate(x, y - r - 22); c.rotate(-w.flick * .32);
+      c.fillStyle = LOGO_GOLD; c.strokeStyle = '#55101a'; c.lineWidth = 3;
+      c.beginPath(); c.moveTo(-19, -10); c.lineTo(19, -10); c.lineTo(0, 34); c.closePath(); c.fill(); c.stroke();
+      circle(c, 0, -10, 9, '#fff3b0'); c.stroke();
+      c.restore();
+    }
+
+    function revealSolo() {
+      const team = teamById(game.teamId); const only = availableMembers(team)[0];
+      if (!team || !only) return;
+      state.pending = { round: 'member', winnerId: only.id, teamId: team.id, createdAt: new Date().toISOString() };
+      const record = commitPending(); if (!record) return;
+      game.record = record; playWin(); spawnConfetti(); scene.flash = .7; scene.hype = 1;
+      hideOverlays(); showFinal(record);
+    }
+
+    function raceEvents(now) {
+      const p = game.progress; const racers = game.racers;
+      const order = racers.map((_, i) => i).sort((a, b) => racers[b].offset - racers[a].offset);
+      order.forEach((index, rank) => { racers[index].rank = rank + 1; });
+      const key = order.join(',');
+      if (key !== game.orderKey && now - game.boardAt > 160) { game.orderKey = key; game.boardAt = now; renderBoard(order); }
+      const zone = zoneIndexAt(p);
+      if (zone !== game.zone) { game.zone = zone; say(`Đoàn đua tiến vào ${ZONES[zone].name}!`, 'zone', true); }
+      if (p >= .8 && !game.flags.tight) { game.flags.tight = true; say(racers.length >= 3 ? 'Gay cấn! Ba chiến mã gần như ngang nhau!' : 'Gay cấn! Hai chiến mã ngang nhau!', 'hot', true); }
+      if (p >= .86 && !game.flags.gate) { game.flags.gate = true; say('Cổng FINISH đã xuất hiện phía trước!', 'hot', true); }
+      if (p >= .95 && !game.flags.sprint) { game.flags.sprint = true; say('Nước rút cuối cùng! Ai sẽ về nhất?!', 'hot', true); }
+      const leader = order[0];
+      if (leader !== game.leader) {
+        game.leader = leader;
+        if (p > .12 && p < .93) {
+          const name = racers[leader].name;
+          say(pick([`${name} vươn lên dẫn đầu!`, `${name} vượt lên!`, `${name} chiếm vị trí số 1!`, `${name} bứt lên phía trước!`]), '');
+        }
+      }
+    }
+
+    function onCross() {
+      game.mode = 'finishing'; game.finishAt = performance.now(); els.skip.hidden = true;
+      scene.flash = reducedMotion() ? .35 : .9; scene.shake = reducedMotion() ? 0 : 16; scene.hype = 1;
+      spawnConfetti(); playWin(); cheer(); stopMusic(1400);
+      const winner = game.racers[game.winner];
+      const order = game.racers.map((_, i) => i).sort((a, b) => game.racers[b].offset - game.racers[a].offset);
+      order.forEach((index, rank) => { game.racers[index].rank = rank + 1; });
+      renderBoard(order); setProgressHud(1);
+      say(`${winner.name} VỀ ĐÍCH ĐẦU TIÊN!`, 'win', true);
+      game.record = commitPending();
+    }
+
+    function showResultScreen() {
+      game.mode = 'result'; syncControls();
+      const record = game.record;
+      if (!record) { enterTeamLobby(); return; }
+      if (record.type === 'team') showTeamWin(record); else showFinal(record);
+    }
+    function showTeamWin(record) {
+      const team = teamById(record.teamId);
+      const racer = game.racers.find(r => r.id === record.resultId);
+      const color = racer ? racer.color : '#ffc400';
+      const count = team ? availableMembers(team).length : 0;
+      const rider = racerOf(team);
+      const wheel = state.settings.round2Method !== 'horse';
+      const rule = count > 1
+        ? `Vòng 2: ${count} thành viên${rider && availableMembers(team).includes(rider) ? ` (kể cả ${escapeHtml(rider.name)})` : ''} vào vòng chọn – mỗi người ${percentLabel(count)}%${spokenMembers(team).length && count < team.members.length ? ' (người đã phát biểu không quay lại)' : ''}.`
+        : (count ? 'Team có 1 thành viên.' : 'Team này chưa có thành viên – hãy thêm trong Cài đặt.');
+      els.teamWin.innerHTML = `<div class="card"><p class="kicker">TEAM CHIẾN THẮNG</p><h2 class="win-name" style="--c:${color}">${escapeHtml(record.resultName)}</h2>
+        ${rider ? `<p class="sub">🏇 ${escapeHtml(rider.name)} đã cưỡi ngựa giúp team về nhất – nhưng chưa phải người được chọn!</p>` : ''}
+        <p class="sub">${rule}</p>
+        <div class="card-actions"><button class="btn-arcade pulse" type="button" data-go="round2">VÒNG 2 · ${wheel ? 'QUAY' : 'ĐUA'} CHỌN THÀNH VIÊN ▶</button><button class="btn-ghost" type="button" data-go="round1">Về vòng 1</button></div></div>`;
+      els.teamWin.hidden = false;
+      requestAnimationFrame(() => { const b = els.teamWin.querySelector('.btn-arcade'); if (b) b.focus(); });
+    }
+    function showFinal(record) {
+      game.mode = 'result'; syncControls();
+      const team = teamById(record.teamId); const member = memberById(team, record.resultId);
+      const racer = game.racers.find(r => r.id === record.resultId);
+      const color = racer ? racer.color : (game.wheel ? game.wheel.color : '#ffc400');
+      const photo = photoOf(member);
+      els.final.innerHTML = `<div class="card final-card"><p class="kicker">NGƯỜI ĐƯỢC CHỌN</p>
+        <div class="avatar final-avatar" style="--c:${color}">${photo ? `<img src="${escapeHtml(photo)}" alt="" />` : escapeHtml(initialOf(record.resultName))}</div>
+        <h2 class="final-name win-name" style="--c:#ffd84a">${escapeHtml(record.resultName)}</h2>
+        <p class="final-team">${escapeHtml(record.teamName)}</p>
+        <p class="final-share">MỜI BẠN CHIA SẺ</p>
+        <div class="card-actions"><button class="btn-arcade" type="button" data-go="round1">VÁN MỚI · VÒNG 1</button><button class="btn-ghost" type="button" data-go="again">${state.settings.round2Method !== 'horse' ? 'Quay' : 'Đua'} lại vòng 2 · ${escapeHtml(record.teamName)}</button></div></div>`;
+      els.final.hidden = false;
+      requestAnimationFrame(() => { const b = els.final.querySelector('.btn-arcade'); if (b) b.focus(); });
+    }
+
+    function commitPending() {
+      const pending = state.pending; if (!pending) return null;
+      const team = teamById(pending.teamId);
+      const selected = pending.round === 'team' ? team : memberById(team, pending.winnerId);
+      if (!team || !selected) { state.pending = null; persist(); showToast('Kết quả đã chốt không còn trong danh sách.', 'error'); return null; }
+      const record = {
+        id: uid(), type: pending.round, method: pending.method === 'wheel' ? 'wheel' : 'horse', resultId: selected.id, resultName: selected.name,
+        teamId: team.id, teamName: team.name, time: pending.createdAt, eliminated: pending.round === 'team' ? state.settings.excludeAfterSpin : state.settings.excludeChosenMembers
+      };
+      if (record.eliminated) {
+        if (record.type === 'team' && !state.excludedTeams.includes(team.id)) state.excludedTeams.push(team.id);
+        if (record.type === 'member') { recycleSpoken(team); const key = memberKey(team.id, selected.id); if (!state.excludedMembers.includes(key)) state.excludedMembers.push(key); }
+      }
+      state.history.push(record); state.pending = null; persist(); renderHistory();
+      return record;
+    }
+
+    function spawnConfetti() {
+      const pieces = reducedMotion() ? 60 : 240;
+      for (let i = 0; i < pieces; i++) {
+        const burst = i < pieces / 3 && scene.gateX !== null;
+        scene.confetti.push({
+          x: burst ? scene.gateX : rand(0, W), y: burst ? 300 : rand(-260, -10),
+          vx: burst ? rand(-520, 520) : rand(-70, 70), vy: burst ? rand(-640, -180) : rand(40, 220),
+          rot: rand(0, 6.28), vr: rand(-9, 9), w: rand(7, 14), h: rand(5, 10), color: pick(SHIRTS)
+        });
+      }
+    }
+
+    // ---------- Frame loop ----------
+    let lastNow = performance.now();
+    function frame(now) {
+      const dt = Math.min(.05, Math.max(0, (now - lastNow) / 1000)); lastNow = now;
+      try { update(dt, now); draw(); } catch (error) { console.error(error); }
+      requestAnimationFrame(frame);
+    }
+
+    function update(dt, now) {
+      scene.time += dt;
+      const racers = game.racers;
+      if (game.mode === 'racing') {
+        game.progress = clamp((now - game.startAt) / game.duration, 0, 1);
+        game.speed = raceSpeed(game.progress);
+        const offsets = game.plan.evaluate(game.progress);
+        racers.forEach((r, i) => {
+          r.prev = r.offset; r.offset = offsets[i];
+          r.surge = lerp(r.surge, clamp((r.offset - r.prev) / Math.max(dt, .001) * .5, -1, 1), .12);
+        });
+        if (game.progress >= .85) {
+          const s = (game.progress - .85) / .15; const winner = racers[game.winner];
+          const nose = xFor(winner.offset) + NOSE * laneGeom(game.winner, racers.length).s;
+          scene.gateX = lerp(W + 170, nose, Math.pow(s, 1.25));
+        }
+        raceEvents(now); setProgressHud(game.progress);
+        if (game.progress >= 1) onCross();
+      } else if (game.mode === 'finishing') {
+        const t = (now - game.finishAt) / 1000;
+        game.speed = lerp(1.8, .3, smooth(0, 2.4, t));
+        if (t > 3) showResultScreen();
+      } else if (game.mode === 'result') {
+        game.speed = lerp(game.speed, .28, Math.min(1, dt * 2));
+      } else if (game.mode === 'intro' && game.intro) {
+        game.speed = 0; updateIntro(now);
+      } else if (game.mode === 'spin' || game.mode === 'spun') {
+        game.speed = 0; updateWheel(now, dt);
+      } else {
+        game.speed = 0;
+      }
+      if ((game.mode === 'finishing' || game.mode === 'result') && scene.gateX !== null) {
+        scene.gateX -= BASE_SPEED * game.speed * dt; if (scene.gateX < -300) scene.gateX = null;
+      }
+      if (scene.startLine !== null && game.speed > 0) { scene.startLine -= BASE_SPEED * game.speed * dt; if (scene.startLine < -300) scene.startLine = null; }
+      advanceScene(dt);
+
+      const moving = game.speed > .02;
+      const n = racers.length;
+      racers.forEach((r, i) => {
+        if (r.revealAt !== null) r.reveal = clamp((now - r.revealAt) / 380, 0, 1);
+        const stride = moving ? 1.55 + .75 * game.speed + Math.max(0, r.surge) * 1.4 : 0;
+        r.phase = (r.phase + dt * stride) % 1;
+        r.x = xFor(r.offset);
+        if (moving && !reducedMotion()) {
+          const geom = laneGeom(i, n); const rate = (6 + 16 * game.speed) * dt;
+          if (Math.random() < rate) scene.dust.push({ x: r.x - 34 * geom.s, y: geom.y - 2, vx: -BASE_SPEED * game.speed * .55 - rand(0, 60), vy: -rand(10, 50), r: rand(4, 8) * geom.s, life: 0, max: rand(.4, .8) });
+        }
+      });
+      // Hoof beats follow the pack's stride.
+      if (moving && state.settings.sound && (game.mode === 'racing' || game.mode === 'finishing')) {
+        const before = Math.floor(game.hoofClock); game.hoofClock += dt * (1.55 + .75 * game.speed) * 3;
+        if (Math.floor(game.hoofClock) !== before) hoofBeat(.035 + .015 * game.speed);
+      }
+      scene.dust.forEach(d => { d.life += dt; d.x += d.vx * dt; d.y += d.vy * dt; d.vy += 30 * dt; d.r += 14 * dt; });
+      scene.dust = scene.dust.filter(d => d.life < d.max);
+      const lineRate = Math.max(0, game.speed - 1.15) * (reducedMotion() ? 10 : 70) * dt;
+      for (let k = 0; k < 3; k++) if (Math.random() < lineRate) scene.lines.push({ x: W + rand(0, 200), y: rand(90, 700), len: rand(90, 280), v: rand(2400, 3600), a: rand(.18, .4) });
+      scene.lines.forEach(l => { l.x -= l.v * dt; });
+      scene.lines = scene.lines.filter(l => l.x + l.len > 0);
+      scene.confetti.forEach(p => { p.vy += 520 * dt; p.vx *= (1 - .9 * dt); p.x += p.vx * dt; p.y += p.vy * dt; p.rot += p.vr * dt; });
+      scene.confetti = scene.confetti.filter(p => p.y < H + 40);
+      const ambientShake = !reducedMotion() && game.mode === 'racing' ? Math.max(0, game.speed - 1.3) * 2.6 : 0;
+      scene.shake = Math.max(ambientShake, scene.shake * Math.exp(-dt * 5));
+      scene.flash = Math.max(0, scene.flash - dt * 1.8);
+      scene.hype = Math.max(game.mode === 'result' ? .35 : 0, scene.hype - dt * .12);
+    }
+
+    // ---------- Draw ----------
+    function drawSky(c) {
+      const warm = game.mode === 'racing' ? smooth(.72, 1, game.progress) : (game.mode === 'finishing' || game.mode === 'result' ? 1 : 0);
+      const g = c.createLinearGradient(0, 0, 0, SKY_BOTTOM);
+      g.addColorStop(0, mix('#2f9fe6', '#ff9b55', warm * .75)); g.addColorStop(1, mix('#c4e9fb', '#ffe2b4', warm * .8));
+      c.fillStyle = g; c.fillRect(-30, -30, W + 60, SKY_BOTTOM + 40);
+      const sunX = 1060, sunY = 108 + warm * 40;
+      circle(c, sunX, sunY, 70, 'rgba(255, 240, 190, .25)'); circle(c, sunX, sunY, 44, mix('#fff7d6', '#ffd27a', warm));
+      const span = W + 400;
+      scene.clouds.forEach(cl => {
+        const x = ((cl.x - scene.scroll.sky - scene.time * 6 * cl.s) % span + span) % span - 200;
+        c.fillStyle = 'rgba(255, 255, 255, .88)';
+        [[0, 0, 26], [24, -12, 30], [52, -2, 24], [30, 8, 24]].forEach(([dx, dy, r]) => { c.beginPath(); c.arc(x + dx * cl.s, cl.y + dy * cl.s, r * cl.s, 0, Math.PI * 2); c.fill(); });
+      });
+    }
+    function drawCity(c) {
+      const offset = ((scene.scroll.city % CITY_W) + CITY_W) % CITY_W;
+      for (let x = -offset; x < W; x += CITY_W) c.drawImage(cityStrip, x, CITY_TOP, CITY_W, CITY_H);
+    }
+    function drawPlaza(c) {
+      const g = c.createLinearGradient(0, SKY_BOTTOM - 6, 0, TRACK_TOP);
+      g.addColorStop(0, '#c9c1b0'); g.addColorStop(1, '#e2dacb'); c.fillStyle = g; c.fillRect(-30, SKY_BOTTOM - 6, W + 60, TRACK_TOP - SKY_BOTTOM + 8);
+      c.fillStyle = 'rgba(80, 110, 70, .55)'; c.fillRect(-30, SKY_BOTTOM - 8, W + 60, 6);
+      c.strokeStyle = 'rgba(120, 110, 95, .18)'; c.lineWidth = 1;
+      const step = 64; const off = scene.scroll.mid % step;
+      for (let x = -off; x < W + step; x += step) { c.beginPath(); c.moveTo(x, SKY_BOTTOM); c.lineTo(x - 22, TRACK_TOP); c.stroke(); }
+    }
+    function drawMid(c) {
+      scene.mid.items.forEach(item => {
+        const x = item.x - scene.scroll.mid; if (x > W + 40 || x + item.w < -40) return;
+        const draw = MID_DRAW[item.type]; if (draw) { c.save(); draw(c, x, PLAZA_BASE + item.dy, item); c.restore(); }
+      });
+    }
+    function drawRails(c, y, speedScroll, spacing, color) {
+      c.fillStyle = color; c.fillRect(-30, y - 20, W + 60, 4); c.fillRect(-30, y - 10, W + 60, 4);
+      const off = speedScroll % spacing;
+      for (let x = -off; x < W + spacing; x += spacing) c.fillRect(x, y - 22, 5, 22);
+    }
+    function drawTrack(c) {
+      let prev = null;
+      scene.road.tiles.forEach(tile => {
+        const x = tile.x - scene.scroll.road;
+        if (x > W || x + TILE_W < 0) { prev = tile.type; return; }
+        c.drawImage(roadTiles[tile.type], x, TRACK_TOP, TILE_W + .6, TRACK_H);
+        if (prev && prev !== tile.type) { c.fillStyle = 'rgba(70, 64, 56, .45)'; c.fillRect(x - 4, TRACK_TOP, 8, TRACK_H); c.fillStyle = 'rgba(255, 255, 255, .35)'; c.fillRect(x - 1, TRACK_TOP, 2, TRACK_H); }
+        prev = tile.type;
+      });
+      const n = Math.max(1, game.racers.length);
+      c.strokeStyle = 'rgba(255, 255, 255, .55)'; c.lineWidth = 2.5; c.setLineDash([46, 34]); c.lineDashOffset = scene.scroll.road % 80;
+      for (let i = 1; i < n; i++) { const y = TRACK_TOP + TRACK_H / n * i; c.beginPath(); c.moveTo(0, y); c.lineTo(W, y); c.stroke(); }
+      c.setLineDash([]);
+    }
+    function drawLine(c, x, labelTop, part, label, board) {
+      if (x === null || x < -260 || x > W + 260) return;
+      if (part === 'back') {
+        const sq = 12.3;
+        for (let y = TRACK_TOP, row = 0; y < TRACK_BOTTOM; y += sq, row++) for (let k = 0; k < 2; k++) { c.fillStyle = (row + k) % 2 ? '#141414' : '#ffffff'; c.fillRect(x - 12 + k * 12, y, 12, Math.min(sq, TRACK_BOTTOM - y)); }
+        c.fillStyle = '#cfd5dc'; c.fillRect(x + 22, labelTop + 40, 11, TRACK_TOP - labelTop - 38);
+        return;
+      }
+      c.fillStyle = '#eef1f5'; c.fillRect(x - 8, labelTop + 40, 15, H - labelTop - 40); c.fillStyle = 'rgba(0, 0, 0, .18)'; c.fillRect(x + 2, labelTop + 40, 5, H - labelTop - 40);
+      c.fillStyle = '#b7bfc9'; c.beginPath(); c.moveTo(x - 8, labelTop + 50); c.lineTo(x + 33, labelTop + 38); c.lineTo(x + 33, labelTop + 46); c.lineTo(x + 7, labelTop + 60); c.closePath(); c.fill();
+      c.fillStyle = board; rr(c, x - 130, labelTop - 18, 260, 62, 10); c.fill();
+      for (let i = 0; i < 26; i++) { c.fillStyle = i % 2 ? '#111' : '#fff'; c.fillRect(x - 124 + i * 9.5, labelTop - 13, 9.5, 6); c.fillStyle = i % 2 ? '#fff' : '#111'; c.fillRect(x - 124 + i * 9.5, labelTop + 33, 9.5, 6); }
+      c.fillStyle = '#fff'; c.font = '900 34px Bahnschrift, "Arial Black", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(label, x, labelTop + 14);
+    }
+    function drawHorses(c) {
+      const n = game.racers.length; const moving = game.speed > .02;
+      const g = moving ? clamp(.45 + game.speed * .55, 0, 1) : 0;
+      scene.dust.forEach(d => { c.fillStyle = `rgba(214, 196, 160, ${(.5 * (1 - d.life / d.max)).toFixed(3)})`; c.beginPath(); c.arc(d.x, d.y, d.r, 0, Math.PI * 2); c.fill(); });
+      game.racers.forEach((r, i) => {
+        if (r.reveal <= 0) return;
+        const geom = laneGeom(i, n);
+        if (r.reveal >= 1) { drawHorse(c, r, r.x, geom.y, geom.s, g); return; }
+        c.save(); c.globalAlpha = clamp(r.reveal * 1.8, 0, 1);
+        drawHorse(c, r, r.x, geom.y, geom.s * (.55 + .45 * easeOutBack(r.reveal)), g); c.restore();
+      });
+    }
+    function drawTags(c) {
+      const n = game.racers.length;
+      game.racers.forEach((r, i) => {
+        if (r.reveal <= 0) return;
+        const geom = laneGeom(i, n);
+        c.save(); c.globalAlpha = r.reveal; drawTag(c, r, r.x, geom.y, geom.s, geom.laneH); c.restore();
+      });
+    }
+    function drawFore(c) {
+      const g = c.createLinearGradient(0, TRACK_BOTTOM, 0, H);
+      g.addColorStop(0, '#d9d2c4'); g.addColorStop(.12, '#cfc7b8'); g.addColorStop(.16, '#3f8f3a'); g.addColorStop(1, '#2c6b2b');
+      c.fillStyle = g; c.fillRect(-30, TRACK_BOTTOM, W + 60, H - TRACK_BOTTOM + 30);
+      // Hàng rào phía gần: chỉ thấy đầu và tay cổ động viên nhô qua rào, không che ngựa.
+      drawFans(c, scene.fansNear, scene.scroll.fore, H + 6, 1, false);
+      drawRails(c, H - 26, scene.scroll.fore, 74, '#f4f6f8');
+      scene.fore.items.forEach(item => {
+        const x = item.x - scene.scroll.fore; if (x > W + 40 || x + item.w < -120) return;
+        c.save(); FORE_DRAW[item.type](c, x, item); c.restore();
+      });
+    }
+    function draw() {
+      const c = ctx; c.setTransform(viewScale, 0, 0, viewScale, 0, 0);
+      c.save();
+      if (scene.shake > .15) c.translate(rand(-1, 1) * scene.shake, rand(-1, 1) * scene.shake * .6);
+      drawSky(c); drawCity(c); drawPlaza(c); drawMid(c);
+      drawFans(c, scene.fansFar, scene.scroll.road, TRACK_TOP + 2, .96, true);
+      drawRails(c, TRACK_TOP, scene.scroll.road, 90, '#f4f6f8');
+      drawTrack(c);
+      drawLine(c, scene.startLine, 240, 'back', 'XUẤT PHÁT', '#0a7fc0');
+      drawLine(c, scene.gateX, 196, 'back', 'FINISH', '#ef1b2d');
+      drawHorses(c);
+      drawLine(c, scene.startLine, 240, 'front', 'XUẤT PHÁT', '#0a7fc0');
+      drawLine(c, scene.gateX, 196, 'front', 'FINISH', '#ef1b2d');
+      drawTags(c);
+      drawFore(c);
+      drawWheel(c);
+      // Sảnh vòng 1: logo nguyên bản, 4 điểm nằm yên trên logo.
+      if (game.mode === 'lobby' && game.round === 'team') drawLogo(c, LOGO_HOME.x, LOGO_HOME.y, LOGO_HOME.size, LOGO_POINT_TO_TEAM);
+      drawIntro(c);
+      scene.lines.forEach(l => { c.strokeStyle = `rgba(255, 255, 255, ${l.a})`; c.lineWidth = 2; c.beginPath(); c.moveTo(l.x, l.y); c.lineTo(l.x + l.len, l.y); c.stroke(); });
+      scene.confetti.forEach(p => { c.save(); c.translate(p.x, p.y); c.rotate(p.rot); c.scale(Math.cos(p.rot * 1.7), 1); c.fillStyle = p.color; c.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); c.restore(); });
+      c.restore();
+      if (scene.flash > 0) { c.fillStyle = `rgba(255, 255, 255, ${scene.flash.toFixed(3)})`; c.fillRect(0, 0, W, H); }
+    }
+
+    function resizeCanvas() {
+      const rect = els.canvas.getBoundingClientRect(); const dpr = Math.min(2, window.devicePixelRatio || 1);
+      els.canvas.width = Math.max(1, Math.round(rect.width * dpr)); els.canvas.height = Math.max(1, Math.round(rect.height * dpr));
+      viewScale = els.canvas.width / W;
+    }
+
+    // ======================================================================
+    // SETTINGS, DIALOGS, HISTORY
+    // ======================================================================
+    function syncControls() {
+      const busy = isBusy();
+      [els.settings, els.undo, els.clearHistory].forEach(b => { b.disabled = busy; });
+      if (!busy && !state.history.length) { els.undo.disabled = true; els.clearHistory.disabled = true; }
+      els.sound.textContent = state.settings.sound ? '🔊' : '🔇';
+      els.sound.setAttribute('aria-label', state.settings.sound ? 'Tắt âm thanh' : 'Bật âm thanh');
+      els.sound.title = els.sound.getAttribute('aria-label');
+      els.screenBox.dataset.mode = game.mode; els.screenBox.dataset.round = game.round;
+      els.screenBox.dataset.method = game.round === 'member' && game.wheel ? 'wheel' : 'race';
+      els.skip.hidden = game.mode !== 'racing' && game.mode !== 'intro';
+      els.skip.textContent = game.mode === 'intro' ? 'Bỏ qua intro ⏭' : 'Tua tới đích ⏭';
+    }
+
+    function renderHistory() {
+      if (!state.history.length) { els.history.innerHTML = '<div class="empty">Chưa có kết quả nào. Hãy bắt đầu cuộc đua đầu tiên.</div>'; syncControls(); return; }
+      const methodLabel = m => m === 'horse' ? '🏇 Đua ngựa' : m === 'race' ? '⛵ Đua thuyền' : '◉ Vòng quay';
+      els.history.innerHTML = `<table><thead><tr><th>Lượt</th><th>Vòng</th><th>Hình thức</th><th>Kết quả</th><th>Team</th><th>Thời gian</th></tr></thead><tbody>${state.history.map((h, i) => `<tr><td>${i + 1}</td><td><span class="tag ${h.type}">${h.type === 'team' ? 'Team' : 'Thành viên'}</span></td><td>${methodLabel(h.method)}</td><td><b>${escapeHtml(h.resultName)}</b></td><td>${escapeHtml(h.teamName)}</td><td>${formatTime(h.time)}</td></tr>`).reverse().join('')}</tbody></table>`;
+      syncControls();
+    }
+    function formatTime(iso) { try { return new Intl.DateTimeFormat('vi-VN', { dateStyle: 'short', timeStyle: 'medium' }).format(new Date(iso)); } catch (_) { return iso; } }
+
+    function renderLogo() {
+      const logo = state.settings.logoData;
+      els.logoButton.classList.toggle('has-image', Boolean(logo));
+      if (logo) els.brandLogo.src = logo; else els.brandLogo.removeAttribute('src');
+      if (!logo) { document.documentElement.style.removeProperty('--logo-plate'); return; }
+      const probe = new Image();
+      probe.onload = () => {
+        try {
+          const size = 32; const canvas = document.createElement('canvas'); canvas.width = canvas.height = size;
+          const c = canvas.getContext('2d'); c.drawImage(probe, 0, 0, size, size); const { data } = c.getImageData(0, 0, size, size);
+          let total = 0, count = 0; for (let i = 0; i < data.length; i += 4) { if (data[i + 3] < 24) continue; total += (.2126 * data[i] + .7152 * data[i + 1] + .0722 * data[i + 2]) / 255; count++; }
+          document.documentElement.style.setProperty('--logo-plate', count && total / count > .55 ? '#0a3f57' : '#ffffff');
+        } catch (_) { document.documentElement.style.setProperty('--logo-plate', '#ffffff'); }
+      };
+      probe.src = logo;
+    }
+
+    function renderSettings() {
+      els.teamSummary.textContent = `${state.teams.length} team · ${state.teams.reduce((sum, t) => sum + t.members.length, 0)} thành viên`;
+      els.teamList.innerHTML = state.teams.length ? state.teams.map((team, index) => `<article class="t-card">
+        <div class="t-head"><span class="dot" style="background:${COLORS[index % COLORS.length]}"></span><b title="${escapeHtml(team.name)}">${escapeHtml(team.name)}</b><span class="count">${team.members.length}</span>
+          <button class="mini" type="button" data-act="rename-team" data-team="${team.id}" title="Đổi tên team">✎</button>
+          <button class="mini del" type="button" data-act="delete-team" data-team="${team.id}" title="Xóa team">×</button></div>
+        <div class="m-list">${team.members.length ? team.members.map(m => `<div class="m-row${m.isRacer ? ' is-racer' : ''}">
+            <button class="m-ava" type="button" data-act="photo" data-team="${team.id}" data-member="${m.id}" title="Ảnh của ${escapeHtml(m.name)}">${photoOf(m) ? `<img src="${escapeHtml(photoOf(m))}" alt="" />` : escapeHtml(initialOf(m.name))}</button>
+            <span title="${escapeHtml(m.name)}">${escapeHtml(m.name)}${m.isRacer ? ' · người đua' : ''}</span>
+            <button class="m-racer${m.isRacer ? ' on' : ''}" type="button" data-act="racer" data-team="${team.id}" data-member="${m.id}" aria-pressed="${m.isRacer}" title="${m.isRacer ? `${escapeHtml(m.name)} đang là người cưỡi ngựa ở vòng 1` : `Chọn ${escapeHtml(m.name)} làm người cưỡi ngựa ở vòng 1`}">🏇</button>
+            <button class="m-photo" type="button" data-act="photo" data-team="${team.id}" data-member="${m.id}">📷 Ảnh</button>
+            <button class="mini" type="button" data-act="rename-member" data-team="${team.id}" data-member="${m.id}" title="Đổi tên">✎</button>
+            <button class="mini del" type="button" data-act="delete-member" data-team="${team.id}" data-member="${m.id}" title="Xóa thành viên">×</button>
+          </div>`).join('') : '<div class="m-empty">Chưa có thành viên.</div>'}
+          <button class="m-add" type="button" data-act="add-member" data-team="${team.id}">＋ Thêm thành viên</button></div></article>`).join('')
+        : '<div class="empty">Chưa có team nào. Hãy thêm team để bắt đầu.</div>';
+      els.soundSwitch.setAttribute('aria-checked', String(state.settings.sound));
+      els.excludeSwitch.setAttribute('aria-checked', String(state.settings.excludeAfterSpin));
+      els.spokenSwitch.setAttribute('aria-checked', String(state.settings.excludeChosenMembers));
+      els.durationRange.value = String(state.settings.raceSeconds); els.durationOut.textContent = `${state.settings.raceSeconds}s`;
+    }
+
+    function openSettings() { if (isBusy()) return; renderSettings(); els.settingsBackdrop.classList.add('open'); els.settingsBackdrop.setAttribute('aria-hidden', 'false'); }
+    function closeSettings() {
+      els.settingsBackdrop.classList.remove('open'); els.settingsBackdrop.setAttribute('aria-hidden', 'true');
+      refreshAfterDataChange();
+    }
+    // Team data may have changed underneath the lobby; rebuild whatever is on screen.
+    function refreshAfterDataChange() {
+      cleanReferences(); persist(); renderHistory(); renderLogo(); syncControls();
+      if (game.mode === 'lobby') { if (game.round === 'member' && teamById(game.teamId)) enterMemberLobby(game.teamId); else enterTeamLobby(); }
+    }
+
+    let dialogOpen = false;
+    function makeButton(label, className, handler) { const b = document.createElement('button'); b.type = 'button'; b.className = className; b.textContent = label; b.addEventListener('click', handler); return b; }
+    function openDialogShell(title, message) {
+      dialogOpen = true; els.dialogTitle.textContent = title; els.dialogMessage.textContent = message;
+      els.dialogInput.hidden = true; els.dialogLabel.hidden = true; els.dialogError.textContent = ''; els.dialogActions.innerHTML = '';
+      els.dialogBackdrop.classList.add('open'); els.dialogBackdrop.setAttribute('aria-hidden', 'false');
+    }
+    function closeDialog() { dialogOpen = false; els.dialogBackdrop.classList.remove('open'); els.dialogBackdrop.setAttribute('aria-hidden', 'true'); }
+    function confirmBox({ title, message, confirmLabel = 'Xác nhận', danger = false, onConfirm }) {
+      openDialogShell(title, message);
+      els.dialogActions.append(makeButton('Hủy', 'btn', closeDialog), makeButton(confirmLabel, danger ? 'btn danger' : 'btn primary', () => { closeDialog(); onConfirm(); }));
+    }
+    function promptBox({ title, message, label, value = '', confirmLabel = 'Lưu', validate, onConfirm }) {
+      openDialogShell(title, message);
+      els.dialogLabel.textContent = label; els.dialogLabel.hidden = false; els.dialogInput.hidden = false; els.dialogInput.value = value;
+      const submit = () => { const text = normalizeText(els.dialogInput.value); const check = validate(text); if (check !== true) { els.dialogError.textContent = check; return; } closeDialog(); onConfirm(text); };
+      els.dialogInput.onkeydown = event => { if (event.key === 'Enter') submit(); };
+      els.dialogActions.append(makeButton('Hủy', 'btn', closeDialog), makeButton(confirmLabel, 'btn primary', submit));
+      setTimeout(() => els.dialogInput.focus(), 30);
+    }
+    function mutate(fn, message) { fn(); cleanReferences(); persist(); renderSettings(); renderHistory(); if (message) showToast(message); }
+    const hasTeamName = (name, exceptId) => state.teams.some(t => t.id !== exceptId && nameKey(t.name) === nameKey(name));
+
+    function handleTeamList(event) {
+      const control = event.target.closest('[data-act]'); if (!control || isBusy()) return;
+      const team = teamById(control.dataset.team); const member = memberById(team, control.dataset.member);
+      const act = control.dataset.act;
+      if (act === 'rename-team' && team) promptBox({
+        title: 'Đổi tên team', message: 'Tên mới sẽ cập nhật cả trong lịch sử.', label: 'Tên team', value: team.name,
+        validate: name => !name ? 'Tên team không được để trống.' : hasTeamName(name, team.id) ? 'Tên team này đã tồn tại.' : true,
+        onConfirm: name => mutate(() => { team.name = name; state.history.forEach(h => { if (h.teamId === team.id) h.teamName = name; if (h.type === 'team' && h.resultId === team.id) h.resultName = name; }); }, 'Đã đổi tên team.')
+      });
+      if (act === 'delete-team' && team) confirmBox({
+        title: 'Xóa team?', message: `Team “${team.name}” và ${team.members.length} thành viên sẽ bị xóa.`, confirmLabel: 'Xóa team', danger: true,
+        onConfirm: () => mutate(() => { state.teams = state.teams.filter(t => t.id !== team.id); }, `Đã xóa ${team.name}.`)
+      });
+      if (act === 'add-member' && team) promptBox({
+        title: 'Thêm thành viên', message: `Thêm người vào ${team.name}.`, label: 'Tên thành viên', confirmLabel: 'Thêm',
+        validate: name => !name ? 'Tên thành viên không được để trống.' : team.members.some(m => nameKey(m.name) === nameKey(name)) ? 'Tên này đã có trong team.' : true,
+        onConfirm: name => mutate(() => team.members.push({ id: uid(), name, imageData: '', isRacer: !team.members.length }), `Đã thêm ${name}.`)
+      });
+      if (act === 'rename-member' && member) promptBox({
+        title: 'Đổi tên thành viên', message: `Cập nhật tên trong ${team.name}.`, label: 'Tên thành viên', value: member.name,
+        validate: name => !name ? 'Tên thành viên không được để trống.' : team.members.some(m => m.id !== member.id && nameKey(m.name) === nameKey(name)) ? 'Tên này đã có trong team.' : true,
+        onConfirm: name => mutate(() => { member.name = name; state.history.forEach(h => { if (h.type === 'member' && h.teamId === team.id && h.resultId === member.id) h.resultName = name; }); }, 'Đã đổi tên thành viên.')
+      });
+      if (act === 'delete-member' && member) confirmBox({
+        title: 'Xóa thành viên?', message: `Xóa “${member.name}” khỏi ${team.name}?`, confirmLabel: 'Xóa', danger: true,
+        onConfirm: () => mutate(() => { team.members = team.members.filter(m => m.id !== member.id); }, `Đã xóa ${member.name}.`)
+      });
+      if (act === 'photo' && member) requestPhoto(team, member);
+      if (act === 'racer' && member && !member.isRacer) {
+        mutate(() => { team.members.forEach(m => { m.isRacer = m.id === member.id; }); }, `${member.name} sẽ cưỡi ngựa cho ${team.name} ở vòng 1.`);
+      }
+    }
+
+    let photoTarget = null;
+    function requestPhoto(team, member) {
+      photoTarget = { teamId: team.id, memberId: member.id };
+      if (!member.imageData) { els.photoInput.click(); return; }
+      openDialogShell(`Ảnh của ${member.name}`, 'Chọn ảnh khác hoặc xóa ảnh hiện tại.');
+      els.dialogActions.append(
+        makeButton('Hủy', 'btn', () => { photoTarget = null; closeDialog(); }),
+        makeButton('Xóa ảnh', 'btn danger', () => { closeDialog(); photoTarget = null; mutate(() => { member.imageData = ''; }, `Đã xóa ảnh của ${member.name}.`); }),
+        makeButton('Chọn ảnh khác', 'btn primary', () => { closeDialog(); els.photoInput.click(); })
+      );
+    }
+    function readImage(file, maxSide, quality, done) {
+      if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) { showToast('Vui lòng chọn ảnh PNG, JPG hoặc WebP.', 'error'); return; }
+      if (file.size > 5 * 1024 * 1024) { showToast('Ảnh không được lớn hơn 5 MB.', 'error'); return; }
+      const reader = new FileReader();
+      reader.onerror = () => showToast('Không thể đọc ảnh.', 'error');
+      reader.onload = () => {
+        const img = new Image(); img.onerror = () => showToast('File ảnh không hợp lệ.', 'error');
+        img.onload = () => {
+          const scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+          const canvas = document.createElement('canvas'); canvas.width = Math.max(1, Math.round(img.naturalWidth * scale)); canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height); done(canvas.toDataURL('image/webp', quality));
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+    els.photoInput.addEventListener('change', event => {
+      const file = event.target.files[0]; event.target.value = ''; const target = photoTarget; photoTarget = null;
+      if (!file || !target) return;
+      readImage(file, 520, .8, data => {
+        const member = memberById(teamById(target.teamId), target.memberId);
+        if (!member || !normalizeImage(data)) { showToast('Không thể lưu ảnh này.', 'error'); return; }
+        const before = member.imageData; member.imageData = data;
+        if (!persist()) { member.imageData = before; return; }
+        renderSettings(); showToast(`Đã cập nhật ảnh của ${member.name}.`);
+      });
+    });
+    els.logoInput.addEventListener('change', event => {
+      const file = event.target.files[0]; event.target.value = ''; if (!file) return;
+      readImage(file, 400, .88, data => { state.settings.logoData = data; persist(); renderLogo(); showToast('Đã cập nhật logo.'); });
+    });
+
+    function exportData() {
+      const payload = { version: 3, exportedAt: new Date().toISOString(), data: state };
+      const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }));
+      const a = document.createElement('a'); a.href = url; a.download = `dua-ngua-seci-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); showToast('Đã xuất file dữ liệu JSON.');
+    }
+    function importData(file) {
+      const reader = new FileReader();
+      reader.onerror = () => showToast('Không thể đọc file đã chọn.', 'error');
+      reader.onload = () => {
+        try {
+          const incoming = normalizeData(JSON.parse(reader.result)); incoming.pending = null;
+          confirmBox({ title: 'Nhập dữ liệu?', message: 'Dữ liệu hiện tại sẽ được ghi đè.', confirmLabel: 'Nhập dữ liệu', onConfirm: () => { state = incoming; persist(); renderSettings(); refreshAfterDataChange(); showToast('Đã nhập dữ liệu thành công.'); } });
+        } catch (error) { showToast(`File JSON không hợp lệ: ${error.message}`, 'error'); }
+      };
+      reader.readAsText(file, 'UTF-8');
+    }
+
+    // ---------- Events ----------
+    function handleScreenClick(event) {
+      const go = event.target.closest('[data-go]'); if (!go) return;
+      const action = go.dataset.go;
+      if (action === 'start' || action === 'spin') startRace();
+      if ((action === 'method-wheel' || action === 'method-horse') && game.mode === 'lobby' && game.round === 'member') {
+        state.settings.round2Method = action === 'method-horse' ? 'horse' : 'wheel'; persist(); enterMemberLobby(game.teamId);
+      }
+      if (action === 'solo') revealSolo();
+      if (action === 'settings') openSettings();
+      if (action === 'round1') enterTeamLobby();
+      if (action === 'round2' && game.record) enterMemberLobby(game.record.teamId);
+      if (action === 'again' && game.record) enterMemberLobby(game.record.teamId);
+    }
+    [els.lobby, els.teamWin, els.final].forEach(el => el.addEventListener('click', handleScreenClick));
+
+    // Bấm vào màn hình để bỏ qua intro – trừ chính cú bấm "Bắt đầu" vừa mở intro.
+    els.screenBox.addEventListener('click', event => {
+      if (game.mode === 'intro' && game.intro && game.intro.t > .4 && !event.target.closest('[data-go]')) skipIntro();
+    });
+    els.skip.addEventListener('click', event => {
+      if (game.mode === 'intro') { event.stopPropagation(); skipIntro(); return; }
+      if (game.mode !== 'racing') return;
+      const now = performance.now(); const target = .965;
+      if ((now - game.startAt) / game.duration < target) game.startAt = now - game.duration * target;
+    });
+    els.settings.addEventListener('click', openSettings);
+    els.closeSettings.addEventListener('click', closeSettings);
+    els.settingsBackdrop.addEventListener('click', event => { if (event.target === els.settingsBackdrop) closeSettings(); });
+    els.dialogBackdrop.addEventListener('click', event => { if (event.target === els.dialogBackdrop) closeDialog(); });
+    els.teamList.addEventListener('click', handleTeamList);
+    els.addTeam.addEventListener('click', () => promptBox({
+      title: 'Thêm team mới', message: 'Nhập tên để tạo team mới.', label: 'Tên team', confirmLabel: 'Tạo team',
+      validate: name => !name ? 'Tên team không được để trống.' : hasTeamName(name) ? 'Tên team này đã tồn tại.' : true,
+      onConfirm: name => mutate(() => state.teams.push({ id: uid(), name, imageData: '', members: [] }), `Đã tạo ${name}.`)
+    }));
+    function toggleSound() {
+      state.settings.sound = !state.settings.sound; persist(); syncControls(); renderSettings();
+      if (music) music.muted = !state.settings.sound;
+      if (state.settings.sound) tone(880, .15, 'triangle', .05);
+    }
+    els.sound.addEventListener('click', toggleSound);
+    els.soundSwitch.addEventListener('click', toggleSound);
+    els.excludeSwitch.addEventListener('click', () => { state.settings.excludeAfterSpin = !state.settings.excludeAfterSpin; persist(); renderSettings(); });
+    els.spokenSwitch.addEventListener('click', () => { state.settings.excludeChosenMembers = !state.settings.excludeChosenMembers; persist(); renderSettings(); });
+    els.durationRange.addEventListener('input', () => { state.settings.raceSeconds = clamp(Number(els.durationRange.value) || 20, 12, 45); els.durationOut.textContent = `${state.settings.raceSeconds}s`; persist(); });
+    els.restoreExcluded.addEventListener('click', () => {
+      const total = state.excludedTeams.length + state.excludedMembers.length;
+      if (!total) { showToast('Chưa có kết quả nào bị loại.'); return; }
+      mutate(() => { state.excludedTeams = []; state.excludedMembers = []; }, 'Đã khôi phục tất cả kết quả đã loại.');
+    });
+    els.newSession.addEventListener('click', () => confirmBox({
+      title: 'Bắt đầu phiên mới?', message: 'Lịch sử sẽ được xóa và mọi kết quả tạm loại được khôi phục. Danh sách team vẫn giữ nguyên.', confirmLabel: 'Phiên mới',
+      onConfirm: () => mutate(() => { state.history = []; state.excludedTeams = []; state.excludedMembers = []; }, 'Đã bắt đầu phiên mới.')
+    }));
+    els.exportButton.addEventListener('click', exportData);
+    els.importButton.addEventListener('click', () => els.importInput.click());
+    els.importInput.addEventListener('change', event => { const file = event.target.files[0]; event.target.value = ''; if (file) importData(file); });
+    els.legacyButton.addEventListener('click', () => {
+      let legacy = null;
+      try { legacy = readLegacy(); } catch (error) { showToast(`Dữ liệu Vòng quay SECI không hợp lệ: ${error.message}`, 'error'); return; }
+      if (!legacy) { showToast('Trình duyệt này chưa có dữ liệu của Vòng quay SECI.', 'error'); return; }
+      confirmBox({
+        title: 'Lấy dữ liệu từ Vòng quay SECI?', message: `Danh sách team hiện tại sẽ được thay bằng ${legacy.teams.length} team của Vòng quay SECI. Lịch sử đua ngựa vẫn giữ nguyên.`, confirmLabel: 'Lấy dữ liệu',
+        onConfirm: () => mutate(() => { state.teams = legacy.teams; state.settings.logoData = legacy.settings.logoData || state.settings.logoData; }, 'Đã lấy dữ liệu từ Vòng quay SECI.')
+      });
+    });
+    els.sampleButton.addEventListener('click', () => confirmBox({
+      title: 'Dùng dữ liệu mẫu?', message: 'Danh sách team, lịch sử và kết quả tạm loại sẽ được thay bằng dữ liệu mẫu.', confirmLabel: 'Dùng dữ liệu mẫu', danger: true,
+      onConfirm: () => { const logo = state.settings.logoData; state = initialState(); state.settings.logoData = logo; persist(); renderSettings(); renderHistory(); showToast('Đã nạp dữ liệu mẫu.'); }
+    }));
+    els.undo.addEventListener('click', () => {
+      if (isBusy() || !state.history.length) return;
+      const record = state.history[state.history.length - 1];
+      state.history.pop();
+      if (record.eliminated) {
+        if (record.type === 'team') state.excludedTeams = state.excludedTeams.filter(id => id !== record.resultId);
+        else state.excludedMembers = state.excludedMembers.filter(key => key !== memberKey(record.teamId, record.resultId));
+      }
+      persist(); renderHistory(); showToast('Đã hoàn tác kết quả gần nhất.');
+      if (game.mode === 'lobby' || game.mode === 'result') enterTeamLobby();
+    });
+    els.clearHistory.addEventListener('click', () => {
+      if (isBusy() || !state.history.length) return;
+      confirmBox({ title: 'Xóa lịch sử?', message: 'Toàn bộ lịch sử sẽ bị xóa. Các kết quả đang tạm loại vẫn giữ nguyên.', confirmLabel: 'Xóa lịch sử', danger: true, onConfirm: () => { state.history = []; persist(); renderHistory(); showToast('Đã xóa lịch sử.'); } });
+    });
+    els.logoButton.addEventListener('click', () => els.logoInput.click());
+    els.fullscreen.addEventListener('click', async () => {
+      try { if (document.fullscreenElement) await document.exitFullscreen(); else await els.stage.requestFullscreen(); }
+      catch (_) { showToast('Trình duyệt không mở được chế độ toàn màn hình.', 'error'); }
+    });
+    document.addEventListener('fullscreenchange', () => { els.fullscreen.textContent = document.fullscreenElement ? '⛶ Thoát toàn màn hình' : '⛶ Toàn màn hình'; requestAnimationFrame(resizeCanvas); });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') { if (dialogOpen) closeDialog(); else if (els.settingsBackdrop.classList.contains('open')) closeSettings(); return; }
+      const typing = event.target && /INPUT|TEXTAREA|SELECT/.test(event.target.tagName);
+      if (!typing && !dialogOpen && (event.key === ' ' || event.key === 'Enter') && game.mode === 'lobby' && !els.settingsBackdrop.classList.contains('open') && event.target === document.body) {
+        event.preventDefault(); if (game.pool.length >= 2) startRace();
+      }
+    });
+    if (typeof ResizeObserver === 'function') new ResizeObserver(resizeCanvas).observe(els.canvas);
+    window.addEventListener('resize', resizeCanvas);
+
+    // ---------- Boot ----------
+    // Biểu tượng mặc định là chính logo SECI (cùng dữ liệu hình học với canvas).
+    els.brandSymbol.innerHTML = `<svg viewBox="-660 -660 1320 1320"><g fill="${LOGO_GOLD}" transform="rotate(45)"><path d="${LOGO_CORE_PATH}"/><rect x="-465" y="-465" width="116" height="116"/><rect x="349" y="-465" width="116" height="116"/><rect x="349" y="349" width="116" height="116"/><rect x="-465" y="349" width="116" height="116"/></g></svg>`;
+    resizeCanvas(); renderLogo(); renderHistory();
+    const recovered = state.pending ? commitPending() : null;
+    enterTeamLobby();
+    if (recovered) {
+      game.record = recovered; game.mode = 'result'; hideOverlays();
+      if (recovered.type === 'team') showTeamWin(recovered); else showFinal(recovered);
+      showToast('Đã công bố kết quả của cuộc đua bị gián đoạn.');
+    } else if (bootMessage) showToast(bootMessage);
+    requestAnimationFrame(frame);
+    setSaveStatus('local');
+    connectServer();
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') refreshFromServer();
+      else if (sync.dirty) { clearTimeout(sync.timer); flushServerSave(); }
+    });
+  </script>
+</body>
+
+</html>

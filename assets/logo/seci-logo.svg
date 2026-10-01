@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-660 -660 1320 1320" width="512" height="512">
+  <title>SECI</title>
+  <!-- Traced from the maroon banner. Drawn on a square grid, then turned 45°.
+       Five separate layers so an animation can pull the four points away
+       from the core; at rest they sit exactly where the original logo has them. -->
+  <g fill="#D9BC6A">
+    <path id="logo-core" transform="rotate(45)" d="M-465 -279 -279 -279 -279 -465 279 -465 279 -279 465 -279 465 279 279 279 279 465 -279 465 -279 279 -465 279ZM-377 -191 -377 -44 -141 -44 -141 44 -377 44 -377 191 -279 191 -279 103 -191 103 -191 191 -103 191 -103 279 -191 279 -191 377 -44 377 -44 141 44 141 44 377 191 377 191 279 103 279 103 191 191 191 191 103 279 103 279 191 377 191 377 44 141 44 141 -44 377 -44 377 -191 279 -191 279 -103 191 -103 191 -191 103 -191 103 -279 191 -279 191 -377 44 -377 44 -141 -44 -141 -44 -377 -191 -377 -191 -279 -103 -279 -103 -191 -191 -191 -191 -103 -279 -103 -279 -191Z" />
+    <rect id="point-top" transform="rotate(45)" x="-465" y="-465" width="116" height="116" />
+    <rect id="point-right" transform="rotate(45)" x="349" y="-465" width="116" height="116" />
+    <rect id="point-bottom" transform="rotate(45)" x="349" y="349" width="116" height="116" />
+    <rect id="point-left" transform="rotate(45)" x="-465" y="349" width="116" height="116" />
+  </g>
+</svg>
