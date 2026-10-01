@@ -655,7 +655,7 @@
       const s = source.settings || {};
       const p = source.pending;
       const pending = p && (p.round === 'team' || p.round === 'member') && typeof p.winnerId === 'string' && typeof p.teamId === 'string'
-        ? { round: p.round, method: p.method === 'wheel' ? 'wheel' : 'horse', winnerId: p.winnerId, teamId: p.teamId, createdAt: typeof p.createdAt === 'string' ? p.createdAt : new Date().toISOString() }
+        ? { round: p.round, method: ['wheel', 'auto'].includes(p.method) ? p.method : 'horse', winnerId: p.winnerId, teamId: p.teamId, createdAt: typeof p.createdAt === 'string' ? p.createdAt : new Date().toISOString() }
         : null;
       return {
         teams, history,
@@ -1753,11 +1753,22 @@
       els.hudTicker.className = `hud-ticker ${kind}`.trim(); void els.hudTicker.offsetWidth; els.hudTicker.classList.add('pop');
     }
 
-    function enterTeamLobby() {
+    // fromUser: người dùng vừa bấm sang ván mới – nếu chỉ còn 1 team thì vào thẳng vòng quay thành viên.
+    function enterTeamLobby(fromUser = false) {
+      if (fromUser && !isBusy()) { recycleExhausted('team'); if (availableTeams().length === 1) { chooseOnlyTeam(); return; } }
       game.mode = 'lobby'; game.round = 'team'; game.teamId = null; game.record = null; game.progress = 0;
       game.pool = availableTeams();
       setRacers(game.pool.slice(0, MAX_LANES), 'team'); resetScene(); setHudRound(); setProgressHud(0);
       hideOverlays(); renderLobby(); say('Sẵn sàng xuất phát!', '', true); syncControls();
+    }
+    // Chỉ còn 1 team: không cần đua, team đó được chọn và vào vòng quay thành viên ngay.
+    function chooseOnlyTeam() {
+      const pool = availableTeams(); if (pool.length !== 1) return;
+      const team = pool[0];
+      state.pending = { round: 'team', method: 'auto', winnerId: team.id, teamId: team.id, createdAt: new Date().toISOString() };
+      const record = commitPending(); if (!record) { enterTeamLobby(); return; }
+      enterMemberLobby(team.id);
+      showToast(`Chỉ còn ${team.name} – vào thẳng vòng quay thành viên.`);
     }
     function enterMemberLobby(teamId) {
       const team = teamById(teamId); if (!team) { enterTeamLobby(); return; }
@@ -1815,9 +1826,11 @@
         return;
       }
       if (pool.length >= 2) actions = `<button class="btn-arcade pulse" type="button" data-go="start">BẮT ĐẦU ĐUA ▶</button>`;
+      else if (isTeam && pool.length === 1) actions = `<button class="btn-arcade pulse" type="button" data-go="only-team">QUAY THÀNH VIÊN · ${escapeHtml(pool[0].name)} ▶</button>`;
       else if (!isTeam && pool.length === 1) actions = `<button class="btn-arcade pulse" type="button" data-go="solo">CÔNG BỐ NGƯỜI ĐƯỢC CHỌN ▶</button>`;
-      else body += `<p class="note">${isTeam ? 'Cần ít nhất 2 team để đua. Hãy thêm team trong Cài đặt.' : 'Team này chưa có thành viên. Hãy thêm thành viên trong Cài đặt.'}</p>`;
-      if (pool.length < 2) actions += `<button class="btn-ghost" type="button" data-go="settings">⚙ Mở cài đặt</button>`;
+      if (isTeam && pool.length === 1) body += `<p class="note">Chỉ còn 1 team chưa được chọn – không cần đua, vào thẳng vòng quay thành viên.</p>`;
+      else if (pool.length < 2 && !(!isTeam && pool.length === 1)) body += `<p class="note">${isTeam ? 'Cần ít nhất 2 team để đua. Hãy thêm team trong Cài đặt.' : 'Team này chưa có thành viên. Hãy thêm thành viên trong Cài đặt.'}</p>`;
+      if (pool.length < 2 && !(isTeam && pool.length === 1)) actions += `<button class="btn-ghost" type="button" data-go="settings">⚙ Mở cài đặt</button>`;
       if (!isTeam) actions += `<button class="btn-ghost" type="button" data-go="round1">◀ Về vòng 1</button>`;
       els.lobby.innerHTML = `<div class="card">${body}<div class="card-actions">${actions}</div></div>`;
       els.lobby.hidden = false;
@@ -2059,7 +2072,7 @@
       const selected = pending.round === 'team' ? team : memberById(team, pending.winnerId);
       if (!team || !selected) { state.pending = null; persist(); showToast('Kết quả đã chốt không còn trong danh sách.', 'error'); return null; }
       const record = {
-        id: uid(), type: pending.round, method: pending.method === 'wheel' ? 'wheel' : 'horse', resultId: selected.id, resultName: selected.name,
+        id: uid(), type: pending.round, method: ['wheel', 'auto'].includes(pending.method) ? pending.method : 'horse', resultId: selected.id, resultName: selected.name,
         teamId: team.id, teamName: team.name, time: pending.createdAt, eliminated: pending.round === 'team' ? state.settings.excludeAfterSpin : state.settings.excludeChosenMembers
       };
       if (record.eliminated) {
@@ -2305,7 +2318,7 @@
 
     function renderHistory() {
       if (!state.history.length) { els.history.innerHTML = '<div class="empty">Chưa có kết quả nào. Hãy bắt đầu cuộc đua đầu tiên.</div>'; syncControls(); return; }
-      const methodLabel = m => m === 'horse' ? '🏇 Đua ngựa' : m === 'race' ? '⛵ Đua thuyền' : '◉ Vòng quay';
+      const methodLabel = m => m === 'auto' ? '⏭ Còn 1 team' : m === 'horse' ? '🏇 Đua ngựa' : m === 'race' ? '⛵ Đua thuyền' : '◉ Vòng quay';
       els.history.innerHTML = `<table><thead><tr><th>Lượt</th><th>Vòng</th><th>Hình thức</th><th>Kết quả</th><th>Team</th><th>Thời gian</th></tr></thead><tbody>${state.history.map((h, i) => `<tr><td>${i + 1}</td><td><span class="tag ${h.type}">${h.type === 'team' ? 'Team' : 'Thành viên'}</span></td><td>${methodLabel(h.method)}</td><td><b>${escapeHtml(h.resultName)}</b></td><td>${escapeHtml(h.teamName)}</td><td>${formatTime(h.time)}</td></tr>`).reverse().join('')}</tbody></table>`;
       syncControls();
     }
@@ -2494,7 +2507,8 @@
       }
       if (action === 'solo') revealSolo();
       if (action === 'settings') openSettings();
-      if (action === 'round1') enterTeamLobby();
+      if (action === 'round1') enterTeamLobby(true);
+      if (action === 'only-team' && game.mode === 'lobby') chooseOnlyTeam();
       if (action === 'round2' && game.record) enterMemberLobby(game.record.teamId);
       if (action === 'again' && game.record) enterMemberLobby(game.record.teamId);
     }
@@ -2600,6 +2614,8 @@
     requestAnimationFrame(frame);
     setSaveStatus('local');
     connectServer();
+    // Màn hình đang mở cũng tự nhận thay đổi từ máy khác, không cần bấm F5.
+    setInterval(() => { if (document.visibilityState === 'visible') refreshFromServer(); }, 10000);
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') refreshFromServer();
       else if (sync.dirty) { clearTimeout(sync.timer); flushServerSave(); }
