@@ -706,9 +706,16 @@
 
     const teamById = id => state.teams.find(team => team.id === id) || null;
     const memberById = (team, id) => (team && team.members.find(member => member.id === id)) || null;
+    // Team còn người chưa phát biểu mới được đua; team đã hết người thì nghỉ cho tới lượt mới.
+    function teamsWithSpeakers() {
+      if (!state.settings.excludeChosenMembers) return state.teams.slice();
+      return state.teams.filter(team => team.members.some(m => !state.excludedMembers.includes(memberKey(team.id, m.id))));
+    }
+    const everyoneSpoke = () => state.settings.excludeChosenMembers && state.teams.some(t => t.members.length) && !teamsWithSpeakers().length;
     function availableTeams() {
-      const left = state.teams.filter(team => !state.settings.excludeAfterSpin || !state.excludedTeams.includes(team.id));
-      return left.length || !state.settings.excludeAfterSpin ? left : state.teams;
+      const base = teamsWithSpeakers();
+      const left = base.filter(team => !state.settings.excludeAfterSpin || !state.excludedTeams.includes(team.id));
+      return left.length || !state.settings.excludeAfterSpin ? left : base;
     }
     // Vòng 2 luôn gồm TOÀN BỘ thành viên của team, kể cả người vừa cưỡi ngựa ở vòng 1:
     // không lọc theo isRacer, không loại người đã được chọn – mỗi người cùng một xác suất.
@@ -717,18 +724,19 @@
     function availableMembers(team) {
       if (!team) return [];
       if (!state.settings.excludeChosenMembers) return team.members.slice();
-      const left = team.members.filter(m => !state.excludedMembers.includes(memberKey(team.id, m.id)));
-      return left.length ? left : team.members.slice();
+      // Người đã phát biểu giữ nguyên dấu qua mọi vòng; không tự quay lại khi team hết người.
+      return team.members.filter(m => !state.excludedMembers.includes(memberKey(team.id, m.id)));
     }
     const spokenMembers = team => (team && state.settings.excludeChosenMembers ? team.members.filter(m => state.excludedMembers.includes(memberKey(team.id, m.id))) : []);
     function recycleExhausted(round) {
       if (!state.settings.excludeAfterSpin) return;
-      if (round === 'team' && state.teams.length && state.teams.every(t => state.excludedTeams.includes(t.id))) state.excludedTeams = [];
+      const base = teamsWithSpeakers();
+      if (round === 'team' && base.length && base.every(t => state.excludedTeams.includes(t.id))) state.excludedTeams = [];
     }
-    function recycleSpoken(team) {
-      if (team && team.members.length && team.members.every(m => state.excludedMembers.includes(memberKey(team.id, m.id)))) {
-        state.excludedMembers = state.excludedMembers.filter(key => !key.startsWith(`${team.id}:`));
-      }
+    // Lượt mới: xóa mọi dấu "đã phát biểu" và "team đã chọn".
+    function startNewTurn() {
+      state.excludedMembers = []; state.excludedTeams = []; persist(); enterTeamLobby();
+      showToast('Bắt đầu lượt mới: mọi người đều có thể được quay lại.');
     }
     function cleanReferences() {
       state.teams.forEach(fixRacers);
@@ -1793,10 +1801,11 @@
       const pool = game.pool; const shown = game.racers;
       let body = '';
       if (isTeam) {
-        const excluded = state.settings.excludeAfterSpin ? state.teams.filter(t => !pool.includes(t)) : [];
+        const finished = state.teams.filter(t => !teamsWithSpeakers().includes(t) && t.members.length);
+        const excluded = state.teams.filter(t => !pool.includes(t) && !finished.includes(t));
         body = `<p class="kicker">VÒNG 1</p><h2>ĐUA NGỰA CHỌN TEAM</h2>
           <p class="sub">${pool.length} team · bấm bắt đầu để các điểm trên logo SECI sinh ra những chiến mã</p>
-          <div class="chips">${pool.map((t, i) => { const rider = racerOf(t); return `<span class="chip"><i style="background:${i < MAX_LANES ? COLORS[i % COLORS.length] : '#56606c'}"></i>${escapeHtml(t.name)} <small>${rider ? `🏇 ${escapeHtml(rider.name)} · ` : ''}${t.members.length} TV</small></span>`; }).join('')}${excluded.map(t => `<span class="chip out">${escapeHtml(t.name)}</span>`).join('')}</div>
+          <div class="chips">${pool.map((t, i) => { const rider = racerOf(t); return `<span class="chip"><i style="background:${i < MAX_LANES ? COLORS[i % COLORS.length] : '#56606c'}"></i>${escapeHtml(t.name)} <small>${rider ? `🏇 ${escapeHtml(rider.name)} · ` : ''}${t.members.length} TV</small></span>`; }).join('')}${excluded.map(t => `<span class="chip out">${escapeHtml(t.name)}</span>`).join('')}${finished.map(t => `<span class="chip out" title="Mọi thành viên đã phát biểu">${escapeHtml(t.name)} <small>✓ hết người</small></span>`).join('')}</div>
           <p class="sub" style="margin-top:.5cqw">Mỗi team 1 người cưỡi ngựa 🏇, các thành viên còn lại đứng hàng rào cổ vũ.</p>`;
         if (pool.length > MAX_LANES) body += `<p class="note">Có ${pool.length} team – khi bắt đầu sẽ bốc thăm ngẫu nhiên ${MAX_LANES} team vào đường đua.</p>`;
         if (excluded.length) body += `<p class="note">Đang tạm loại ${excluded.length} team đã được chọn trước đó.</p>`;
@@ -1808,7 +1817,7 @@
           + (spoken.length ? ` · đã phát biểu (vẫn hiện, không trúng): ${spoken.map(m => escapeHtml(m.name)).join(', ')}` : '');
         body = `<div class="strip-copy"><p class="kicker">VÒNG 2 · ${escapeHtml(team ? team.name : '')}</p><h2>QUAY CHỌN NGƯỜI CHIA SẺ</h2>
           <p class="sub">${fair}${rider && pool.includes(rider) && pool.length > 1 ? ` – ${escapeHtml(rider.name)} vừa cưỡi ngựa vẫn có cơ hội như mọi người` : ''}</p></div>`;
-        if (!pool.length) body += `<p class="note">Team này chưa có thành viên. Hãy thêm thành viên trong Cài đặt.</p>`;
+        if (!pool.length) body += `<p class="note">${team && team.members.length ? 'Cả team đã phát biểu – hãy về vòng 1 chọn team khác.' : 'Team này chưa có thành viên. Hãy thêm thành viên trong Cài đặt.'}</p>`;
       } else {
         body = `<p class="kicker">VÒNG 2 · ${escapeHtml(team ? team.name : '')}</p><h2>${shown.length > 1 ? `${shown.length} THÀNH VIÊN · ${shown.length} CHIẾN MÃ` : 'CHỌN THÀNH VIÊN'}</h2>
           <div class="members">${shown.map((r, i) => { const member = memberById(team, r.id); return `<div class="member-card" style="--c:${r.color};--i:${i}"><div class="avatar">${r.image ? `<img src="${escapeHtml(r.image)}" alt="" />` : escapeHtml(initialOf(r.name))}</div><span>${escapeHtml(r.name)}</span><small>${member && member.isRacer ? '🏇 vừa đua vòng 1' : `Ngựa số ${r.number}`}</small></div>`; }).join('')}</div>`;
@@ -1829,8 +1838,9 @@
       else if (isTeam && pool.length === 1) actions = `<button class="btn-arcade pulse" type="button" data-go="only-team">QUAY THÀNH VIÊN · ${escapeHtml(pool[0].name)} ▶</button>`;
       else if (!isTeam && pool.length === 1) actions = `<button class="btn-arcade pulse" type="button" data-go="solo">CÔNG BỐ NGƯỜI ĐƯỢC CHỌN ▶</button>`;
       if (isTeam && pool.length === 1) body += `<p class="note">Chỉ còn 1 team chưa được chọn – không cần đua, vào thẳng vòng quay thành viên.</p>`;
+      else if (isTeam && everyoneSpoke()) { body += `<p class="note">🎉 Tất cả mọi người đã phát biểu! Bấm "Lượt mới" để quay lại từ đầu.</p>`; actions = `<button class="btn-arcade pulse" type="button" data-go="new-turn">↺ LƯỢT MỚI</button>`; }
       else if (pool.length < 2 && !(!isTeam && pool.length === 1)) body += `<p class="note">${isTeam ? 'Cần ít nhất 2 team để đua. Hãy thêm team trong Cài đặt.' : 'Team này chưa có thành viên. Hãy thêm thành viên trong Cài đặt.'}</p>`;
-      if (pool.length < 2 && !(isTeam && pool.length === 1)) actions += `<button class="btn-ghost" type="button" data-go="settings">⚙ Mở cài đặt</button>`;
+      if (pool.length < 2 && !(isTeam && pool.length === 1) && !(isTeam && everyoneSpoke())) actions += `<button class="btn-ghost" type="button" data-go="settings">⚙ Mở cài đặt</button>`;
       if (!isTeam) actions += `<button class="btn-ghost" type="button" data-go="round1">◀ Về vòng 1</button>`;
       els.lobby.innerHTML = `<div class="card">${body}<div class="card-actions">${actions}</div></div>`;
       els.lobby.hidden = false;
@@ -2077,7 +2087,7 @@
       };
       if (record.eliminated) {
         if (record.type === 'team' && !state.excludedTeams.includes(team.id)) state.excludedTeams.push(team.id);
-        if (record.type === 'member') { recycleSpoken(team); const key = memberKey(team.id, selected.id); if (!state.excludedMembers.includes(key)) state.excludedMembers.push(key); }
+        if (record.type === 'member') { const key = memberKey(team.id, selected.id); if (!state.excludedMembers.includes(key)) state.excludedMembers.push(key); }
       }
       state.history.push(record); state.pending = null; persist(); renderHistory();
       return record;
@@ -2509,6 +2519,7 @@
       if (action === 'settings') openSettings();
       if (action === 'round1') enterTeamLobby(true);
       if (action === 'only-team' && game.mode === 'lobby') chooseOnlyTeam();
+      if (action === 'new-turn' && game.mode === 'lobby') startNewTurn();
       if (action === 'round2' && game.record) enterMemberLobby(game.record.teamId);
       if (action === 'again' && game.record) enterMemberLobby(game.record.teamId);
     }
