@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" role="img" aria-labelledby="title" preserveAspectRatio="xMidYMid slice">
+  <title id="title">Regatta banner backdrop</title>
+  <defs>
+    <linearGradient id="bsky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#bfe6f4"/>
+      <stop offset="1" stop-color="#eafaff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="400" fill="url(#bsky)"/>
+  <circle cx="880" cy="150" r="120" fill="#5fd6f5" opacity=".45"/>
+  <path d="M0 268c130-42 254-46 372-14 100 27 184 22 274-12 96-36 188-34 284 6 88 36 172 40 270 12v140H0z" fill="#7fd0a8" opacity=".55"/>
+  <g stroke="#0a3f57" stroke-width="9" stroke-linecap="round">
+    <path d="M150 340v-70M300 344v-58M960 340v-72M1080 344v-56"/>
+  </g>
+  <g>
+    <circle cx="150" cy="262" r="60" fill="#2ea86a"/><circle cx="112" cy="288" r="42" fill="#46c17f"/><circle cx="190" cy="290" r="40" fill="#1c8f57"/>
+    <circle cx="300" cy="282" r="48" fill="#2ea86a"/><circle cx="336" cy="300" r="34" fill="#46c17f"/>
+    <circle cx="960" cy="260" r="62" fill="#1c8f57"/><circle cx="1000" cy="288" r="44" fill="#46c17f"/>
+    <circle cx="1080" cy="284" r="46" fill="#2ea86a"/>
+  </g>
+  <path d="M0 340h1200v60H0z" fill="#0a9ee8"/>
+  <path d="M0 366c220 18 440 12 660-8 200-18 360-14 540 6v36H0z" fill="#22b9ee" opacity=".85"/>
+  <g>
+    <path d="M470 96l58 12-37 57z" fill="#ef1b2d"/>
+    <path d="M560 108l58 9-35 60z" fill="#ffc400"/>
+    <path d="M650 116l58 6-33 61z" fill="#00c9c9"/>
+  </g>
+</svg>

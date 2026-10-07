@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" role="img" aria-labelledby="title">
+  <title id="title">Subtle looping water highlight texture</title>
+  <g fill="none" stroke="#fff" stroke-linecap="round" opacity=".34">
+    <path d="M-40 82c115-42 210-40 326 0s212 42 330 0 218-40 336 0 214 42 328 2" stroke-width="13"/>
+    <path d="M-120 191c126-39 232-38 359 0s235 42 360 1 230-39 356 0 232 39 365 0" stroke-width="9"/>
+    <path d="M-20 304c99-34 186-33 285 0s184 34 284 0 188-33 289 0 188 35 282 2" stroke-width="11"/>
+  </g>
+  <g fill="#d8fbff" opacity=".26">
+    <ellipse cx="180" cy="130" rx="70" ry="10"/><ellipse cx="510" cy="264" rx="88" ry="12"/><ellipse cx="850" cy="137" rx="76" ry="10"/><ellipse cx="1080" cy="286" rx="63" ry="9"/>
+  </g>
+</svg>

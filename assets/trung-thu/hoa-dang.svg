@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 300" role="img" aria-labelledby="title">
+<title id="title">Hoa đăng: floating lotus lanterns</title>
+<defs><radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffe7a0" stop-opacity=".62"/><stop offset=".45" stop-color="#ffc56b" stop-opacity=".22"/><stop offset="1" stop-color="#ffb35c" stop-opacity="0"/></radialGradient><radialGradient id="pool" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffd27a" stop-opacity=".45"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient></defs>
+<ellipse cx="120" cy="80" rx="46" ry="12" fill="url(#pool)"/>
+<ellipse cx="120" cy="78" rx="24" ry="6" fill="#2f8f5a"/>
+<circle cx="120" cy="66" r="26" fill="url(#glow)"/>
+<ellipse cx="120" cy="68" rx="6" ry="14" fill="#e07ea2" transform="rotate(-58 120 78)"/>
+<ellipse cx="120" cy="68" rx="6" ry="14" fill="#e07ea2" transform="rotate(-30 120 78)"/>
+<ellipse cx="120" cy="68" rx="6" ry="14" fill="#e07ea2" transform="rotate(30 120 78)"/>
+<ellipse cx="120" cy="68" rx="6" ry="14" fill="#e07ea2" transform="rotate(58 120 78)"/>
+<ellipse cx="120" cy="66" rx="6" ry="14" fill="#ff8fb8" transform="rotate(-14 120 78)"/>
+<ellipse cx="120" cy="66" rx="6" ry="14" fill="#ff8fb8" transform="rotate(14 120 78)"/>
+<ellipse cx="120" cy="67" rx="4" ry="6" fill="#fff4c2"/>
+<path d="M120 62q3 -5 0 -9q-3 4 0 9z" fill="#ffb52e"/>
+<ellipse cx="360" cy="234.5" rx="39.1" ry="10.2" fill="url(#pool)"/>
+<ellipse cx="360" cy="232.8" rx="20.4" ry="5.1" fill="#2f8f5a"/>
+<circle cx="360" cy="222.6" r="22.1" fill="url(#glow)"/>
+<ellipse cx="360" cy="224.3" rx="5.1" ry="11.9" fill="#e09bb3" transform="rotate(-58 360 232.8)"/>
+<ellipse cx="360" cy="224.3" rx="5.1" ry="11.9" fill="#e09bb3" transform="rotate(-30 360 232.8)"/>
+<ellipse cx="360" cy="224.3" rx="5.1" ry="11.9" fill="#e09bb3" transform="rotate(30 360 232.8)"/>
+<ellipse cx="360" cy="224.3" rx="5.1" ry="11.9" fill="#e09bb3" transform="rotate(58 360 232.8)"/>
+<ellipse cx="360" cy="222.6" rx="5.1" ry="11.9" fill="#ffb0cb" transform="rotate(-14 360 232.8)"/>
+<ellipse cx="360" cy="222.6" rx="5.1" ry="11.9" fill="#ffb0cb" transform="rotate(14 360 232.8)"/>
+<ellipse cx="360" cy="223.4" rx="3.4" ry="5.1" fill="#fff4c2"/>
+<path d="M360 219.2q2.5 -4.2 0 -7.6q-2.5 3.4 0 7.6z" fill="#ffb52e"/>
+<ellipse cx="590" cy="129" rx="50.6" ry="13.2" fill="url(#pool)"/>
+<ellipse cx="590" cy="126.8" rx="26.4" ry="6.6" fill="#2f8f5a"/>
+<circle cx="590" cy="113.6" r="28.6" fill="url(#glow)"/>
+<ellipse cx="590" cy="115.8" rx="6.6" ry="15.4" fill="#e06b94" transform="rotate(-58 590 126.8)"/>
+<ellipse cx="590" cy="115.8" rx="6.6" ry="15.4" fill="#e06b94" transform="rotate(-30 590 126.8)"/>
+<ellipse cx="590" cy="115.8" rx="6.6" ry="15.4" fill="#e06b94" transform="rotate(30 590 126.8)"/>
+<ellipse cx="590" cy="115.8" rx="6.6" ry="15.4" fill="#e06b94" transform="rotate(58 590 126.8)"/>
+<ellipse cx="590" cy="113.6" rx="6.6" ry="15.4" fill="#ff7aa8" transform="rotate(-14 590 126.8)"/>
+<ellipse cx="590" cy="113.6" rx="6.6" ry="15.4" fill="#ff7aa8" transform="rotate(14 590 126.8)"/>
+<ellipse cx="590" cy="114.7" rx="4.4" ry="6.6" fill="#fff4c2"/>
+<path d="M590 109.2q3.3 -5.5 0 -9.9q-3.3 4.4 0 9.9z" fill="#ffb52e"/>
+<ellipse cx="760" cy="264" rx="36.8" ry="9.6" fill="url(#pool)"/>
+<ellipse cx="760" cy="262.4" rx="19.2" ry="4.8" fill="#2f8f5a"/>
+<circle cx="760" cy="252.8" r="20.8" fill="url(#glow)"/>
+<ellipse cx="760" cy="254.4" rx="4.8" ry="11.2" fill="#e0abbc" transform="rotate(-58 760 262.4)"/>
+<ellipse cx="760" cy="254.4" rx="4.8" ry="11.2" fill="#e0abbc" transform="rotate(-30 760 262.4)"/>
+<ellipse cx="760" cy="254.4" rx="4.8" ry="11.2" fill="#e0abbc" transform="rotate(30 760 262.4)"/>
+<ellipse cx="760" cy="254.4" rx="4.8" ry="11.2" fill="#e0abbc" transform="rotate(58 760 262.4)"/>
+<ellipse cx="760" cy="252.8" rx="4.8" ry="11.2" fill="#ffc2d6" transform="rotate(-14 760 262.4)"/>
+<ellipse cx="760" cy="252.8" rx="4.8" ry="11.2" fill="#ffc2d6" transform="rotate(14 760 262.4)"/>
+<ellipse cx="760" cy="253.6" rx="3.2" ry="4.8" fill="#fff4c2"/>
+<path d="M760 249.6q2.4 -4 0 -7.2q-2.4 3.2 0 7.2z" fill="#ffb52e"/>
+</svg>

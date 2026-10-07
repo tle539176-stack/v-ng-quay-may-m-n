@@ -4,27 +4,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0a9ee8" />
-  <title>Vòng quay SECI</title>
+  <meta name="theme-color" content="#b3201a" />
+  <title>Vòng quay SECI · Trung Thu</title>
   <style>
     :root {
-      --ink: #314346;
+      --ink: #3c3e56;
       --muted: #6e7e82;
-      --paper: #f9fdff;
-      --canvas: #f7f9f9;
-      --line: #e7ecee;
-      --lilac: #e4f2f8;
-      --lavender: #89b7c2;
-      --pink: #e0f3fb;
-      --rose: #84bacf;
+      --paper: #fffcf6;
+      --canvas: #f9f9f7;
+      --line: #edebe6;
+      --lilac: #f6efdd;
+      --lavender: #e8a217;
+      --pink: #faefd5;
+      --rose: #e9a61f;
       --mint: #daede3;
       --teal: #699a82;
-      --cream: #bdecff;
-      --gold: #34a2cd;
-      --blue: #dcf5fc;
-      --blue-strong: #64aabc;
-      --danger: #5a93aa;
-      --shadow: 0 12px 32px rgba(63, 85, 94, .10);
+      --cream: #fae3a7;
+      --gold: #c88c14;
+      --blue: #fbf0d3;
+      --blue-strong: #d39415;
+      --danger: #b88112;
+      --shadow: 0 12px 32px rgba(76, 79, 114, .10);
       --radius: 18px;
     }
 
@@ -46,7 +46,7 @@
       margin: 0;
       color: var(--ink);
       background:
-        radial-gradient(circle at 85% 0%, rgba(228, 242, 248, .75), transparent 30rem),
+        radial-gradient(circle at 85% 0%, rgba(246, 239, 221, .75), transparent 30rem),
         radial-gradient(circle at 0% 100%, rgba(218, 237, 227, .55), transparent 27rem), var(--canvas);
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif;
       font-size: 15px;
@@ -99,9 +99,9 @@
       overflow: hidden;
       border: 0;
       border-radius: 17px;
-      background: linear-gradient(135deg, #a1cbd6, #a9ccd9);
+      background: linear-gradient(135deg, #efbc58, #efbf60);
       color: white;
-      box-shadow: 0 9px 20px rgba(124, 155, 167, .25);
+      box-shadow: 0 9px 20px rgba(198, 139, 20, .25);
       font-size: 26px;
       transform: none;
     }
@@ -145,7 +145,7 @@
       inset: auto 0 0;
       padding: 3px 0 4px;
       color: white;
-      background: rgba(51, 63, 68, .72);
+      background: rgba(59, 60, 78, .72);
       font-size: 9px;
       font-weight: 850;
       opacity: 0;
@@ -216,26 +216,26 @@
     .soft-button {
       padding: 0 13px;
       background: var(--lilac);
-      color: #50727b;
+      color: #65699b;
     }
 
     .outline-button {
       padding: 0 13px;
       background: white;
-      border: 1px solid #d7dfe2;
-      color: #4f666c;
+      border: 1px solid #e1ddd5;
+      color: #5e6080;
     }
 
     .primary-button {
       padding: 0 17px;
-      background: linear-gradient(135deg, #7fb0bc, #95b0ba);
+      background: linear-gradient(135deg, #de9b16, #e39f16);
       color: white;
-      box-shadow: 0 8px 18px rgba(119, 152, 165, .22);
+      box-shadow: 0 8px 18px rgba(194, 136, 19, .22);
     }
 
     .danger-button {
       padding: 0 13px;
-      background: #eaf6fb;
+      background: #faf4e4;
       color: var(--danger);
     }
 
@@ -244,8 +244,8 @@
     }
 
     .panel {
-      background: rgba(249, 253, 255, .94);
-      border: 1px solid rgba(229, 235, 238, .95);
+      background: rgba(255, 252, 246, .94);
+      border: 1px solid rgba(237, 234, 227, .95);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
     }
@@ -297,8 +297,8 @@
     }
 
     .team-card.selected {
-      border-color: #b1c8d2;
-      box-shadow: 0 0 0 3px rgba(161, 203, 214, .15);
+      border-color: #efbd59;
+      box-shadow: 0 0 0 3px rgba(239, 188, 88, .15);
     }
 
     .team-top {
@@ -329,10 +329,10 @@
       place-items: center;
       overflow: hidden;
       padding: 0;
-      border: 1px solid rgba(118, 149, 162, .16);
+      border: 1px solid rgba(191, 133, 19, .16);
       border-radius: 11px;
-      color: #648b94;
-      background: linear-gradient(145deg, #eff7fa, #ebf6fa);
+      color: #af7b11;
+      background: linear-gradient(145deg, #f9f5ec, #f9f4e7);
       font-size: 13px;
       font-weight: 900;
     }
@@ -362,7 +362,7 @@
       place-items: center;
       border-radius: 7px 0 0 0;
       color: white;
-      background: rgba(69, 88, 96, .82);
+      background: rgba(81, 83, 112, .82);
       font-size: 11px;
       line-height: 1;
       opacity: 0;
@@ -399,7 +399,7 @@
       font-weight: 800;
       padding: 3px 7px;
       border-radius: 100px;
-      color: #557c86;
+      color: #6f72a3;
       background: var(--mint);
     }
 
@@ -421,12 +421,12 @@
     }
 
     .mini-button:hover {
-      background: #f3f7f9;
+      background: #f8f6f1;
       color: var(--lavender);
     }
 
     .mini-button.delete:hover {
-      background: #eaf5f9;
+      background: #f8f3e6;
       color: var(--danger);
     }
 
@@ -434,27 +434,27 @@
       flex: 0 0 auto;
       min-height: 28px;
       padding: 0 7px;
-      border: 1px solid #dee7ea;
+      border: 1px solid #e9e5dc;
       border-radius: 8px;
-      color: #59808a;
-      background: #f3f8fa;
+      color: #7376a5;
+      background: #f9f7f1;
       font-size: 11px;
       font-weight: 850;
       white-space: nowrap;
     }
 
     .photo-button:hover {
-      border-color: #b8ccd4;
-      background: #ebf4f7;
+      border-color: #f0c267;
+      background: #f6f2e9;
     }
 
     .image-tip {
       margin: 0 12px 8px;
       padding: 9px 10px;
-      border: 1px dashed #c8dbe3;
+      border: 1px dashed #e0d7c2;
       border-radius: 10px;
-      color: #5a757c;
-      background: #f7fbfd;
+      color: #6b6e94;
+      background: #fcfaf5;
       font-size: 12px;
       line-height: 1.45;
     }
@@ -468,7 +468,7 @@
       align-items: center;
       min-height: 36px;
       gap: 6px;
-      color: #57676b;
+      color: #616378;
       font-size: 13px;
     }
 
@@ -489,10 +489,10 @@
       width: 100%;
       margin: 7px 0 1px;
       min-height: 31px;
-      color: #5b828c;
+      color: #a47310;
       font-size: 12px;
       font-weight: 800;
-      background: #f3f8fa;
+      background: #f9f7f1;
       border: 0;
       border-radius: 9px;
     }
@@ -553,7 +553,7 @@
     }
 
     .tab-button[aria-selected="true"] {
-      color: #527780;
+      color: #6a6d9f;
     }
 
     .tab-button[aria-selected="true"]::after {
@@ -561,7 +561,7 @@
       position: absolute;
       height: 3px;
       border-radius: 3px 3px 0 0;
-      background: #92aeb9;
+      background: #e09d16;
       left: 15px;
       right: 15px;
       bottom: -1px;
@@ -596,9 +596,9 @@
       gap: 11px;
       margin: 0 auto 13px;
       padding: 10px 12px;
-      border: 1px solid #dbe6ea;
+      border: 1px solid #e8e4d8;
       border-radius: 14px;
-      background: #f7fbfd;
+      background: #fcfaf5;
     }
 
     .member-team-picker[hidden] {
@@ -607,7 +607,7 @@
 
     .member-team-picker label {
       flex: 0 0 auto;
-      color: #5a757c;
+      color: #6b6e94;
       font-size: 12px;
       font-weight: 850;
     }
@@ -617,7 +617,7 @@
       flex: 1;
       height: 38px;
       padding: 0 34px 0 11px;
-      border: 1px solid #d6dfe2;
+      border: 1px solid #e1ddd4;
       border-radius: 10px;
       outline: none;
       color: var(--ink);
@@ -627,8 +627,8 @@
     }
 
     .member-team-picker select:focus {
-      border-color: #8eb9c5;
-      box-shadow: 0 0 0 3px rgba(142, 185, 197, .16);
+      border-color: #e9a51f;
+      box-shadow: 0 0 0 3px rgba(233, 165, 31, .16);
     }
 
     .wheel-wrap {
@@ -650,8 +650,8 @@
       height: 0;
       border-left: 19px solid transparent;
       border-right: 19px solid transparent;
-      border-top: 37px solid #54676e;
-      filter: drop-shadow(0 3px 2px rgba(44, 60, 64, .2));
+      border-top: 37px solid #60627e;
+      filter: drop-shadow(0 3px 2px rgba(54, 56, 79, .2));
     }
 
     .pointer::after {
@@ -661,17 +661,17 @@
       left: -5px;
       width: 10px;
       height: 10px;
-      background: #f9fdff;
+      background: #fffcf6;
       border-radius: 50%;
     }
 
     .wheel-disc {
       width: 100%;
       height: 100%;
-      border: 9px solid #f9fdff;
+      border: 9px solid #fffcf6;
       border-radius: 50%;
       background: #ffffff;
-      box-shadow: 0 13px 26px rgba(61, 97, 106, .18), inset 0 0 0 1px rgba(78, 95, 102, .11);
+      box-shadow: 0 13px 26px rgba(83, 87, 144, .18), inset 0 0 0 1px rgba(89, 90, 116, .11);
       overflow: hidden;
       will-change: transform;
     }
@@ -691,7 +691,7 @@
       border-radius: 50%;
       padding: 40px;
       color: var(--muted);
-      background: #f5f7f8;
+      background: #f8f7f4;
       font-size: 14px;
     }
 
@@ -704,28 +704,28 @@
       min-height: 60px;
       border: 0;
       border-radius: 17px;
-      background: linear-gradient(135deg, #7dadba, #98b4bf);
+      background: linear-gradient(135deg, #db9916, #e8a217);
       color: white;
       font-size: 16px;
       letter-spacing: .025em;
       font-weight: 900;
-      box-shadow: 0 12px 20px rgba(128, 160, 173, .25);
+      box-shadow: 0 12px 20px rgba(205, 143, 20, .25);
       transition: transform .18s ease, box-shadow .18s ease;
     }
 
     .spin-button:hover {
       transform: translateY(-3px);
-      box-shadow: 0 16px 25px rgba(128, 160, 173, .32);
+      box-shadow: 0 16px 25px rgba(205, 143, 20, .32);
     }
 
     .spin-button.spinning {
-      background: linear-gradient(135deg, #abb9be, #acb8bd);
+      background: linear-gradient(135deg, #eaac2e, #eaab2c);
     }
 
     .selected-team-card {
       padding: 18px;
-      background: linear-gradient(140deg, #f4fafc, #f7fdff);
-      border: 1px solid #e3eef3;
+      background: linear-gradient(140deg, #fbf9f2, #fefcf5);
+      border: 1px solid #f1ecdf;
       border-radius: 15px;
     }
 
@@ -752,18 +752,18 @@
     }
 
     .toolbar-toggle {
-      color: #687e86;
+      color: #767895;
       font-size: 21px;
     }
 
     .toolbar-toggle.on {
-      color: #2b5964;
+      color: #444a9e;
       border-color: #b1cec0;
       background: #e6f1ec;
     }
 
     .reset-icon {
-      color: #5a757c;
+      color: #6b6e94;
       font-size: 21px;
     }
 
@@ -817,7 +817,7 @@
 
     th {
       color: var(--muted);
-      background: #fcfdfd;
+      background: #fdfdfc;
       font-size: 11px;
       letter-spacing: .04em;
       text-align: left;
@@ -827,7 +827,7 @@
     th,
     td {
       padding: 12px 15px;
-      border-bottom: 1px solid #eff1f2;
+      border-bottom: 1px solid #f2f1ee;
     }
 
     td {
@@ -849,12 +849,12 @@
     }
 
     .type-team {
-      color: #62818d;
-      background: #eff7fa;
+      color: #a47310;
+      background: #f9f5ec;
     }
 
     .type-member {
-      color: #406c76;
+      color: #5a5fa6;
       background: #e6f1ec;
     }
 
@@ -881,7 +881,7 @@
       align-items: center;
       justify-content: center;
       padding: 18px;
-      background: rgba(42, 53, 57, .38);
+      background: rgba(49, 50, 66, .38);
       backdrop-filter: blur(3px);
     }
 
@@ -894,8 +894,8 @@
       width: min(100%, 500px);
       padding: 26px;
       border-radius: 22px;
-      background: #f9fdff;
-      box-shadow: 0 24px 70px rgba(39, 53, 58, .25);
+      background: #fffcf6;
+      box-shadow: 0 24px 70px rgba(48, 49, 71, .25);
       animation: pop .28s cubic-bezier(.2, .8, .2, 1);
     }
 
@@ -909,7 +909,7 @@
     }
 
     .modal-kicker {
-      color: #849ca6;
+      color: #c98d14;
       font-size: 12px;
       text-align: center;
       font-weight: 900;
@@ -939,12 +939,12 @@
       place-items: center;
       margin: -60px auto 14px;
       overflow: hidden;
-      border: 4px solid #f9fdff;
+      border: 4px solid #fffcf6;
       border-radius: 24px;
-      background: linear-gradient(135deg, #a9c4ce, #a6cddd);
+      background: linear-gradient(135deg, #edb74b, #efc061);
       color: white;
       font-size: 31px;
-      box-shadow: 0 10px 20px rgba(120, 151, 164, .3);
+      box-shadow: 0 10px 20px rgba(193, 135, 19, .3);
     }
 
     .result-symbol[hidden] {
@@ -958,7 +958,7 @@
       aspect-ratio: 1;
       margin: 0 auto 16px;
       border-radius: 24px;
-      background: #f5f7f8;
+      background: #f8f7f4;
     }
 
     .result-symbol.has-image.member-image {
@@ -994,8 +994,8 @@
       flex-direction: column;
       overflow: hidden;
       border-radius: 22px;
-      background: #f9fdff;
-      box-shadow: 0 24px 70px rgba(39, 53, 58, .25);
+      background: #fffcf6;
+      box-shadow: 0 24px 70px rgba(48, 49, 71, .25);
       animation: pop .28s cubic-bezier(.2, .8, .2, 1);
     }
 
@@ -1043,7 +1043,7 @@
       gap: 13px;
       align-content: center;
       padding: 22px;
-      background: linear-gradient(145deg, rgba(244, 249, 251, .76), rgba(249, 253, 255, .1));
+      background: linear-gradient(145deg, rgba(250, 248, 242, .76), rgba(255, 252, 246, .1));
     }
 
     .round-settings .action-stack {
@@ -1069,7 +1069,7 @@
 
     .dialog-input {
       width: 100%;
-      border: 1px solid #d7dee1;
+      border: 1px solid #e0ddd5;
       outline: none;
       border-radius: 11px;
       padding: 11px 12px;
@@ -1078,8 +1078,8 @@
     }
 
     .dialog-input:focus {
-      border-color: #8eb9c5;
-      box-shadow: 0 0 0 3px rgba(142, 185, 197, .16);
+      border-color: #e9a51f;
+      box-shadow: 0 0 0 3px rgba(233, 165, 31, .16);
     }
 
     .dialog-error {
@@ -1109,7 +1109,7 @@
       border-radius: 12px;
       color: #ffffff;
       background: #4f5a5f;
-      box-shadow: 0 9px 22px rgba(34, 43, 46, .2);
+      box-shadow: 0 9px 22px rgba(40, 41, 54, .2);
       font-size: 13px;
       font-weight: 700;
       transition: opacity .2s, transform .2s;
@@ -1121,7 +1121,7 @@
     }
 
     .toast.error {
-      background: #57899d;
+      background: #ac7811;
     }
 
     .confetti-piece {
@@ -1246,11 +1246,11 @@
     }
   </style>
   <!-- RACE-INTEGRATION: giao diện đường đua do mô-đun riêng quản lý. -->
-  <link rel="stylesheet" href="race-ui.css?v=20260908-regatta-11" />
+  <link rel="stylesheet" href="race-ui-trung-thu.css?v=20260922-trungthu-1" />
   <link rel="stylesheet" href="seci-logo.css?v=20261001-1" />
 </head>
 
-<body>
+<body class="theme-trung-thu">
   <main class="app-shell">
     <header class="topbar">
       <div class="brand">
@@ -1262,7 +1262,7 @@
         <input id="logoInput" class="file-input" type="file" accept="image/png,image/jpeg,image/webp" />
         <div>
           <h1>VÒNG QUAY SECI</h1>
-          <p class="tagline">Chọn team – Chọn thành viên – Cùng nhau chia sẻ</p>
+          <p class="tagline">Rước đèn trăng rằm – Chọn team – Chọn thành viên</p>
         </div>
       </div>
       <div class="top-actions">
@@ -1301,8 +1301,8 @@
             <div id="wheelView" class="wheel-area">
               <header class="wheel-festival-heading">
                 <span class="wheel-festival-copy">
-                  <span class="wheel-festival-kicker">SÂN CHƠI SECI · CÙNG NHAU CHIA SẺ</span>
-                  <strong id="wheelFestivalTitle" class="wheel-festival-title">Vòng quay SECI</strong>
+                  <span class="wheel-festival-kicker">TẾT TRUNG THU · ĐÊM HỘI TRĂNG RẰM</span>
+                  <strong id="wheelFestivalTitle" class="wheel-festival-title">Vòng quay Trăng Rằm</strong>
                 </span>
               </header>
               <div id="memberTeamPicker" class="member-team-picker" hidden>
@@ -1313,7 +1313,7 @@
               <div class="wheel-wrap" aria-label="Vòng quay">
                 <div class="pointer" aria-hidden="true"></div>
                 <div id="wheelDisc" class="wheel-disc"><canvas id="wheelCanvas"></canvas></div>
-                <div class="wheel-hub" aria-hidden="true"><span class="wheel-hub-star">◆</span><strong>SECI</strong><small>2026</small></div>
+                <div class="wheel-hub" aria-hidden="true"><span class="wheel-hub-star">✦</span><strong>SECI</strong><small>TRUNG THU</small></div>
                 <div id="wheelEmpty" class="wheel-empty" hidden></div>
               </div>
               <button id="spinButton" class="spin-button" type="button">QUAY CHỌN TEAM</button>
@@ -1325,8 +1325,8 @@
                 <header class="race-header">
                   <div class="race-festival-brand">
                     <div class="race-heading">
-                      <p class="race-kicker">SÂN CHƠI SECI · CÙNG NHAU CHIA SẺ</p>
-                      <h2 class="race-title">Đường đua SECI</h2>
+                      <p class="race-kicker">TẾT TRUNG THU · ĐÊM HỘI TRĂNG RẰM</p>
+                      <h2 class="race-title">Đua thuyền rước đèn</h2>
                       <p id="raceCaption" class="race-subtitle">Mỗi chiếc thuyền đại diện cho một team.</p>
                     </div>
                   </div>
@@ -1341,7 +1341,7 @@
                   <div class="race-festival-scene" aria-hidden="true">
                     <span class="race-scene-layer race-scene-far"><span class="race-scene-strip"><i></i><i></i></span></span>
                     <span class="race-scene-layer race-scene-near"><span class="race-scene-strip"><i></i><i></i></span></span>
-                    <span class="race-anniversary-mark"><strong>SECI</strong><small>2026</small></span>
+                    <span class="race-anniversary-mark"><strong>SECI</strong><small>TRUNG THU</small></span>
                   </div>
                   <div id="raceTrack" class="race-track" style="--race-lanes:4" data-lanes="4" aria-live="polite"></div>
                   <div id="raceCountdown" class="race-countdown" aria-live="assertive" aria-hidden="true"><span
@@ -1389,7 +1389,7 @@
       <header class="result-festival-banner" aria-hidden="true">
         <img data-logo-slot alt="" hidden />
         <span class="seci-logo-plate" data-seci-logo data-logo-fallback></span>
-        <span><small>SÂN CHƠI SECI · CÙNG NHAU CHIA SẺ</small><strong>Khoảnh khắc SECI</strong></span>
+        <span><small>TẾT TRUNG THU · ĐÊM HỘI TRĂNG RẰM</small><strong>Khoảnh khắc Trăng Rằm</strong></span>
       </header>
       <div id="resultVisual" class="result-symbol" aria-hidden="true"><img id="resultImage" alt="" hidden /><span
           id="resultFallback">✦</span></div>
@@ -1467,8 +1467,8 @@
       '#ef1b2d', '#ff7a1a', '#ffc400', '#7ed321', '#00b862', '#00c9c9', '#1eb8ff', '#2563ff', '#8b3dff', '#ff2e88'
     ];
     const TEXT_COLORS = ['#06384d', '#06384d', '#06384d', '#06384d', '#ffffff', '#06384d', '#06384d', '#ffffff', '#ffffff', '#ffffff'];
-    const WHEEL_COLORS = ['#0a9ee8', '#8fe0f8', '#0b6a97', '#d6f4fd', '#00c9c9', '#5fd6f5', '#075a80', '#bfe9fb', '#1d8ec4', '#a3e4f7'];
-    const WHEEL_TEXT_COLORS = ['#ffffff', '#06384d', '#ffffff', '#06384d', '#06384d', '#06384d', '#ffffff', '#06384d', '#ffffff', '#06384d'];
+    const WHEEL_COLORS = ['#d9261c', '#ffd257', '#2b2f86', '#fff0c4', '#c2410c', '#ffe08a', '#a3155f', '#ffc53d', '#3b2f9a', '#fde6b0'];
+    const WHEEL_TEXT_COLORS = ['#fff6dc', '#5a1408', '#ffe08a', '#5a1408', '#fff6dc', '#5a1408', '#fff6dc', '#5a1408', '#ffe08a', '#5a1408'];
     const RACE_MUSIC_FOLDER = 'Nha\u0323c \u0111ua thuy\u00EA\u0300n';
     // A race lasts this long no matter how long the track is: the background
     // music runs 16 minutes, so it is played as a bed and faded out, not to the end.
@@ -1831,6 +1831,12 @@
       [els.addTeam, els.restoreSample, els.newSession, els.startNew, els.restoreAll, els.undo, els.clearHistory, els.export, els.import, els.settings].forEach(button => setButtonDisabled(button, disabled));
     }
 
+    function mixHex(from, to, amount) {
+      const parse = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+      const a = parse(from); const b = parse(to);
+      return `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * amount)).join(',')})`;
+    }
+
     function drawWheel() {
       const canvas = els.wheelCanvas;
       // clientWidth/clientHeight không bị thay đổi khi .wheel-disc đang xoay.
@@ -1842,7 +1848,7 @@
       const items = currentItems(); const center = size / 2; const radius = center;
       canvas.title = items.length ? `Các mục trên vòng quay: ${items.map(item => item.name).join(' · ')}` : '';
       els.wheelEmpty.hidden = items.length > 0;
-      if (!items.length) { ctx.fillStyle = '#d6f4fd'; ctx.beginPath(); ctx.arc(center, center, radius, 0, Math.PI * 2); ctx.fill(); return; }
+      if (!items.length) { ctx.fillStyle = '#fff1c4'; ctx.beginPath(); ctx.arc(center, center, radius, 0, Math.PI * 2); ctx.fill(); return; }
       const segment = (Math.PI * 2) / items.length;
       const discRotation = (state.activeStage === 'team' ? state.rotations.team : state.rotations.member) * Math.PI / 180;
       // Một cỡ chữ cố định cho mọi trạng thái: trước quay, đang quay và đã dừng.
@@ -1851,9 +1857,9 @@
         const start = -Math.PI / 2 + index * segment; const end = start + segment;
         const segmentColor = WHEEL_COLORS[index % WHEEL_COLORS.length];
         const segmentGradient = ctx.createRadialGradient(center, center, radius * .08, center, center, radius);
-        segmentGradient.addColorStop(0, index % 2 ? '#eafaff' : '#3fc0f0');
+        segmentGradient.addColorStop(0, mixHex(segmentColor, '#ffffff', index % 2 ? .62 : .3));
         segmentGradient.addColorStop(.36, segmentColor);
-        segmentGradient.addColorStop(1, index % 2 ? '#6fcfe8' : '#064f70');
+        segmentGradient.addColorStop(1, mixHex(segmentColor, index % 2 ? '#e09a00' : '#000000', index % 2 ? .42 : .34));
         ctx.beginPath(); ctx.moveTo(center, center); ctx.arc(center, center, radius, start, end); ctx.closePath(); ctx.fillStyle = segmentGradient; ctx.fill();
         ctx.strokeStyle = 'rgba(255,255,255,.94)'; ctx.lineWidth = 2; ctx.stroke();
         const middle = start + segment / 2;
@@ -1865,7 +1871,7 @@
         const onScreenAngle = (((textAngle + discRotation) % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
         if (onScreenAngle > Math.PI / 2 && onScreenAngle < Math.PI * 1.5) textAngle += Math.PI;
         ctx.rotate(textAngle);
-        ctx.fillStyle = WHEEL_TEXT_COLORS[index % WHEEL_TEXT_COLORS.length]; ctx.shadowColor = index % 2 ? 'rgba(255,255,255,.38)' : 'rgba(6,40,58,.45)'; ctx.shadowBlur = 2; ctx.shadowOffsetY = 1; ctx.font = `900 ${labelFont}px "Bahnschrift", "Aptos Display", sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillStyle = WHEEL_TEXT_COLORS[index % WHEEL_TEXT_COLORS.length]; ctx.shadowColor = index % 2 ? 'rgba(255,255,255,.38)' : 'rgba(58,14,6,.45)'; ctx.shadowBlur = 2; ctx.shadowOffsetY = 1; ctx.font = `900 ${labelFont}px "Bahnschrift", "Aptos Display", sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         const charLimit = items.length > 10 ? 10 : items.length > 6 ? 16 : 25;
         ctx.fillText(truncate(item.name, charLimit), 0, 0, radius * .54);
         ctx.restore();
@@ -1931,7 +1937,7 @@
       els.raceTrack.style.setProperty('--race-lanes', String(Math.max(1, items.length)));
       els.raceTrack.dataset.lanes = String(items.length);
       els.raceTrack.classList.toggle('is-empty', items.length === 0);
-      els.raceTrack.innerHTML = items.length ? items.map((item, index) => `<div class="race-lane${index === 0 ? ' is-edge-first' : ''}${index === items.length - 1 ? ' is-edge-last' : ''}" data-item-id="${escapeHtml(item.id)}" data-rank="" style="--race-team-color:${COLORS[index % COLORS.length]}"><div class="race-lane-name" data-rank="${index + 1}"><span class="race-team-name">${escapeHtml(item.name)}</span></div><div class="race-course"><div class="race-boat" data-boat-id="${escapeHtml(item.id)}" style="--race-team-color:${COLORS[index % COLORS.length]};--race-team-ink:${teamInk(COLORS[index % COLORS.length])};--race-bob-delay:${(index * .07).toFixed(2)}s"><span class="race-speed-lines" aria-hidden="true"></span><span class="race-troll-effect" aria-hidden="true"></span>${boatSprite(item, index)}<span class="race-boat-label">${escapeHtml(item.name)}</span></div></div></div>`).join('') + '<div class="race-finish-line" aria-hidden="true"><img src="assets/regatta/finish-gate.svg" alt="" /></div>' : '<div class="race-empty">Chưa có team. Hãy thêm ít nhất hai team để bắt đầu.</div>';
+      els.raceTrack.innerHTML = items.length ? items.map((item, index) => `<div class="race-lane${index === 0 ? ' is-edge-first' : ''}${index === items.length - 1 ? ' is-edge-last' : ''}" data-item-id="${escapeHtml(item.id)}" data-rank="" style="--race-team-color:${COLORS[index % COLORS.length]}"><div class="race-lane-name" data-rank="${index + 1}"><span class="race-team-name">${escapeHtml(item.name)}</span></div><div class="race-course"><div class="race-boat" data-boat-id="${escapeHtml(item.id)}" style="--race-team-color:${COLORS[index % COLORS.length]};--race-team-ink:${teamInk(COLORS[index % COLORS.length])};--race-bob-delay:${(index * .07).toFixed(2)}s"><span class="race-speed-lines" aria-hidden="true"></span><span class="race-troll-effect" aria-hidden="true"></span>${boatSprite(item, index)}<span class="race-boat-label">${escapeHtml(item.name)}</span></div></div></div>`).join('') + '<div class="race-finish-line" aria-hidden="true"><img src="assets/trung-thu/finish-gate.svg" alt="" /></div>' : '<div class="race-empty">Chưa có team. Hãy thêm ít nhất hai team để bắt đầu.</div>';
       els.raceLeaderboard.innerHTML = items.map((item, index) => `<li class="race-leaderboard-item" data-item-id="${escapeHtml(item.id)}" data-rank="${index + 1}" style="--race-team-color:${COLORS[index % COLORS.length]}"><span class="race-leaderboard-rank">${index + 1}</span><span class="race-leaderboard-dot"></span><span class="race-leaderboard-name">${escapeHtml(item.name)}</span></li>`).join('');
     }
 
@@ -3034,6 +3040,7 @@
       let nearOffset = 0;
       let waterOffset = 0;
       let underOffset = 0;
+      let lanternOffset = 0;
       let lastFrame = 0;
       if (far) far.style.transform = 'translate3d(0, 0, 0)';
       if (near) near.style.transform = 'translate3d(0, 0, 0)';
@@ -3058,10 +3065,12 @@
           farOffset = (farOffset + step * .34) % tile;
           waterOffset = (waterOffset + step * 1.55) % 210;
           underOffset = (underOffset + step * .7) % 290;
+          lanternOffset = (lanternOffset + step * 1.55) % 840;
           near.style.transform = `translate3d(${-nearOffset.toFixed(2)}px, 0, 0)`;
           far.style.transform = `translate3d(${-farOffset.toFixed(2)}px, 0, 0)`;
           els.raceTrack.style.setProperty('--race-water-x1', waterOffset.toFixed(2));
           els.raceTrack.style.setProperty('--race-water-x2', underOffset.toFixed(2));
+          els.raceTrack.style.setProperty('--race-lantern-x', lanternOffset.toFixed(2));
         }
       };
     }

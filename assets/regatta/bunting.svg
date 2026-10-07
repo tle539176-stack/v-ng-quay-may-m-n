@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 140" role="img" aria-labelledby="title">
+  <title id="title">Regatta bunting in the ten team colours</title>
+  <path d="M0 22c350 96 1200 96 1600 0" fill="none" stroke="#0a3f57" stroke-width="6"/>
+  <g>
+    <path d="M92 43l92 19-59 91z" fill="#ef1b2d"/>
+    <path d="M242 62l92 14-56 94z" fill="#ff7a1a"/>
+    <path d="M392 78l92 10-53 96z" fill="#ffc400"/>
+    <path d="M542 90l92 7-50 98z" fill="#7ed321"/>
+    <path d="M692 99l92 1-46 100z" fill="#00b862"/>
+    <path d="M842 100l92-2-44 100z" fill="#00c9c9"/>
+    <path d="M992 95l92-5-41 99z" fill="#1eb8ff"/>
+    <path d="M1142 86l92-9-37 99z" fill="#2563ff"/>
+    <path d="M1292 72l92-13-32 101z" fill="#8b3dff"/>
+    <path d="M1442 55l92-16-28 103z" fill="#ff2e88"/>
+  </g>
+  <g fill="#ffffff" opacity=".28">
+    <path d="M92 43l92 19-6 9-88-18zM242 62l92 14-5 10-88-14zM392 78l92 10-5 10-88-10zM542 90l92 7-4 10-88-7zM692 99l92 1-4 10-88-1zM842 100l92-2-4 10-88 2zM992 95l92-5-4 10-88 5zM1142 86l92-9-4 10-88 9zM1292 72l92-13-3 10-88 13zM1442 55l92-16-3 10-88 16z"/>
+  </g>
+</svg>

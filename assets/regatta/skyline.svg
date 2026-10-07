@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 360" role="img" aria-labelledby="title desc">
+  <title id="title">Clear riverside skyline</title>
+  <desc id="desc">A stylized riverside with green trees, light pavilions, a footbridge and a bright sun.</desc>
+  <defs>
+    <linearGradient id="sun" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#5fd6f5" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#5fd6f5" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <circle cx="800" cy="188" r="150" fill="url(#sun)"/>
+  <g fill="#7fd0a8" opacity=".3">
+    <path d="M0 268c120-46 236-52 352-18 96 28 176 22 258-14 92-40 178-38 268 4 84 40 164 44 244 12 90-36 182-30 278 16v92H0z"/>
+  </g>
+  <g fill="#e8f7fd">
+    <path d="M610 198h380v120H610z"/>
+    <path d="M565 198h470l-42-34H607z" fill="#0a9ee8"/>
+    <path d="M638 145h324v19H638z" fill="#0b7fb8"/>
+  </g>
+  <g fill="#0a9ee8" opacity=".55">
+    <path d="M642 215h28v103h-28zM694 215h28v103h-28zM746 215h28v103h-28zM798 215h28v103h-28zM850 215h28v103h-28zM902 215h28v103h-28z"/>
+  </g>
+  <path d="M570 318h460v24H570z" fill="#0a3f57"/>
+  <path d="M180 330c70-92 250-92 320 0" fill="none" stroke="#0a9ee8" stroke-width="14" stroke-linecap="round"/>
+  <path d="M1100 330c70-92 250-92 320 0" fill="none" stroke="#0a9ee8" stroke-width="14" stroke-linecap="round"/>
+  <g fill="#2ea86a">
+    <circle cx="90" cy="282" r="62"/><circle cx="333" cy="286" r="68"/><circle cx="1267" cy="286" r="68"/><circle cx="1510" cy="282" r="62"/>
+  </g>
+  <g fill="#46c17f">
+    <circle cx="184" cy="300" r="49"/><circle cx="1416" cy="300" r="49"/>
+  </g>
+  <g fill="#1c8f57" opacity=".85">
+    <circle cx="248" cy="312" r="38"/><circle cx="1352" cy="312" r="38"/>
+  </g>
+  <g stroke="#0a3f57" stroke-width="9" stroke-linecap="round">
+    <path d="M90 344v-52M184 348v-44M333 344v-56M1267 344v-56M1416 348v-44M1510 344v-52"/>
+  </g>
+  <g stroke="#0a3f57" stroke-width="7">
+    <path d="M475 132v197M1125 132v197"/>
+  </g>
+  <g>
+    <path d="M482 136h112v67H482z" fill="#ef1b2d"/>
+    <path d="M1132 136h112v67h-112z" fill="#00c9c9"/>
+  </g>
+</svg>

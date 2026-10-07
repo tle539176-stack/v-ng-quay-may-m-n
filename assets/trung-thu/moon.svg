@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-labelledby="title desc">
+  <title id="title">Trăng rằm tháng Tám</title>
+  <desc id="desc">A glowing full moon with the silhouette of the banyan tree and chú Cuội sitting at its root.</desc>
+  <defs>
+    <radialGradient id="halo" cx="50%" cy="50%" r="50%">
+      <stop offset=".62" stop-color="#fff2c2" stop-opacity=".55"/>
+      <stop offset=".8" stop-color="#ffd98a" stop-opacity=".2"/>
+      <stop offset="1" stop-color="#ffc56b" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="face" cx="42%" cy="38%" r="68%">
+      <stop offset="0" stop-color="#fffcee"/>
+      <stop offset=".55" stop-color="#fff1c4"/>
+      <stop offset="1" stop-color="#ffd67e"/>
+    </radialGradient>
+    <clipPath id="disc"><circle cx="200" cy="200" r="138"/></clipPath>
+  </defs>
+  <circle cx="200" cy="200" r="198" fill="url(#halo)"/>
+  <circle cx="200" cy="200" r="138" fill="url(#face)"/>
+  <g clip-path="url(#disc)">
+    <g fill="#e8c476" opacity=".34">
+      <circle cx="128" cy="132" r="22"/><circle cx="268" cy="96" r="12"/><circle cx="108" cy="232" r="10"/>
+      <circle cx="300" cy="286" r="18"/><circle cx="150" cy="300" r="13"/>
+    </g>
+    <!-- Cây đa: the banyan the moon carries in every Vietnamese childhood story. -->
+    <g fill="#c7963f" opacity=".5">
+      <path d="M224 316c-3-34-1-62 4-84-10-8-22-12-36-12l1-8c14 0 28 4 38 12 3-10 4-20 2-30l9-1c3 12 1 24-2 34 12-8 26-12 40-12v9c-18 0-32 6-42 18-5 22-6 46-4 74z"/>
+      <circle cx="188" cy="184" r="30"/><circle cx="214" cy="152" r="33"/><circle cx="254" cy="140" r="33"/>
+      <circle cx="292" cy="160" r="29"/><circle cx="306" cy="194" r="24"/><circle cx="276" cy="204" r="27"/>
+      <circle cx="238" cy="196" r="30"/><circle cx="200" cy="208" r="22"/><circle cx="164" cy="206" r="18"/>
+    </g>
+    <g fill="none" stroke="#c7963f" stroke-width="2.5" stroke-linecap="round" opacity=".5">
+      <path d="M176 214v30M196 226v26M264 226v34M288 222v24M306 214v20"/>
+    </g>
+    <!-- Chú Cuội resting at the root. -->
+    <g fill="#b8873a" opacity=".62">
+      <circle cx="196" cy="282" r="8"/>
+      <path d="M184 318c0-16 5-27 13-28 8-1 13 6 15 14l13 4-2 8-15-2 0 4z"/>
+    </g>
+    <path d="M60 318c60-10 110-6 150 0s110 8 150-2v90H60z" fill="#e8c476" opacity=".28"/>
+  </g>
+</svg>

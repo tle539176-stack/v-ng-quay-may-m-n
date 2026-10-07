@@ -1,0 +1,3726 @@
+/* Trung Thu edition, copied from race-ui.css on 2026-09-22. The regatta
+   files are untouched; edit this copy for the Mid-Autumn theme only. */
+/* Boat race UI. Motion is driven by JS through --race-x or --race-progress. */
+:root {
+  --seci-ink: #232b97;
+  --race-water-deep: #656ddb;
+  --race-water: #e59e12;
+  --race-water-light: #f6d070;
+  --race-bank: #63c894;
+  --race-sand: #e6d9a8;
+  --race-orange: #ef1b2d;
+  --race-yellow: #ffc400;
+  --race-panel: rgba(254, 251, 244, .96);
+  --race-line: rgba(35, 43, 151, .18);
+  --race-shadow: 0 16px 36px rgba(23, 28, 97, .15);
+  --race-lane-height: clamp(62px, 8.2vh, 82px);
+  --race-name-width: clamp(126px, 15vw, 210px);
+  --race-finish-offset: 50px;
+}
+
+.stage-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: min(100%, 690px);
+  margin: 18px auto 10px;
+  padding: 6px;
+  border: 1px solid #e6e3db;
+  border-radius: 16px;
+  background: rgba(249, 248, 245, .88);
+  box-shadow: inset 0 1px 2px rgba(71, 72, 94, .05);
+}
+
+.stage-tabs button,
+.stage-tabs .stage-tab {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 45px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 11px;
+  color: #76716c;
+  background: transparent;
+  font-weight: 850;
+  line-height: 1.2;
+  transition: color .2s ease, background .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+.stage-tabs button:hover:not(:disabled),
+.stage-tabs .stage-tab:hover:not(:disabled) {
+  color: #606389;
+  background: rgba(255, 255, 255, .7);
+}
+
+.stage-tabs button[aria-selected="true"],
+.stage-tabs button.is-active,
+.stage-tabs .stage-tab[aria-selected="true"],
+.stage-tabs .stage-tab.is-active {
+  color: #ffffff;
+  background: linear-gradient(135deg, #d49415, #c98c14);
+  box-shadow: 0 7px 15px rgba(118, 121, 158, .2);
+}
+
+.stage-tabs button:focus-visible,
+.team-method-picker button:focus-visible,
+.race-toolbar button:focus-visible,
+.race-start-button:focus-visible {
+  outline: 3px solid rgba(188, 131, 19, .28);
+  outline-offset: 2px;
+}
+
+.team-method-picker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: fit-content;
+  max-width: 100%;
+  margin: 8px auto 18px;
+  padding: 5px;
+  border: 1px solid #e3e0d8;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 6px 16px rgba(76, 79, 114, .07);
+}
+
+.team-method-picker button,
+.team-method-picker .team-method-option {
+  min-height: 38px;
+  padding: 7px 17px;
+  border: 0;
+  border-radius: 999px;
+  color: #767069;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 850;
+  white-space: nowrap;
+  transition: color .18s ease, background .18s ease, box-shadow .18s ease;
+}
+
+.team-method-picker button:hover:not(:disabled),
+.team-method-picker .team-method-option:hover:not(:disabled) {
+  color: #5c6096;
+  background: #f9f5ed;
+}
+
+.team-method-picker button[aria-pressed="true"],
+.team-method-picker button[aria-selected="true"],
+.team-method-picker button.is-active,
+.team-method-picker .team-method-option.is-active {
+  color: #474daa;
+  background: linear-gradient(135deg, #f0eadb, #fbf5e4);
+  box-shadow: inset 0 0 0 1px rgba(110, 115, 193, .18);
+}
+
+#raceView {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  padding: 4px 0 8px;
+}
+
+#raceView[hidden] {
+  display: none !important;
+}
+
+.race-shell {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  isolation: isolate;
+}
+
+.race-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 13px;
+}
+
+.race-heading {
+  min-width: 0;
+}
+
+.race-kicker {
+  display: block;
+  margin-bottom: 2px;
+  color: #5c62bb;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+.race-title {
+  color: var(--seci-ink);
+  font-size: clamp(20px, 3vw, 30px);
+  font-weight: 950;
+  line-height: 1.15;
+}
+
+.race-subtitle {
+  max-width: 650px;
+  margin-top: 5px;
+  color: #707a7c;
+  font-size: 13px;
+}
+
+.race-toolbar {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.race-toolbar button,
+.race-tool-button {
+  min-width: 40px;
+  min-height: 40px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0 11px;
+  border: 1px solid #e5e2da;
+  border-radius: 12px;
+  color: #54599d;
+  background: rgba(255, 255, 255, .94);
+  box-shadow: 0 5px 13px rgba(67, 73, 155, .08);
+  font-weight: 850;
+  transition: transform .18s ease, border-color .18s ease, background .18s ease;
+}
+
+.race-toolbar button:hover:not(:disabled),
+.race-tool-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: #edb74a;
+  background: #faf8f2;
+}
+
+.race-toolbar button[aria-pressed="true"],
+.race-tool-button.is-active {
+  color: #474fbc;
+  border-color: #f0c265;
+  background: #f0eadc;
+}
+
+.race-toolbar .race-skip-button,
+.race-skip-button {
+  min-width: auto;
+  padding-inline: 14px;
+}
+
+.race-board {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(79, 86, 185, .2);
+  border-radius: 22px;
+  background: #eaaa2a;
+  box-shadow: var(--race-shadow);
+}
+
+.race-board::before {
+  content: "";
+  position: absolute;
+  z-index: 5;
+  inset: 0 0 auto;
+  height: 13px;
+  pointer-events: none;
+  background: linear-gradient(180deg, #a4d0ba 0 54%, #edd28d 55% 100%);
+  box-shadow: 0 2px 5px rgba(60, 63, 108, .14);
+}
+
+.race-board::after {
+  content: "";
+  position: absolute;
+  z-index: 5;
+  inset: auto 0 0;
+  height: 13px;
+  pointer-events: none;
+  background: linear-gradient(0deg, #99c6b0 0 54%, #f1c670 55% 100%);
+  box-shadow: 0 -2px 5px rgba(60, 63, 108, .12);
+}
+
+.race-track {
+  --race-track-height: calc(var(--race-lanes, 4) * var(--race-lane-height));
+  position: relative;
+  min-width: 720px;
+  height: var(--race-track-height);
+  min-height: calc(2 * var(--race-lane-height));
+  max-height: calc(10 * var(--race-lane-height));
+  margin: 13px 0;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255,.08), transparent 19%, rgba(255, 255, 255,.09) 49%, transparent 73%),
+    repeating-radial-gradient(ellipse at 50% 110%, transparent 0 24px, rgba(255, 255, 255,.13) 25px 28px, transparent 29px 54px),
+    linear-gradient(180deg, var(--race-water-light), var(--race-water) 24%, #de9c16 72%, var(--race-water-deep));
+}
+
+.race-track.is-empty {
+  height: clamp(260px, 45vh, 360px);
+  min-height: 260px;
+}
+
+.race-track.is-empty::after {
+  display: none;
+}
+
+.race-track::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  opacity: .64;
+  background:
+    repeating-linear-gradient(176deg, transparent 0 20px, rgba(255, 255, 255,.21) 21px 23px, transparent 24px 48px),
+    repeating-linear-gradient(4deg, transparent 0 32px, rgba(96, 103, 210, .13) 33px 35px, transparent 36px 65px);
+  background-size: 190px 100%, 260px 100%;
+  animation: race-water-flow 7s linear infinite;
+}
+
+.race-track::after {
+  content: "XUẤT PHÁT";
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--race-name-width) + 12px);
+  display: grid;
+  place-items: center;
+  width: 2px;
+  color: rgba(53, 58, 126, .56);
+  border-left: 2px dashed rgba(255, 255, 255,.72);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: .12em;
+  text-indent: 18px;
+  writing-mode: vertical-rl;
+}
+
+.race-lane {
+  --race-team-color: #d99815;
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: var(--race-name-width) minmax(0, 1fr);
+  width: 100%;
+  height: var(--race-lane-height);
+  min-height: 0;
+  border-bottom: 1px dashed rgba(255, 255, 255, .42);
+}
+
+.race-lane:last-of-type {
+  border-bottom: 0;
+}
+
+.race-lane::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(255, 255, 255,.08), transparent 34%);
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+
+.race-lane.is-leading::after,
+.race-lane[data-rank="1"]::after {
+  opacity: 1;
+}
+
+.race-lane.is-winner {
+  background: linear-gradient(90deg, rgba(248, 211, 117, .18), rgba(248, 211, 117, .38));
+}
+
+.race-lane.is-winner .race-lane-name {
+  color: #1f2685;
+  background: linear-gradient(90deg, rgba(249, 218, 140, .98), rgba(252, 234, 191, .91));
+}
+
+.race-lane.is-winner .race-lane-name::before {
+  box-shadow: 0 0 0 3px rgba(255, 189, 56, .34), 0 3px 8px rgba(65, 67, 85, .12);
+}
+
+.race-lane-name {
+  position: relative;
+  z-index: 4;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 13px 6px 12px;
+  overflow: hidden;
+  color: #3e437d;
+  border-right: 1px solid rgba(74, 82, 188, .15);
+  background: linear-gradient(90deg, rgba(254, 254, 253, .97), rgba(248, 246, 240, .88));
+  box-shadow: 5px 0 12px rgba(63, 69, 144, .08);
+  font-size: clamp(12px, 1.25vw, 16px);
+  font-weight: 900;
+  line-height: 1.18;
+}
+
+.race-lane-name::before {
+  content: attr(data-rank);
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  color: #ffffff;
+  background: var(--race-team-color);
+  box-shadow: 0 3px 8px rgba(65, 67, 85, .12);
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.race-lane-name:empty::before {
+  content: attr(data-lane);
+}
+
+.race-team-name,
+.race-lane-name > span:not(.race-rank) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.race-rank {
+  flex: 0 0 auto;
+  min-width: 24px;
+  padding: 3px 6px;
+  margin-left: auto;
+  border-radius: 999px;
+  color: #65689c;
+  background: rgba(238, 232, 217, .78);
+  font-size: 10px;
+  text-align: center;
+}
+
+.race-course {
+  position: relative;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.race-course::after {
+  content: "";
+  position: absolute;
+  inset: 50% 0 auto;
+  height: 20px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  opacity: .37;
+  background: repeating-linear-gradient(176deg, transparent 0 15px, rgba(255, 255, 255,.55) 16px 18px, transparent 19px 40px);
+}
+
+.race-boat {
+  --race-x: 0px;
+  --race-progress: 0;
+  --race-bob-delay: 0s;
+  --race-team-color: #d99815;
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  left: 6px;
+  width: clamp(72px, 8.2vw, 106px);
+  height: clamp(43px, 5.3vw, 62px);
+  transform: translate3d(var(--race-x), calc(-50% + var(--race-y, 0px)), 0);
+  transform-origin: 45% 70%;
+  will-change: transform;
+  pointer-events: none;
+  filter: drop-shadow(0 7px 5px rgba(56, 62, 140, .18));
+}
+
+.race-boat::before {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  left: 25%;
+  bottom: 11%;
+  width: 59%;
+  height: 24%;
+  border-radius: 15% 50% 62% 54%;
+  background: var(--race-team-color);
+  box-shadow: inset 0 -4px 0 rgba(55, 60, 125, .17);
+  clip-path: polygon(0 0, 100% 0, 84% 100%, 14% 100%);
+}
+
+.race-boat::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  left: 5%;
+  right: -5%;
+  bottom: 1%;
+  height: 17%;
+  border-radius: 50%;
+  opacity: .76;
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255,.85) 0 12px, rgba(255, 255, 255,.18) 13px 21px, transparent 22px 29px);
+  filter: blur(.4px);
+  animation: race-wake .55s linear infinite;
+}
+
+.race-boat-icon,
+.race-boat svg,
+.race-boat img {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+  object-fit: contain;
+}
+
+.race-boat-flag {
+  position: absolute;
+  z-index: 5;
+  left: 47%;
+  top: 4%;
+  width: 25%;
+  height: 27%;
+  border-radius: 2px 5px 5px 2px;
+  color: #ffffff;
+  background: var(--race-team-color);
+  box-shadow: 0 2px 3px rgba(58, 62, 113, .14);
+}
+
+/* The national racer sprite already carries the red flag and gold star. */
+.race-boat > .race-boat-flag {
+  display: none;
+}
+
+.race-boat-flag::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -3px;
+  width: 2px;
+  height: 32px;
+  border-radius: 3px;
+  background: #484b73;
+}
+
+.race-boat-label {
+  position: absolute;
+  z-index: 6;
+  top: 48%;
+  left: 42%;
+  max-width: 52%;
+  overflow: hidden;
+  color: #ffffff;
+  font-size: clamp(8px, .75vw, 11px);
+  font-weight: 950;
+  line-height: 1;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 2px rgba(40, 43, 78, .55);
+  white-space: nowrap;
+}
+
+.race-lane.is-racing .race-boat,
+.race-track.is-racing .race-boat {
+  animation: race-boat-bob .62s ease-in-out var(--race-bob-delay) infinite alternate;
+}
+
+.race-lane.is-leading .race-boat,
+.race-lane[data-rank="1"] .race-boat {
+  filter: drop-shadow(0 8px 6px rgba(56, 62, 140, .2)) drop-shadow(0 0 7px rgba(255, 190, 61, .45));
+}
+
+.race-lane.is-winner .race-boat {
+  animation: race-winner-bounce .58s cubic-bezier(.2,.8,.2,1) infinite alternate;
+  filter: drop-shadow(0 9px 6px rgba(56, 62, 140, .2)) drop-shadow(0 0 11px rgba(255, 177, 20, .8));
+}
+
+.race-finish-line {
+  position: absolute;
+  z-index: 7;
+  top: 0;
+  right: var(--race-finish-offset);
+  bottom: 0;
+  width: 13px;
+  pointer-events: none;
+  border-inline: 2px solid rgba(54, 56, 85, .65);
+  background-color: #ffffff;
+  background-image:
+    linear-gradient(45deg, #343654 25%, transparent 25%, transparent 75%, #343654 75%),
+    linear-gradient(45deg, #343654 25%, transparent 25%, transparent 75%, #343654 75%);
+  background-position: 0 0, 6px 6px;
+  background-size: 12px 12px;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255,.55), 0 0 10px rgba(51, 55, 111, .2);
+}
+
+.race-finish-line::before {
+  content: "ĐÍCH";
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  min-width: 44px;
+  padding: 4px 7px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  color: #2831ab;
+  background: var(--race-yellow);
+  box-shadow: 0 3px 8px rgba(60, 63, 58, .18);
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: .08em;
+  text-align: center;
+}
+
+.race-countdown {
+  position: absolute;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  color: #ffffff;
+  background: rgba(45, 50, 121, .32);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .16s ease, visibility 0s linear .16s;
+}
+
+.race-countdown.is-visible,
+.race-countdown[aria-hidden="false"] {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.race-countdown-value,
+.race-countdown > span {
+  min-width: 1.45em;
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  font-size: clamp(76px, 15vw, 172px);
+  font-weight: 1000;
+  line-height: 1;
+  letter-spacing: -.06em;
+  text-shadow: 0 8px 0 rgba(48, 53, 117, .16), 0 12px 28px rgba(36, 40, 93, .35);
+  animation: race-count-pop .68s cubic-bezier(.16,.9,.23,1) both;
+}
+
+.race-countdown.is-go .race-countdown-value,
+.race-countdown.is-go > span,
+.race-countdown-value.is-go {
+  width: auto;
+  padding: .14em .28em .2em;
+  border-radius: .22em;
+  color: #3d417e;
+  background: var(--race-yellow);
+  font-size: clamp(48px, 10vw, 108px);
+  letter-spacing: .03em;
+  text-shadow: none;
+  transform: rotate(-2deg);
+}
+
+.race-leaderboard {
+  display: none !important;
+  position: absolute;
+  z-index: 12;
+  top: 26px;
+  right: 83px;
+  width: min(250px, calc(100% - 180px));
+  max-height: calc(100% - 52px);
+  overflow: auto;
+  padding: 9px;
+  border: 1px solid rgba(255, 255, 255, .62);
+  border-radius: 14px;
+  color: #404473;
+  background: rgba(255, 255, 255, .88);
+  box-shadow: 0 10px 25px rgba(55, 61, 140, .16);
+  backdrop-filter: blur(8px);
+  transition: opacity .2s ease, transform .2s ease;
+}
+
+.race-leaderboard[hidden],
+.race-leaderboard.is-hidden {
+  display: none;
+}
+
+.race-leaderboard-title {
+  padding: 1px 4px 7px;
+  color: #61648b;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.race-leaderboard-list {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.race-leaderboard-item {
+  --race-team-color: #d99815;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 24px 8px minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 4px 7px;
+  border-radius: 8px;
+  background: rgba(246, 244, 239, .82);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.race-leaderboard-item.is-leading,
+.race-leaderboard-item[data-rank="1"] {
+  color: #2931ad;
+  background: #fae3a7;
+}
+
+.race-leaderboard-rank {
+  color: #6e797c;
+  font-size: 10px;
+  text-align: center;
+}
+
+.race-leaderboard-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--race-team-color);
+}
+
+.race-leaderboard-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.race-winner-banner {
+  position: absolute;
+  z-index: 18;
+  left: 50%;
+  bottom: 30px;
+  width: min(620px, calc(100% - 34px));
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 13px;
+  padding: 14px 18px;
+  transform: translate(-50%, 24px) scale(.96);
+  visibility: hidden;
+  opacity: 0;
+  border: 1px solid rgba(174, 122, 17, .2);
+  border-radius: 18px;
+  color: #202788;
+  background: linear-gradient(135deg, rgba(253, 240, 208, .97), rgba(247, 203, 94, .97));
+  box-shadow: 0 16px 40px rgba(56, 58, 88, .25);
+  pointer-events: none;
+  transition: opacity .28s ease, transform .4s cubic-bezier(.16,.9,.24,1), visibility 0s linear .4s;
+}
+
+.race-winner-banner.is-visible,
+.race-winner-banner[aria-hidden="false"] {
+  transform: translate(-50%, 0) scale(1);
+  visibility: visible;
+  opacity: 1;
+  transition-delay: 0s;
+}
+
+.race-winner-icon {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  color: #ffffff;
+  background: linear-gradient(145deg, #de9b16, #e19d16);
+  box-shadow: 0 7px 15px rgba(168, 117, 17, .24);
+  font-size: 24px;
+}
+
+.race-winner-copy {
+  min-width: 0;
+}
+
+.race-winner-label {
+  color: #454ed3;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+.race-winner-name {
+  overflow: hidden;
+  font-size: clamp(19px, 3vw, 29px);
+  font-weight: 1000;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.race-footer {
+  display: grid;
+  justify-items: center;
+  gap: 9px;
+  padding-top: 17px;
+}
+
+.race-start-button {
+  width: min(100%, 430px);
+  min-height: 60px;
+  padding: 12px 22px;
+  border: 0;
+  border-radius: 17px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #6269cb, #b17c12 58%, #76a78e);
+  box-shadow: 0 12px 23px rgba(91, 98, 195, .26);
+  font-size: 16px;
+  font-weight: 950;
+  letter-spacing: .035em;
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+
+.race-start-button:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 28px rgba(91, 98, 195, .33);
+  filter: saturate(1.06);
+}
+
+.race-start-button.is-racing,
+.race-start-button[aria-busy="true"] {
+  color: rgba(255, 255, 255,.9);
+  background: linear-gradient(135deg, #b88112, #bc8413);
+}
+
+.race-hint,
+.race-status {
+  min-height: 19px;
+  color: #707a7c;
+  font-size: 12px;
+  text-align: center;
+}
+
+.race-empty {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 36px;
+  border: 1px dashed #d8d1bf;
+  border-radius: 20px;
+  color: #697b7e;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(228, 216, 187, .58), transparent 40%),
+    #faf8f3;
+  text-align: center;
+}
+
+.race-empty[hidden] {
+  display: none;
+}
+
+.race-empty-inner {
+  max-width: 440px;
+}
+
+.race-empty-icon {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 42px;
+}
+
+.race-empty strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #4e528a;
+  font-size: 17px;
+}
+
+.race-screen-reader-status {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+#raceView:fullscreen,
+.race-shell.is-fullscreen {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(14px, 2vw, 28px);
+  overflow: hidden;
+  color: var(--seci-ink);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(239, 231, 210, .86), transparent 32rem),
+    linear-gradient(145deg, #faf9f6, #f4f1ea);
+}
+
+#raceView:fullscreen .race-shell,
+.race-shell.is-fullscreen {
+  flex: 1;
+  min-height: 0;
+}
+
+#raceView:fullscreen .race-board,
+.race-shell.is-fullscreen .race-board {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+#raceView:fullscreen .race-track,
+.race-shell.is-fullscreen .race-track {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+}
+
+#raceView:fullscreen .race-footer,
+.race-shell.is-fullscreen .race-footer {
+  padding-top: 12px;
+}
+
+.race-track[data-lanes="7"],
+.race-track[data-lanes="8"],
+.race-track[data-lanes="9"],
+.race-track[data-lanes="10"],
+.race-track.is-compact {
+  --race-lane-height: clamp(52px, 7vh, 67px);
+}
+
+.race-track[data-lanes="9"] .race-lane-name,
+.race-track[data-lanes="10"] .race-lane-name,
+.race-track.is-compact .race-lane-name {
+  font-size: 12px;
+}
+
+.race-track[data-lanes="9"] .race-boat,
+.race-track[data-lanes="10"] .race-boat,
+.race-track.is-compact .race-boat {
+  --race-boat-scale: .8;
+}
+
+@keyframes race-water-flow {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: -210px 0, 290px 0; }
+}
+
+@keyframes race-wake {
+  from { transform: translateX(5px) scaleX(.88); opacity: .42; }
+  to { transform: translateX(-7px) scaleX(1.06); opacity: .78; }
+}
+
+@keyframes race-boat-bob {
+  from { margin-top: -1px; rotate: -.8deg; }
+  to { margin-top: 2px; rotate: .9deg; }
+}
+
+@keyframes race-winner-bounce {
+  from { margin-top: -2px; rotate: -1deg; }
+  to { margin-top: 3px; rotate: 1.3deg; }
+}
+
+@keyframes race-count-pop {
+  0% { transform: scale(.55) rotate(-5deg); opacity: 0; }
+  55% { transform: scale(1.1) rotate(1deg); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@media (max-width: 900px) {
+  :root {
+    --race-name-width: 150px;
+    --race-finish-offset: 38px;
+  }
+
+  .race-board {
+    overflow-x: auto;
+    scrollbar-color: rgba(74, 82, 184, .45) rgba(255, 255, 255,.18);
+    scrollbar-width: thin;
+  }
+
+  .race-header {
+    align-items: center;
+  }
+
+  .race-track {
+    min-width: 680px;
+  }
+
+  .race-leaderboard {
+    right: 69px;
+    width: 210px;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --race-lane-height: 60px;
+    --race-name-width: 112px;
+    --race-finish-offset: 31px;
+  }
+
+  .stage-tabs {
+    margin-top: 12px;
+  }
+
+  .stage-tabs button,
+  .stage-tabs .stage-tab {
+    min-height: 43px;
+    padding-inline: 9px;
+    font-size: 12px;
+  }
+
+  .team-method-picker {
+    width: 100%;
+    border-radius: 14px;
+  }
+
+  .team-method-picker button,
+  .team-method-picker .team-method-option {
+    flex: 1;
+    padding-inline: 10px;
+    border-radius: 10px;
+    font-size: 12px;
+  }
+
+  .race-header {
+    align-items: flex-start;
+    gap: 9px;
+  }
+
+  .race-title {
+    font-size: 20px;
+  }
+
+  .race-subtitle {
+    font-size: 12px;
+  }
+
+  .race-toolbar {
+    gap: 5px;
+  }
+
+  .race-toolbar button,
+  .race-tool-button {
+    min-width: 37px;
+    min-height: 37px;
+    padding-inline: 9px;
+  }
+
+  .race-toolbar .race-skip-button,
+  .race-skip-button {
+    position: absolute;
+    z-index: 16;
+    right: 12px;
+    bottom: 19px;
+    min-height: 36px;
+    color: #4c5088;
+    background: rgba(255, 255, 255,.92);
+  }
+
+  .race-board {
+    margin-inline: -5px;
+    width: calc(100% + 10px);
+    border-radius: 17px;
+  }
+
+  .race-track {
+    min-width: 610px;
+  }
+
+  .race-lane-name {
+    gap: 6px;
+    padding-inline: 8px;
+    font-size: 11px;
+  }
+
+  .race-lane-name::before {
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    font-size: 10px;
+  }
+
+  .race-rank {
+    display: none;
+  }
+
+  .race-boat {
+    --race-boat-scale: .64;
+  }
+
+  .race-finish-line::before {
+    min-width: 35px;
+    padding-inline: 4px;
+    font-size: 8px;
+  }
+
+  .race-leaderboard {
+    position: sticky;
+    left: 0;
+    top: auto;
+    right: auto;
+    width: min(calc(100vw - 34px), 100%);
+    max-height: none;
+    margin: 0;
+    border-width: 1px 0 0;
+    border-radius: 0;
+    box-shadow: 0 -8px 20px rgba(55, 61, 140, .1);
+    backdrop-filter: none;
+  }
+
+  .race-leaderboard-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .race-leaderboard-item {
+    min-height: 27px;
+    padding-block: 3px;
+    font-size: 10px;
+  }
+
+  .race-winner-banner {
+    bottom: 22px;
+    gap: 9px;
+    padding: 11px 13px;
+  }
+
+  .race-winner-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    font-size: 20px;
+  }
+
+  .race-winner-name {
+    font-size: 19px;
+  }
+
+  .race-start-button {
+    min-height: 55px;
+    font-size: 14px;
+  }
+
+  .race-empty {
+    min-height: 290px;
+    padding: 24px;
+  }
+}
+
+@media (max-height: 760px) and (min-width: 641px) {
+  :root {
+    --race-lane-height: clamp(50px, 7.2vh, 66px);
+  }
+
+  .race-header {
+    margin-bottom: 8px;
+  }
+
+  .race-footer {
+    padding-top: 10px;
+  }
+
+  .race-start-button {
+    min-height: 52px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .race-boat::after,
+  .race-lane.is-racing .race-boat,
+  .race-track.is-racing .race-boat,
+  .race-lane.is-winner .race-boat,
+  .race-countdown-value,
+  .race-countdown > span {
+    animation: none !important;
+  }
+
+  .stage-tabs button,
+  .stage-tabs .stage-tab,
+  .team-method-picker button,
+  .team-method-picker .team-method-option,
+  .race-toolbar button,
+  .race-tool-button,
+  .race-start-button,
+  .race-winner-banner,
+  .race-countdown {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+@media print {
+  .race-toolbar,
+  .race-footer,
+  .race-countdown {
+    display: none !important;
+  }
+
+  .race-board {
+    box-shadow: none;
+  }
+}
+
+/* SECI regatta identity: bright cool chrome so the ten team colours stay readable. */
+:root {
+  --seci-ink-950: #171c61;
+  --seci-ink-900: #232b97;
+  --seci-blue-800: #656ddb;
+  --seci-blue: #c98909;
+  --seci-blue-bright: #e59e12;
+  --seci-accent: #ffc400;
+  --seci-accent-deep: #d9a600;
+  --seci-paper: #fef8ec;
+  --seci-red: #ef1b2d;
+  --seci-red-deep: #c4121f;
+  --race-sky: #f7e0a7;
+  --race-water-light: #f6d070;
+  --race-water: #e59e12;
+  --race-water-deep: #656ddb;
+  --seci-ink: #232b97;
+  --race-panel: rgba(254, 251, 244, .97);
+  --race-line: rgba(35, 43, 151, .18);
+  --race-shadow: 0 24px 55px rgba(23, 28, 97, .16), 0 5px 15px rgba(101, 109, 219, .12);
+  --race-lane-height: clamp(88px, 10vh, 104px);
+  --race-name-width: clamp(138px, 14vw, 202px);
+  --race-finish-offset: 65px;
+  --ink: #1f2469;
+  --muted: #6c6f98;
+  --canvas: #faf5e9;
+  --line: #ece2ca;
+  --lilac: #f9ebc8;
+  --lavender: #c98909;
+  --pink: #ffe0e3;
+  --rose: #ef1b2d;
+  --mint: #d6f5e8;
+  --teal: #c98600;
+  --cream: #fff4cc;
+  --gold: #d9a600;
+  --blue: #f9ebc8;
+  --blue-strong: #c98909;
+  --danger: #d81a2a;
+}
+
+html {
+  background: #f5eedc;
+}
+
+body {
+  background:
+    radial-gradient(circle at 91% 7%, rgba(201, 137, 9, .10) 0 5.5rem, transparent 5.6rem),
+    radial-gradient(circle at 8% 36%, rgba(246, 164, 0, .12), transparent 25rem),
+    linear-gradient(145deg, #fefbf3 0%, #faf5e9 52%, #f7efdc 100%);
+  font-family: "Be Vietnam Pro", "Aptos", "Segoe UI", sans-serif;
+}
+
+.brand-mark {
+  background: linear-gradient(145deg, var(--seci-blue-bright), var(--seci-ink-900));
+  box-shadow: 0 9px 22px rgba(74, 83, 212, .28);
+}
+
+.brand-mark .brand-symbol {
+  color: var(--seci-accent);
+}
+
+.topbar h1 {
+  color: var(--seci-ink-900);
+  font-family: "Bahnschrift", "Aptos Display", "Segoe UI", sans-serif;
+  font-weight: 900;
+}
+
+.panel {
+  border-color: rgba(205, 143, 20, .28);
+  background: rgba(254, 250, 241, .95);
+  box-shadow: 0 14px 38px rgba(53, 58, 124, .1);
+}
+
+.primary-button,
+.spin-button {
+  background: linear-gradient(135deg, #ff4351, var(--seci-red-deep));
+  box-shadow: 0 10px 22px rgba(196, 18, 31, .26);
+}
+
+/* Result ceremony shared by the race and the member wheel. */
+#resultBackdrop.modal-backdrop {
+  background:
+    radial-gradient(circle at 50% 20%, rgba(255, 176, 19, .2), transparent 32rem),
+    rgba(22, 27, 94, .58);
+  backdrop-filter: blur(7px) saturate(.82);
+}
+
+.result-modal {
+  position: relative;
+  width: min(100%, 560px);
+  padding: 0 30px 28px;
+  overflow-x: hidden;
+  border: 2px solid var(--seci-ink-900);
+  border-radius: 27px;
+  color: #282e79;
+  background:
+    linear-gradient(rgba(254, 248, 232, .965), rgba(253, 242, 213, .98)),
+    url("assets/trung-thu/bunting.svg") center 72px / 420px auto repeat-x,
+    #fdf1d5;
+  box-shadow:
+    0 30px 80px rgba(21, 25, 89, .4),
+    0 0 0 6px rgba(255, 176, 19, .24),
+    inset 0 0 0 3px rgba(255, 176, 19, .18);
+}
+
+.result-modal::before,
+.result-modal::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.result-modal::before {
+  z-index: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 88px;
+  opacity: .075;
+  background: url("assets/trung-thu/skyline.svg") center bottom / 100% auto no-repeat;
+}
+
+.result-modal::after {
+  z-index: 0;
+  right: -56px;
+  bottom: 4px;
+  width: 175px;
+  aspect-ratio: 1;
+  border: 20px double rgba(180, 126, 18, .06);
+  border-radius: 50%;
+  box-shadow: 0 0 0 18px rgba(255, 176, 19, .06);
+}
+
+.result-festival-banner {
+  position: relative;
+  z-index: 2;
+  min-height: 88px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin: 0 -30px 20px;
+  padding: 13px 25px;
+  overflow: hidden;
+  color: #fdf1d5;
+  background:
+    linear-gradient(90deg, rgba(30, 36, 127, .96), rgba(74, 83, 212, .91) 62%, rgba(180, 126, 18, .75)),
+    url("assets/trung-thu/banner.svg") center 42% / cover no-repeat;
+  box-shadow: 0 8px 20px rgba(30, 36, 127, .22), inset 0 -3px var(--seci-accent);
+}
+
+.result-festival-banner::after {
+  content: "❧  ❧  ❧  ❧";
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  color: rgba(255, 176, 19, .22);
+  font-size: 25px;
+  letter-spacing: .22em;
+  transform: translateY(-50%) rotate(-5deg);
+}
+
+.result-festival-banner img {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  width: 58px;
+  height: 58px;
+  display: block;
+  filter: drop-shadow(0 5px 8px rgba(19, 23, 80, .28));
+}
+
+.result-festival-banner span {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 3px;
+}
+
+.result-festival-banner small {
+  color: var(--seci-accent);
+  font-size: 8px;
+  font-weight: 950;
+  letter-spacing: .14em;
+}
+
+.result-festival-banner strong {
+  font-family: "Bahnschrift", "Aptos Display", sans-serif;
+  font-size: 25px;
+  line-height: 1;
+  text-shadow: 0 2px rgba(30, 36, 127, .62);
+}
+
+.result-modal > :not(.result-festival-banner) {
+  position: relative;
+  z-index: 2;
+}
+
+.result-modal .result-symbol {
+  border-color: #ffc248;
+  color: #fdf1d5;
+  background: linear-gradient(145deg, var(--seci-blue-bright), var(--seci-ink-900));
+  box-shadow: 0 11px 24px rgba(46, 55, 183, .26), 0 0 0 4px rgba(74, 83, 212, .13);
+}
+
+.result-modal .result-symbol:not(.has-image) {
+  margin: 14px auto 10px;
+}
+
+.result-modal .result-symbol.has-image {
+  margin-top: 0;
+  padding: 4px;
+  overflow: hidden;
+  border: 5px solid var(--seci-accent);
+  border-radius: 27px;
+  background: #fdf5df;
+  box-shadow:
+    0 15px 31px rgba(30, 36, 127, .24),
+    0 0 0 4px var(--seci-ink-900),
+    0 0 0 8px rgba(255, 176, 19, .18);
+}
+
+.result-modal .result-symbol.has-image img {
+  border-radius: 18px;
+  background: #fdf5df;
+}
+
+.result-modal .modal-kicker {
+  width: fit-content;
+  margin: 7px auto 0;
+  padding: 5px 12px;
+  border: 1px solid rgba(74, 83, 212, .18);
+  border-radius: 999px;
+  color: var(--seci-ink-900);
+  background: linear-gradient(135deg, #fae09e, #ffbd38);
+  font-family: "Bahnschrift", "Aptos Display", sans-serif;
+  font-size: 10px;
+  letter-spacing: .13em;
+  box-shadow: 0 5px 12px rgba(46, 55, 183, .08);
+}
+
+.result-modal .modal-result {
+  margin: 10px 0 4px;
+  color: #282f97;
+  font-family: "Bahnschrift", "Aptos Display", sans-serif;
+  font-size: clamp(31px, 5vw, 43px);
+  font-weight: 950;
+  letter-spacing: -.025em;
+  text-shadow: 0 2px #fbe7b5;
+}
+
+.result-modal .modal-detail {
+  width: fit-content;
+  max-width: 100%;
+  margin: 8px auto 22px;
+  padding: 7px 13px;
+  border-left: 3px solid var(--seci-accent);
+  border-radius: 4px 12px 12px 4px;
+  color: #626482;
+  background: rgba(251, 233, 185, .66);
+  font-size: 13px;
+}
+
+.result-modal .modal-actions {
+  position: relative;
+  z-index: 3;
+  gap: 10px;
+}
+
+.result-modal .modal-actions button {
+  min-height: 46px;
+  padding-inline: 17px;
+  border-radius: 13px;
+  font-family: "Bahnschrift", "Aptos Display", sans-serif;
+  font-weight: 900;
+}
+
+.result-modal .modal-actions .outline-button {
+  border: 1px solid rgba(74, 83, 212, .32);
+  color: var(--seci-ink-900);
+  background: #fef9ed;
+}
+
+.result-modal .modal-actions .primary-button {
+  border: 1px solid rgba(255, 255, 255, .5);
+  color: #ffffff;
+  background: linear-gradient(135deg, #ff4351, var(--seci-red-deep));
+  box-shadow: 0 9px 18px rgba(196, 18, 31, .26);
+}
+
+.result-modal .modal-actions .soft-button {
+  border: 1px solid #da9916;
+  color: #2f37a2;
+  background: linear-gradient(135deg, #f7ce67, #ffb013);
+  box-shadow: 0 8px 17px rgba(169, 118, 17, .16);
+}
+
+.result-modal.is-team-result {
+  padding-bottom: 31px;
+}
+
+.result-modal.is-team-result .modal-kicker {
+  margin-top: 15px;
+}
+
+@media (max-height: 720px) and (min-width: 641px) {
+  .result-modal {
+    max-height: calc(100vh - 20px);
+    padding: 0 24px 18px;
+  }
+
+  .result-festival-banner {
+    min-height: 68px;
+    margin: 0 -24px 12px;
+    padding: 8px 20px;
+  }
+
+  .result-festival-banner img {
+    width: 46px;
+    height: 46px;
+  }
+
+  .result-festival-banner strong {
+    font-size: 21px;
+  }
+
+  .result-modal .result-symbol.has-image.member-image {
+    --result-image-size: min(220px, 70vw, 34vh);
+    margin-bottom: 11px;
+    border-width: 4px;
+  }
+
+  .result-modal .modal-result {
+    margin-top: 7px;
+    font-size: clamp(28px, 5vw, 35px);
+  }
+
+  .result-modal .modal-detail {
+    margin: 6px auto 14px;
+    padding-block: 5px;
+  }
+
+  .result-modal .modal-actions button {
+    min-height: 42px;
+  }
+}
+
+/* Wheel: shares the same regatta identity as the boat race. */
+.wheel-area {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-height: 680px;
+  align-content: start;
+  justify-items: center;
+  gap: 14px;
+  margin-top: 20px;
+  padding: 24px 24px 28px;
+  overflow: hidden;
+  border: 2px solid var(--seci-ink-900);
+  border-radius: 26px;
+  background:
+    linear-gradient(180deg, rgba(253, 243, 218, .9), rgba(253, 241, 213, .96)),
+    url("assets/trung-thu/skyline.svg") center bottom / 100% auto no-repeat,
+    #fdf1d5;
+  box-shadow: var(--race-shadow), inset 0 0 0 3px rgba(255, 176, 19, .25);
+}
+
+.wheel-area::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0 0 auto;
+  height: 128px;
+  pointer-events: none;
+  opacity: .2;
+  background: url("assets/trung-thu/bunting.svg") center -25px / 620px auto repeat-x;
+}
+
+.wheel-area::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  right: -110px;
+  bottom: -125px;
+  width: 360px;
+  aspect-ratio: 1;
+  border: 32px double rgba(180, 126, 18, .06);
+  border-radius: 50%;
+  box-shadow: 0 0 0 28px rgba(255, 176, 19, .07), 0 0 0 62px rgba(180, 126, 18, .035);
+}
+
+.wheel-festival-heading {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 920px);
+  min-height: 86px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 14px 21px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 183, 38, .72);
+  border-radius: 20px;
+  color: #fdf5df;
+  background:
+    radial-gradient(circle at 92% 18%, rgba(255, 176, 19, .22), transparent 26%),
+    linear-gradient(120deg, var(--seci-ink-950), var(--seci-blue) 62%, #5861d8);
+  box-shadow: 0 13px 28px rgba(46, 55, 183, .22), inset 0 1px rgba(255, 255, 255, .13);
+}
+
+.wheel-festival-heading::after {
+  content: "❧  ❧  ❧  ❧  ❧";
+  position: absolute;
+  right: 24px;
+  top: 50%;
+  color: rgba(255, 176, 19, .18);
+  font-size: 27px;
+  letter-spacing: .28em;
+  transform: translateY(-50%) rotate(-4deg);
+}
+
+.wheel-festival-copy {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.wheel-festival-kicker {
+  color: var(--seci-accent);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: .16em;
+}
+
+.wheel-festival-title {
+  font-family: "Bahnschrift", "Aptos Display", "Segoe UI", sans-serif;
+  font-size: clamp(25px, 2.35vw, 38px);
+  font-weight: 950;
+  letter-spacing: -.025em;
+  line-height: 1;
+  text-shadow: 0 3px 0 rgba(30, 36, 127, .48);
+}
+
+.wheel-caption {
+  position: relative;
+  z-index: 2;
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 7px 15px;
+  border: 1px solid rgba(169, 118, 17, .24);
+  border-radius: 999px;
+  color: #323cc0;
+  background: rgba(252, 240, 207, .9);
+  box-shadow: 0 5px 13px rgba(46, 55, 183, .08);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.member-team-picker {
+  position: relative;
+  z-index: 3;
+  width: min(100%, 520px);
+  margin: 0 auto;
+  border-color: rgba(104, 112, 217, .25);
+  color: #2e36a5;
+  background: linear-gradient(135deg, #fdf0d1, #fae09d);
+  box-shadow: 0 7px 17px rgba(46, 55, 183, .1);
+}
+
+.member-team-picker label {
+  color: #323cc0;
+}
+
+.member-team-picker select {
+  border-color: rgba(74, 83, 212, .26);
+  color: #292f88;
+  background: #fef9ed;
+}
+
+.member-team-picker select:focus {
+  border-color: var(--seci-blue);
+  box-shadow: 0 0 0 3px rgba(180, 126, 18, .14);
+}
+
+.wheel-wrap {
+  z-index: 2;
+  width: min(100%, 570px);
+  padding: 29px;
+}
+
+.wheel-wrap::before,
+.wheel-wrap::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+}
+
+.wheel-wrap::before {
+  z-index: -1;
+  inset: 8px;
+  border: 2px dashed rgba(74, 83, 212, .24);
+  box-shadow: 0 0 0 10px rgba(255, 176, 19, .1);
+  animation: wheel-festival-orbit 16s linear infinite;
+}
+
+.wheel-wrap::after {
+  z-index: -2;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255, 176, 19, .28), rgba(180, 126, 18, .08) 55%, transparent 72%);
+  filter: blur(8px);
+}
+
+.wheel-disc {
+  position: relative;
+  border: 11px solid #ffb013;
+  outline: 5px solid #414bd0;
+  outline-offset: -2px;
+  background: var(--seci-ink-900);
+  box-shadow:
+    0 19px 34px rgba(30, 36, 127, .24),
+    0 0 0 7px rgba(252, 238, 203, .94),
+    0 0 0 11px rgba(74, 83, 212, .18),
+    inset 0 0 22px rgba(30, 36, 127, .25);
+}
+
+.pointer {
+  z-index: 10;
+  top: 1px;
+  border-left-width: 22px;
+  border-right-width: 22px;
+  border-top: 43px solid #414bd0;
+  filter: drop-shadow(0 4px 0 #ffb013) drop-shadow(0 8px 7px rgba(30, 36, 127, .3));
+}
+
+.pointer::after {
+  top: -41px;
+  left: -8px;
+  width: 16px;
+  height: 16px;
+  border: 3px solid #414bd0;
+  background: #ffb013;
+  box-shadow: 0 0 0 2px #fae3a7;
+}
+
+.wheel-hub {
+  position: absolute;
+  z-index: 8;
+  top: 50%;
+  left: 50%;
+  width: clamp(98px, 10vw, 126px);
+  aspect-ratio: 1;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 1px;
+  border: 6px double #ffc248;
+  border-radius: 50%;
+  color: #fdf1d5;
+  background:
+    radial-gradient(circle at 45% 28%, rgba(255, 255, 255, .2), transparent 20%),
+    linear-gradient(145deg, #bc8313, #2e37b7 76%);
+  box-shadow: 0 7px 17px rgba(30, 36, 127, .34), inset 0 0 0 3px rgba(255, 176, 19, .18);
+  font-family: "Bahnschrift", "Aptos Display", sans-serif;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.wheel-hub-star {
+  color: var(--seci-accent);
+  font-size: 25px;
+  line-height: .8;
+  text-shadow: 0 2px 6px rgba(30, 36, 127, .42);
+}
+
+.wheel-hub strong {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.wheel-hub small {
+  color: #f8d782;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .15em;
+}
+
+.wheel-empty {
+  z-index: 12;
+  inset: 22%;
+  border: 2px dashed rgba(74, 83, 212, .32);
+  color: #323cc0;
+  background: rgba(252, 240, 207, .96);
+  box-shadow: 0 9px 24px rgba(46, 55, 183, .12);
+  font-weight: 800;
+}
+
+.spin-button {
+  position: relative;
+  z-index: 3;
+  width: min(100%, 440px);
+  min-height: 64px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, .5);
+  border-radius: 17px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #ff4351, var(--seci-red-deep) 74%);
+  box-shadow: 0 14px 27px rgba(196, 18, 31, .3), inset 0 1px rgba(255, 255, 255,.22);
+  font-family: "Bahnschrift", "Aptos Display", sans-serif;
+  letter-spacing: .065em;
+  text-shadow: 0 2px rgba(124, 10, 20, .45);
+}
+
+.spin-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 0 34%, rgba(255, 255, 255,.24) 42%, transparent 50% 100%);
+  transform: translateX(-120%);
+  animation: race-button-sheen 3.2s ease-in-out infinite;
+}
+
+.spin-button:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 34px rgba(196, 18, 31, .34), 0 0 0 4px rgba(255, 196, 0, .22);
+}
+
+.spin-button.spinning {
+  color: #fbe7b4;
+  background: linear-gradient(135deg, #646abc, #3a3f81);
+}
+
+.team-method-picker button[aria-pressed="true"]:hover:not(:disabled) {
+  color: #fdf4de;
+  background: linear-gradient(135deg, var(--seci-blue-bright), var(--seci-ink-900));
+}
+
+@keyframes wheel-festival-orbit {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-height: 980px) and (min-width: 901px) {
+  .wheel-area {
+    min-height: 640px;
+    gap: 8px;
+    padding: 16px 22px 18px;
+  }
+
+  .wheel-festival-heading {
+    min-height: 68px;
+    padding: 9px 18px;
+  }
+
+    .wheel-festival-title {
+    font-size: clamp(24px, 2vw, 31px);
+  }
+
+  .wheel-wrap {
+    width: min(100%, 470px);
+    padding: 24px;
+  }
+
+  .wheel-hub {
+    width: 104px;
+  }
+
+  .spin-button {
+    min-height: 58px;
+  }
+}
+
+@media (max-height: 980px) and (min-width: 1200px) {
+  .wheel-area {
+    grid-template-columns: minmax(230px, 1fr) 470px minmax(280px, 1fr);
+    grid-template-rows: auto auto 470px;
+    column-gap: 24px;
+    min-height: 0;
+  }
+
+  .wheel-festival-heading {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .member-team-picker {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .wheel-caption {
+    grid-column: 1;
+    grid-row: 3;
+    justify-self: end;
+    align-self: center;
+    max-width: 260px;
+    border-radius: 17px;
+    text-align: right;
+  }
+
+  .wheel-wrap {
+    grid-column: 2;
+    grid-row: 3;
+  }
+
+  .spin-button {
+    grid-column: 3;
+    grid-row: 3;
+    justify-self: start;
+    align-self: center;
+    width: min(100%, 310px);
+  }
+}
+
+.soft-button {
+  color: #343dc0;
+  background: #fbe7b5;
+}
+
+.stage-tabs {
+  height: auto;
+  width: min(100%, 720px);
+  margin: 19px auto 11px;
+  padding: 6px;
+  border-color: rgba(74, 83, 212, .15);
+  background: rgba(253, 245, 223, .9);
+  box-shadow: inset 0 1px 3px rgba(53, 59, 142, .06);
+}
+
+.stage-tabs button,
+.stage-tabs .stage-tab {
+  color: #666881;
+  font-family: "Bahnschrift", "Aptos Display", "Segoe UI", sans-serif;
+  letter-spacing: .015em;
+}
+
+.stage-tabs button:hover:not(:disabled),
+.stage-tabs .stage-tab:hover:not(:disabled) {
+  color: var(--seci-ink-900);
+  background: rgba(255, 255, 255, .8);
+}
+
+.stage-tabs button[aria-selected="true"],
+.stage-tabs button.is-active,
+.stage-tabs .stage-tab[aria-selected="true"],
+.stage-tabs .stage-tab.is-active {
+  color: #fdf4de;
+  background: linear-gradient(135deg, var(--seci-blue-bright), var(--seci-ink-900));
+  box-shadow: 0 8px 18px rgba(74, 83, 212, .22), inset 0 1px rgba(255, 255, 255, .2);
+}
+
+.stage-tabs button[aria-selected="true"]::after {
+  background: var(--seci-accent);
+}
+
+.team-method-picker {
+  gap: 6px;
+  margin: 8px auto 20px;
+  padding: 5px;
+  border-color: rgba(74, 83, 212, .16);
+  background: rgba(254, 252, 245, .96);
+  box-shadow: 0 8px 20px rgba(55, 61, 140, .08);
+}
+
+.team-method-label {
+  padding: 0 9px 0 12px;
+  color: #777994;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.team-method-picker button,
+.team-method-picker .team-method-option {
+  color: #59666b;
+}
+
+.team-method-picker button:hover:not(:disabled),
+.team-method-picker .team-method-option:hover:not(:disabled) {
+  color: var(--seci-ink-900);
+  background: #fcedc7;
+}
+
+.team-method-picker button[aria-pressed="true"],
+.team-method-picker button[aria-selected="true"],
+.team-method-picker button.is-active,
+.team-method-picker .team-method-option.is-active {
+  color: #fdf4de;
+  background: linear-gradient(135deg, var(--seci-blue-bright), var(--seci-ink-900));
+  box-shadow: 0 6px 14px rgba(74, 83, 212, .2), inset 0 0 0 1px rgba(255, 176, 19, .28);
+}
+
+#raceView {
+  padding: 3px 0 11px;
+}
+
+.race-shell {
+  font-family: "Be Vietnam Pro", "Aptos", "Segoe UI", sans-serif;
+}
+
+.race-header {
+  position: relative;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 16px 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 176, 19, .3);
+  border-radius: 22px;
+  color: var(--seci-paper);
+  background:
+    radial-gradient(circle at 18% 45%, rgba(255, 176, 19, .16), transparent 13rem),
+    linear-gradient(128deg, var(--seci-ink-950), var(--seci-blue-800) 55%, var(--seci-blue));
+  box-shadow: 0 14px 28px rgba(36, 43, 152, .2);
+}
+
+.race-header::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .13;
+  background-image: url("assets/trung-thu/bunting.svg");
+  background-position: right -8px top -17px;
+  background-repeat: no-repeat;
+  background-size: min(48%, 470px) auto;
+}
+
+.race-festival-brand {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.race-heading {
+  position: relative;
+  z-index: 1;
+}
+
+.race-kicker {
+  margin-bottom: 4px;
+  color: var(--seci-accent);
+  font-size: 10px;
+  letter-spacing: .15em;
+}
+
+.race-title {
+  color: #fef9ec;
+  font-family: "Bahnschrift", "Aptos Display", "Segoe UI", sans-serif;
+  font-size: clamp(25px, 3.5vw, 38px);
+  font-weight: 950;
+  letter-spacing: -.025em;
+  text-shadow: 0 3px 10px rgba(24, 29, 101, .25);
+}
+
+.race-subtitle {
+  margin-top: 4px;
+  color: rgba(253, 244, 221, .78);
+}
+
+.race-toolbar {
+  position: relative;
+  z-index: 2;
+}
+
+.race-toolbar button,
+.race-tool-button {
+  border-color: rgba(248, 212, 121, .3);
+  color: #fdf1d5;
+  background: rgba(29, 35, 122, .42);
+  box-shadow: inset 0 1px rgba(255, 255, 255, .08), 0 5px 14px rgba(18, 22, 77, .16);
+  backdrop-filter: blur(8px);
+}
+
+.race-toolbar button:hover:not(:disabled),
+.race-tool-button:hover:not(:disabled) {
+  border-color: var(--seci-accent);
+  color: #1e247f;
+  background: var(--seci-accent);
+}
+
+.stage-tabs button:focus-visible,
+.team-method-picker button:focus-visible,
+.race-toolbar button:focus-visible,
+.race-start-button:focus-visible {
+  outline: 3px solid #ffbe3d;
+  outline-offset: 3px;
+}
+
+.race-board {
+  overflow: hidden;
+  border: 2px solid var(--seci-ink-900);
+  border-radius: 26px;
+  background: linear-gradient(180deg, #fbe4aa 0 132px, var(--race-water) 132px);
+  box-shadow: var(--race-shadow), inset 0 0 0 3px rgba(255, 176, 19, .25);
+}
+
+.race-board::before,
+.race-board::after {
+  content: "";
+  position: absolute;
+  z-index: 9;
+  left: 0;
+  right: 0;
+  height: 8px;
+  pointer-events: none;
+  background: linear-gradient(90deg, var(--seci-ink-900), var(--seci-accent) 18%, var(--seci-blue) 50%, var(--seci-accent) 82%, var(--seci-ink-900));
+  box-shadow: 0 2px 7px rgba(30, 36, 127, .2);
+}
+
+.race-board::before {
+  top: 0;
+}
+
+.race-board::after {
+  top: auto;
+  bottom: 0;
+}
+
+.race-festival-scene {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-width: 780px;
+  aspect-ratio: 2172 / 400;
+  overflow: hidden;
+  background: linear-gradient(180deg, #f0c164 0%, #f7e0a7 52%, #fdf6e2 100%);
+}
+
+/* A still shore next to moving water reads as a treadmill, so the bank scrolls
+   too: two layers, the far one slower, each a pair of tiles that hand off. */
+.race-scene-layer {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.race-scene-strip {
+  position: absolute;
+  inset: 0;
+  width: 200%;
+  display: flex;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+
+.race-scene-strip > i {
+  flex: 0 0 50%;
+  height: 100%;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.race-scene-far .race-scene-strip > i {
+  background-image: url("assets/trung-thu/scene-far.svg");
+}
+
+.race-scene-near .race-scene-strip > i {
+  background-image: url("assets/trung-thu/scene-near.svg");
+}
+
+.race-anniversary-mark {
+  position: absolute;
+  z-index: 5;
+  top: 28px;
+  left: 24px;
+  min-width: 88px;
+  display: grid;
+  justify-items: center;
+  padding: 7px 13px 6px;
+  transform: rotate(-3deg);
+  border: 1px solid rgba(255, 191, 62, .72);
+  border-radius: 12px;
+  color: var(--seci-accent);
+  background: linear-gradient(145deg, rgba(46, 55, 183, .96), rgba(180, 126, 18, .94));
+  box-shadow: 0 7px 15px rgba(36, 43, 152, .2);
+}
+
+.race-anniversary-mark strong {
+  font-family: "Bahnschrift", "Aptos Display", sans-serif;
+  font-size: 25px;
+  line-height: .9;
+}
+
+.race-anniversary-mark small {
+  margin-top: 4px;
+  color: #fdf1d4;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .16em;
+}
+
+.race-track {
+  --race-track-height: calc(var(--race-lanes, 4) * var(--race-lane-height));
+  min-width: 860px;
+  min-height: calc(2 * var(--race-lane-height));
+  margin: 0;
+  border-top: 3px solid rgba(251, 228, 172, .92);
+  border-bottom: 3px solid rgba(46, 55, 183, .7);
+  background:
+    linear-gradient(180deg, rgba(37, 45, 157, .04), rgba(24, 29, 102, .26)),
+    url("assets/trung-thu/water-track-seamless.svg") center top / 100% auto repeat-y,
+    var(--race-water-deep);
+}
+
+.race-track::before {
+  z-index: 1;
+  opacity: .24;
+  background:
+    repeating-linear-gradient(174deg, transparent 0 20px, rgba(255, 255, 255,.25) 21px 23px, transparent 24px 46px),
+    repeating-linear-gradient(5deg, transparent 0 34px, rgba(48, 58, 205, .14) 35px 38px, transparent 39px 70px);
+  background-size: 210px 100%, 290px 100%;
+  background-position: calc(var(--race-water-x1, 0) * -1px) 0, calc(var(--race-water-x2, 0) * 1px) 0;
+  animation-duration: 4.8s;
+}
+
+/* Racing hands the surface to JS: a keyframe runs on its own clock and would
+   drift out of step with the bank, which is what makes a river look fake. */
+.race-track.is-racing::before {
+  opacity: .42;
+  animation: none;
+}
+
+.race-track.is-racing.is-high-energy {
+  animation: race-camera-vibration .16s steps(2, end) infinite;
+}
+
+.race-track::after {
+  content: "XUẤT PHÁT";
+  z-index: 5;
+  left: calc(var(--race-name-width) + 17px);
+  width: 5px;
+  color: #fdf1d5;
+  border: 0;
+  border-inline: 2px solid rgba(46, 55, 183, .76);
+  background: repeating-linear-gradient(180deg, #ffffff 0 8px, var(--seci-blue) 8px 16px);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255,.55), 0 0 14px rgba(50, 59, 181, .22);
+  font-size: 8px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0,.4);
+}
+
+.race-lane {
+  z-index: 3;
+  grid-template-columns: var(--race-name-width) minmax(0, 1fr);
+  border-bottom: 1px dashed rgba(255, 255, 255, .48);
+}
+
+.race-lane[class*="is-troll-"] {
+  z-index: 8;
+}
+
+.race-lane::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  opacity: .16;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255,.34) 52%, transparent);
+}
+
+.race-lane::after {
+  z-index: -1;
+  background: linear-gradient(90deg, rgba(255, 176, 19, .28), transparent 55%);
+}
+
+.race-lane.is-winner {
+  background: linear-gradient(90deg, rgba(255, 176, 19, .2), rgba(250, 227, 167, .42));
+}
+
+.race-lane-name {
+  z-index: 7;
+  gap: 10px;
+  padding: 8px 13px;
+  color: var(--seci-ink-900);
+  border-right: 2px solid var(--seci-blue);
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, .97), rgba(252, 244, 224, .94)),
+    #fefbf4;
+  box-shadow: 7px 0 18px rgba(35, 43, 151, .12);
+  font-family: "Bahnschrift", "Aptos Display", "Segoe UI", sans-serif;
+  font-weight: 850;
+}
+
+.race-lane-name::before {
+  width: 34px;
+  height: 34px;
+  border: 2px solid rgba(255, 255, 255, .9);
+  border-radius: 50%;
+  color: #ffffff;
+  background: var(--race-team-color, var(--seci-blue));
+  box-shadow: 0 0 0 3px rgba(35, 43, 151, .1), 0 4px 10px rgba(15, 19, 66, .2);
+  font-size: 13px;
+}
+
+.race-lane.is-winner .race-lane-name {
+  color: var(--seci-ink-950);
+  background: linear-gradient(90deg, #ffe27a, #fff6d1);
+}
+
+.race-rank {
+  color: #fbe7b5;
+  background: rgba(255, 255, 255, .12);
+}
+
+.race-course::after {
+  z-index: 1;
+  height: 28px;
+  opacity: .48;
+  background: repeating-linear-gradient(176deg, transparent 0 16px, rgba(255, 255, 255,.62) 17px 20px, transparent 21px 45px);
+}
+
+.race-course {
+  overflow: visible;
+}
+
+.race-track.is-racing .race-course::after {
+  animation: race-course-rush var(--race-course-duration, .4s) linear infinite;
+}
+
+.race-course::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: 8% 0;
+  pointer-events: none;
+  opacity: 0;
+  background: repeating-linear-gradient(180deg, transparent 0 8px, rgba(255, 255, 255,.72) 9px 11px, transparent 12px 21px);
+  clip-path: polygon(0 12%, 100% 0, 100% 100%, 0 88%);
+  filter: blur(.55px);
+  transform-origin: right center;
+}
+
+.race-track.is-racing .race-course::before {
+  opacity: calc(.06 + (var(--race-pace, .7) * .24));
+  animation: race-course-streaks var(--race-course-duration, .4s) linear infinite;
+}
+
+.race-track.is-racing .race-course.is-sprinting::before {
+  opacity: .54;
+  filter: blur(1px);
+}
+
+.race-boat {
+  --race-x: 0px;
+  --race-progress: 0;
+  --race-speed: 0;
+  --race-acceleration: 0;
+  --race-boost: 0;
+  --race-lean: 0deg;
+  z-index: 5;
+  left: 11px;
+  height: calc(var(--race-lane-height) * var(--race-boat-scale, .8));
+  width: calc(var(--race-lane-height) * var(--race-boat-scale, .8) * 2.667);
+  transform: translate3d(var(--race-x), calc(-50% + var(--race-y, 0px)), 0) rotate(var(--race-lean));
+  transform-origin: 48% 72%;
+  filter: drop-shadow(0 11px 7px rgba(32, 38, 135, .25));
+  contain: layout style;
+}
+
+/* Keep the large sprite and its speech effects inside the outer track mask. */
+.race-lane.is-edge-first .race-boat {
+  top: 58%;
+}
+
+.race-lane.is-edge-last .race-boat {
+  top: 42%;
+}
+
+.race-boat::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  left: -42%;
+  bottom: 1%;
+  width: 75%;
+  height: 36%;
+  border-radius: 50%;
+  opacity: calc(.48 + (var(--race-boost) * .42));
+  background: url("assets/trung-thu/water-wake.svg") right center / contain no-repeat;
+  filter: blur(calc(var(--race-boost) * .45px));
+  transform: scaleX(calc(.86 + (var(--race-boost) * .55))) scaleY(calc(.9 + (var(--race-speed) * .16)));
+  transform-origin: right center;
+  animation: race-wake .38s steps(3, end) infinite;
+}
+
+.race-boat::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  right: 12%;
+  bottom: 2%;
+  width: 62%;
+  height: 12%;
+  border-radius: 50%;
+  opacity: .72;
+  background: rgba(255, 255, 255, .78);
+  filter: blur(3px);
+  transform: skewX(-24deg);
+}
+
+.race-boat-sprite,
+.race-boat .race-boat-sprite {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  object-position: center;
+  overflow: visible;
+  filter: saturate(1.04) contrast(1.02);
+}
+
+.race-speed-lines {
+  position: absolute;
+  z-index: 2;
+  right: 63%;
+  top: 24%;
+  width: 76%;
+  height: 49%;
+  opacity: calc((var(--race-speed) * .28) + (var(--race-boost) * .7));
+  background: repeating-linear-gradient(180deg, transparent 0 7px, rgba(255, 255, 255,.88) 8px 10px, transparent 11px 17px);
+  clip-path: polygon(0 28%, 100% 0, 100% 100%, 0 72%);
+  filter: blur(calc(.2px + (var(--race-boost) * .7px)));
+  transform: scaleX(calc(.62 + (var(--race-boost) * .58)));
+  transform-origin: right center;
+}
+
+.race-troll-effect {
+  position: absolute;
+  z-index: 12;
+  left: 45%;
+  top: 2%;
+  min-width: max-content;
+  padding: 4px 8px 5px;
+  border: 2px solid #3640c9;
+  border-radius: 10px 10px 10px 2px;
+  opacity: 0;
+  color: #3640c9;
+  background: linear-gradient(145deg, #fdf4dd, #ffb013);
+  box-shadow: 0 4px 0 #3640c9, 0 8px 15px rgba(22, 26, 84, .24);
+  font: 900 clamp(8px, .7vw, 11px)/1 "Bahnschrift", "Aptos Display", sans-serif;
+  letter-spacing: .045em;
+  text-align: center;
+  text-shadow: 0 1px rgba(255, 255, 255, .55);
+  pointer-events: none;
+  transform: translate3d(-10%, 7px, 0) scale(.75) rotate(-4deg);
+  transform-origin: left bottom;
+}
+
+.race-troll-effect::before,
+.race-troll-effect::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.race-boat[class*="is-troll-"] .race-troll-effect {
+  opacity: calc(.35 + var(--race-troll-intensity, 0) * .65);
+  transform: translate3d(-10%, 0, 0) scale(calc(.84 + var(--race-troll-intensity, 0) * .16)) rotate(-4deg);
+  animation: race-troll-pop .42s cubic-bezier(.2, 1.35, .35, 1) infinite alternate;
+}
+
+.race-boat.is-troll-rocket {
+  filter: drop-shadow(0 12px 7px rgba(32, 38, 135, .3)) drop-shadow(0 0 18px rgba(243, 162, 0, .95));
+}
+
+.race-boat.is-troll-rocket::before,
+.race-boat.is-troll-shortcut::before {
+  width: 108%;
+  left: -78%;
+  opacity: 1;
+  filter: blur(.5px) drop-shadow(0 0 7px rgba(248, 212, 120, .95));
+  animation-duration: .08s;
+}
+
+.race-boat.is-troll-rocket .race-speed-lines,
+.race-boat.is-troll-shortcut .race-speed-lines {
+  right: 58%;
+  width: 104%;
+  opacity: 1;
+  filter: blur(1.15px) drop-shadow(0 0 5px #ffad0a);
+  animation-duration: .095s;
+}
+
+.race-boat.is-troll-rocket .race-troll-effect::after {
+  right: calc(100% + 8px);
+  top: 33%;
+  width: 48px;
+  height: 14px;
+  border-radius: 100% 0 0 100%;
+  background: linear-gradient(90deg, transparent, #f6cb5d 38%, #ea9c00 72%, #bb8313);
+  filter: blur(1px) drop-shadow(0 0 5px #ea9c00);
+  animation: race-troll-flame .11s steps(2, end) infinite;
+}
+
+.race-boat.is-troll-stall .race-boat-sprite,
+.race-boat.is-troll-anchor .race-boat-sprite {
+  filter: saturate(.68) contrast(.94);
+}
+
+.race-boat.is-troll-stall .race-troll-effect::after,
+.race-boat.is-troll-sneeze .race-troll-effect::after {
+  left: -27px;
+  bottom: -4px;
+  width: 34px;
+  height: 30px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 25% 68%, rgba(85, 92, 93, .82) 0 20%, transparent 22%),
+    radial-gradient(circle at 55% 45%, rgba(126, 134, 136, .78) 0 27%, transparent 29%),
+    radial-gradient(circle at 78% 28%, rgba(192, 196, 192, .74) 0 19%, transparent 21%);
+  filter: blur(.5px);
+  animation: race-troll-smoke .75s ease-out infinite;
+}
+
+.race-boat.is-troll-celebrate .race-boat-sprite {
+  animation: race-troll-celebrate .32s cubic-bezier(.2, .8, .2, 1) infinite alternate;
+}
+
+.race-boat.is-troll-celebrate .race-troll-effect::after {
+  left: -19px;
+  top: -13px;
+  width: 76px;
+  height: 42px;
+  background:
+    radial-gradient(circle, #ffad0a 0 2px, transparent 3px) 0 0 / 19px 18px,
+    radial-gradient(circle, #bb8313 0 2px, transparent 3px) 8px 6px / 21px 20px;
+  animation: race-troll-confetti .58s linear infinite;
+}
+
+.race-boat.is-troll-pack .race-troll-effect,
+.race-boat.is-troll-traffic .race-troll-effect,
+.race-boat.is-troll-photo .race-troll-effect {
+  color: #ffffff;
+  border-color: #f9da8c;
+  background: linear-gradient(145deg, #bb8313, #404acf);
+  box-shadow: 0 4px 0 #ffad0a, 0 8px 15px rgba(22, 26, 84, .3);
+}
+
+.race-lane.is-troll-pack .race-course,
+.race-lane.is-troll-traffic .race-course,
+.race-lane.is-troll-photo .race-course {
+  background-image: linear-gradient(90deg, rgba(255, 173, 10, .08), rgba(187, 131, 19, .16), rgba(255, 173, 10, .08));
+}
+
+.race-boat.is-troll-brake .race-boat-sprite {
+  transform-origin: 55% 78%;
+  animation: race-troll-brake .2s ease-in-out infinite alternate;
+}
+
+.race-boat.is-troll-brake::before {
+  left: -16%;
+  width: 54%;
+  height: 57%;
+  transform: rotate(13deg) scaleY(1.45);
+  filter: blur(1px);
+}
+
+.race-boat.is-troll-yoyo .race-boat-sprite {
+  animation: race-troll-yoyo .34s ease-in-out infinite alternate;
+}
+
+.race-boat.is-troll-reverse .race-boat-sprite {
+  animation: race-troll-reverse .46s ease-in-out infinite alternate;
+}
+
+.race-boat.is-troll-reverse .race-speed-lines {
+  right: auto;
+  left: 71%;
+  transform: scaleX(-.75);
+}
+
+.race-boat.is-troll-photo .race-troll-effect::after {
+  right: -19px;
+  top: -13px;
+  width: 22px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 0 5px rgba(249, 219, 143, .7), 0 0 22px 12px rgba(255, 255, 255, .72);
+  animation: race-troll-camera .7s steps(1, end) infinite;
+}
+
+.race-boat.is-troll-anchor .race-troll-effect::after {
+  left: -22px;
+  top: 16px;
+  width: 18px;
+  height: 25px;
+  border: 4px solid #3e405c;
+  border-top: 0;
+  border-radius: 0 0 12px 12px;
+  box-shadow: inset 0 -3px #ffad0a;
+  animation: race-troll-anchor .42s ease-in-out infinite alternate;
+}
+
+.race-boat.is-troll-wave .race-boat-sprite {
+  animation: race-troll-wave .24s ease-in-out infinite alternate;
+}
+
+.race-boat.is-troll-wave .race-troll-effect::after {
+  left: -45px;
+  top: 23px;
+  width: 48px;
+  height: 31px;
+  border-radius: 50% 50% 12% 50%;
+  background: linear-gradient(140deg, rgba(255, 255, 255,.95), #e19d16 56%, rgba(73, 82, 212, .18) 57%);
+  clip-path: polygon(0 100%, 12% 42%, 40% 11%, 70% 33%, 100% 0, 83% 100%);
+  animation: race-troll-wave-slap .38s ease-out infinite;
+}
+
+.race-boat.is-troll-shortcut .race-troll-effect {
+  color: #ffffff;
+  border-color: #ffb82a;
+  background: linear-gradient(145deg, #27724d, #164d32);
+}
+
+.race-boat.is-troll-shortcut .race-troll-effect::after {
+  right: -31px;
+  top: 2px;
+  width: 24px;
+  height: 24px;
+  border: 4px solid #ffb82a;
+  border-left-color: transparent;
+  border-radius: 50%;
+  animation: race-troll-compass .38s linear infinite;
+}
+
+.race-boat.is-troll-sneeze .race-boat-sprite {
+  animation: race-troll-sneeze .18s steps(2, end) infinite;
+}
+
+.race-boat-flag {
+  z-index: 6;
+  left: 43%;
+  top: 3%;
+  width: 27%;
+  height: 25%;
+  border-radius: 2px 6px 6px 2px;
+  background: var(--seci-blue);
+  box-shadow: 0 3px 6px rgba(19, 23, 80, .22);
+  transform: skewY(-3deg);
+  transform-origin: left center;
+}
+
+.race-boat > .race-boat-flag {
+  display: none;
+}
+
+.race-boat-flag::before {
+  top: -1px;
+  left: -3px;
+  width: 3px;
+  height: 40px;
+  background: #373b7b;
+}
+
+.race-boat-flag::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 54%;
+  width: 40%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  background: var(--seci-accent);
+  clip-path: polygon(50% 2%, 72% 18%, 80% 44%, 70% 72%, 54% 96%, 50% 62%, 46% 96%, 30% 72%, 20% 44%, 28% 18%);
+}
+
+.race-boat-label {
+  z-index: 7;
+  top: auto;
+  left: 45%;
+  bottom: 12%;
+  max-width: 49%;
+  padding: 3px 7px 4px;
+  border: 1px solid rgba(255, 255, 255,.7);
+  border-radius: 999px;
+  color: var(--race-team-ink, #ffffff);
+  background: var(--race-team-color);
+  box-shadow: 0 3px 8px rgba(15, 18, 63, .22);
+  font-size: clamp(8px, .76vw, 11px);
+  letter-spacing: .02em;
+}
+
+.race-track.is-racing .race-boat,
+.race-lane.is-racing .race-boat {
+  animation: race-boat-festival-bob .32s ease-in-out var(--race-bob-delay) infinite alternate;
+}
+
+.race-track.is-racing .race-speed-lines {
+  animation: race-speed-streak .28s linear infinite;
+}
+
+.race-boat[data-motion="fast"]::before {
+  animation-duration: .18s;
+}
+
+.race-boat.is-boosting::before,
+.race-lane.is-boosting .race-boat::before {
+  animation-duration: .12s;
+}
+
+.race-track.is-racing .race-boat-flag,
+.race-lane.is-racing .race-boat-flag {
+  animation: race-flag-flutter .22s ease-in-out infinite alternate;
+}
+
+.race-boat.is-boosting,
+.race-lane.is-boosting .race-boat {
+  filter: drop-shadow(0 12px 7px rgba(32, 38, 135, .3)) drop-shadow(0 0 12px rgba(255, 183, 38, .55));
+  animation-duration: .22s;
+}
+
+.race-boat.is-boosting .race-speed-lines,
+.race-lane.is-boosting .race-speed-lines {
+  opacity: .94;
+  animation: race-speed-streak .18s linear infinite;
+}
+
+.race-lane.is-leading .race-boat,
+.race-lane[data-rank="1"] .race-boat {
+  filter: drop-shadow(0 12px 7px rgba(32, 38, 135, .28)) drop-shadow(0 0 10px rgba(255, 170, 1, .62));
+}
+
+.race-lane.is-winner .race-boat {
+  animation: race-winner-salute .56s cubic-bezier(.2,.8,.2,1) infinite alternate;
+  filter: drop-shadow(0 13px 8px rgba(32, 38, 135, .3)) drop-shadow(0 0 18px rgba(255, 176, 19, .95));
+}
+
+.race-finish-line {
+  z-index: 8;
+  right: var(--race-finish-offset);
+  width: 20px;
+  border-inline: 3px solid var(--seci-ink-950);
+  background-color: #fdf1d5;
+  background-image:
+    linear-gradient(45deg, var(--seci-blue) 25%, transparent 25%, transparent 75%, var(--seci-blue) 75%),
+    linear-gradient(45deg, var(--seci-blue) 25%, transparent 25%, transparent 75%, var(--seci-blue) 75%);
+  box-shadow: 0 0 0 2px var(--seci-accent), 0 0 16px rgba(31, 37, 120, .25);
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  transition: opacity .45s ease, transform .6s cubic-bezier(.16,.9,.24,1), visibility 0s linear .6s;
+}
+
+.race-track.is-racing:not(.is-finish-visible) .race-finish-line {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(18px);
+  transition-delay: 0s, 0s, .6s;
+}
+
+.race-track.is-racing.is-finish-visible .race-finish-line {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  transition-delay: 0s;
+}
+
+.race-finish-line > img {
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  width: 92px;
+  height: 64px;
+  transform: translateX(-50%);
+  object-fit: contain;
+  object-position: center top;
+  overflow: visible;
+}
+
+.race-finish-line::before {
+  content: "ĐÍCH";
+  top: 10px;
+  min-width: 52px;
+  color: var(--seci-ink-950);
+  border: 1px solid #cc8d11;
+  background: linear-gradient(145deg, #ffc34c, var(--seci-accent));
+  box-shadow: 0 4px 10px rgba(31, 37, 120, .2);
+}
+
+.race-countdown {
+  z-index: 24;
+  color: #fdf1d4;
+  background: rgba(30, 36, 127, .48);
+  backdrop-filter: blur(5px) saturate(.8);
+}
+
+.race-countdown-value,
+.race-countdown > span {
+  color: var(--seci-accent);
+  font-family: "Bahnschrift", "Aptos Display", sans-serif;
+  text-shadow: 0 7px 0 rgba(30, 36, 127, .72), 0 15px 35px rgba(18, 22, 77, .42);
+}
+
+.race-countdown.is-go .race-countdown-value,
+.race-countdown.is-go > span,
+.race-countdown-value.is-go {
+  color: #fdf1d5;
+  border: 2px solid var(--seci-accent);
+  background: linear-gradient(135deg, var(--seci-blue-bright), var(--seci-ink-900));
+  box-shadow: 0 12px 30px rgba(30, 36, 127, .32);
+}
+
+.race-leaderboard {
+  z-index: 14;
+  top: 159px;
+  right: 98px;
+  border-color: rgba(255, 190, 61, .75);
+  color: #fdf5df;
+  background: linear-gradient(145deg, rgba(30, 36, 127, .94), rgba(46, 55, 183, .88));
+  box-shadow: 0 13px 28px rgba(22, 26, 92, .25);
+  backdrop-filter: blur(10px);
+}
+
+.race-leaderboard-title {
+  color: var(--seci-accent);
+}
+
+.race-leaderboard-item {
+  color: #fdf6e2;
+  background: rgba(255, 255, 255, .09);
+}
+
+.race-leaderboard-item.is-leading,
+.race-leaderboard-item[data-rank="1"] {
+  color: var(--seci-ink-950);
+  background: linear-gradient(90deg, #ffc043, #fae2a6);
+}
+
+.race-leaderboard-rank {
+  color: currentColor;
+  opacity: .74;
+}
+
+.race-leaderboard-dot {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255,.65);
+}
+
+.race-winner-banner {
+  z-index: 20;
+  bottom: 28px;
+  border: 2px solid var(--seci-accent);
+  color: #fdf1d5;
+  background: linear-gradient(135deg, rgba(30, 36, 127, .98), rgba(180, 126, 18, .97));
+  box-shadow: 0 20px 46px rgba(22, 26, 92, .34), inset 0 1px rgba(255, 255, 255,.18);
+}
+
+.race-winner-icon {
+  width: 56px;
+  height: 56px;
+  border: 1px solid #f6ca59;
+  color: var(--seci-ink-950);
+  background: var(--seci-accent);
+  box-shadow: 0 8px 18px rgba(19, 23, 80, .28);
+  font-size: 26px;
+}
+
+.race-winner-label {
+  color: var(--seci-accent);
+}
+
+.race-start-button {
+  position: relative;
+  min-height: 64px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, .5);
+  color: #ffffff;
+  background: linear-gradient(135deg, #ff4351, var(--seci-red-deep) 72%);
+  box-shadow: 0 14px 28px rgba(196, 18, 31, .3), inset 0 1px rgba(255, 255, 255,.22);
+  font-family: "Bahnschrift", "Aptos Display", "Segoe UI", sans-serif;
+  letter-spacing: .055em;
+}
+
+.race-start-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 0 34%, rgba(255, 255, 255,.22) 42%, transparent 50% 100%);
+  transform: translateX(-120%);
+  animation: race-button-sheen 3.2s ease-in-out infinite;
+}
+
+.race-start-button:hover:not(:disabled) {
+  box-shadow: 0 18px 34px rgba(74, 83, 212, .36), 0 0 0 4px rgba(255, 176, 19, .16);
+  filter: saturate(1.08);
+}
+
+.race-start-button.is-racing,
+.race-start-button[aria-busy="true"] {
+  background: linear-gradient(135deg, #6267ad, #4c5087);
+}
+
+.race-status {
+  width: fit-content;
+  max-width: min(100%, 880px);
+  min-height: 30px;
+  margin-inline: auto;
+  padding: 6px 13px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: #5d696e;
+  background: rgba(254, 248, 232, .72);
+  font-weight: 700;
+  transition: color .2s ease, background .2s ease, border-color .2s ease, transform .2s ease;
+}
+
+.race-status.is-taunting {
+  color: #323cc2;
+  border-color: rgba(180, 126, 18, .28);
+  background: linear-gradient(135deg, #fdf0d1, #f9db8f);
+  box-shadow: 0 5px 14px rgba(49, 58, 184, .1);
+  transform: translateY(-1px) rotate(-.25deg);
+}
+
+.race-status.is-taunting::before {
+  content: "💬 ";
+}
+
+.race-status.is-trolling {
+  color: #fdf1d5;
+  border-color: #ffb013;
+  background: linear-gradient(135deg, #b47e12, #2e37b7);
+  box-shadow: 0 6px 16px rgba(46, 55, 183, .22);
+}
+
+.race-status.is-trolling::before {
+  content: "📣 ";
+}
+
+.race-empty {
+  color: #fdf1d5;
+  border: 0;
+  border-radius: 0;
+  background:
+    linear-gradient(rgba(73, 82, 212, .72), rgba(73, 82, 212, .72)),
+    url("assets/trung-thu/water-caustics.svg") center / 620px auto repeat;
+}
+
+#raceView:fullscreen,
+.race-shell.is-fullscreen {
+  color: #2d2f47;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(180, 126, 18, .13), transparent 32rem),
+    linear-gradient(145deg, #fef9ec, #f2e8cf);
+}
+
+#raceView:fullscreen .race-header {
+  flex: 0 0 auto;
+}
+
+#raceView:fullscreen .race-board {
+  flex-direction: column;
+}
+
+#raceView:fullscreen .race-festival-scene {
+  flex: 0 0 auto;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2172 / 400;
+}
+
+#raceView:fullscreen .race-track {
+  flex: 1 1 auto;
+}
+
+@keyframes race-boat-festival-bob {
+  from { margin-top: -2px; translate: 0 -1px; }
+  to { margin-top: 3px; translate: 0 2px; }
+}
+
+@keyframes race-flag-flutter {
+  from { scale: .96 1; skew: 0deg -2deg; }
+  to { scale: 1.04 .96; skew: 0deg 3deg; }
+}
+
+@keyframes race-speed-streak {
+  from { background-position: 0 0; transform: translateX(2px) scaleX(1.08); }
+  to { background-position: 0 17px; transform: translateX(-9px) scaleX(1.24); }
+}
+
+@keyframes race-course-rush {
+  from { background-position: 0 0; }
+  to { background-position: -170px 0; }
+}
+
+@keyframes race-course-streaks {
+  from { background-position: 0 0; transform: translateX(7%) scaleX(.86); }
+  to { background-position: 0 42px; transform: translateX(-16%) scaleX(1.2); }
+}
+
+@keyframes race-camera-vibration {
+  from { translate: 0 -.45px; }
+  to { translate: 0 .45px; }
+}
+
+@keyframes race-winner-salute {
+  from { margin-top: -3px; translate: 0 -2px; rotate: -1deg; }
+  to { margin-top: 4px; translate: 0 2px; rotate: 1.4deg; }
+}
+
+@keyframes race-troll-pop {
+  from { opacity: .55; transform: translate3d(-10%, 4px, 0) scale(.82) rotate(-4deg); }
+  to { opacity: 1; transform: translate3d(-10%, -4px, 0) scale(1) rotate(3deg); }
+}
+
+@keyframes race-troll-flame {
+  from { transform: translateX(2px) scaleX(.72); opacity: .65; }
+  to { transform: translateX(-10px) scaleX(1.25); opacity: 1; }
+}
+
+@keyframes race-troll-smoke {
+  from { opacity: .7; transform: translate3d(0, 3px, 0) scale(.7); }
+  to { opacity: 0; transform: translate3d(-13px, -18px, 0) scale(1.45); }
+}
+
+@keyframes race-troll-celebrate {
+  from { translate: 0 1px; rotate: -4deg; }
+  to { translate: 0 -8px; rotate: 5deg; }
+}
+
+@keyframes race-troll-confetti {
+  from { transform: translateY(4px) rotate(0); opacity: .4; }
+  to { transform: translateY(-11px) rotate(18deg); opacity: 1; }
+}
+
+@keyframes race-troll-brake {
+  from { translate: 0 0; rotate: 1deg; }
+  to { translate: -5px 2px; rotate: -6deg; }
+}
+
+@keyframes race-troll-yoyo {
+  from { translate: -7px 1px; rotate: -2deg; }
+  to { translate: 8px -2px; rotate: 3deg; }
+}
+
+@keyframes race-troll-reverse {
+  from { rotate: 2deg; translate: 0 0; }
+  to { rotate: -9deg; translate: -10px 2px; }
+}
+
+@keyframes race-troll-camera {
+  0%, 34% { opacity: .15; transform: scale(.5); }
+  35%, 40% { opacity: 1; transform: scale(1.35); }
+  41%, 100% { opacity: .1; transform: scale(.7); }
+}
+
+@keyframes race-troll-anchor {
+  from { transform: translateY(-3px) rotate(-12deg); }
+  to { transform: translateY(7px) rotate(18deg); }
+}
+
+@keyframes race-troll-wave {
+  from { translate: -1px 1px; rotate: -4deg; }
+  to { translate: 3px -4px; rotate: 6deg; }
+}
+
+@keyframes race-troll-wave-slap {
+  from { opacity: .2; transform: translate3d(13px, 8px, 0) scale(.45) rotate(-15deg); }
+  to { opacity: .95; transform: translate3d(-3px, -4px, 0) scale(1.08) rotate(9deg); }
+}
+
+@keyframes race-troll-compass {
+  from { transform: rotate(0); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes race-troll-sneeze {
+  0%, 100% { translate: 0 0; rotate: 0; }
+  25% { translate: -5px -2px; rotate: -5deg; }
+  50% { translate: 6px 2px; rotate: 5deg; }
+  75% { translate: -3px 0; rotate: -2deg; }
+}
+
+@keyframes race-button-sheen {
+  0%, 62% { transform: translateX(-120%); }
+  82%, 100% { transform: translateX(130%); }
+}
+
+@media (max-width: 900px) {
+  :root {
+    --race-name-width: 142px;
+    --race-finish-offset: 48px;
+  }
+
+  .race-board {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-color: rgba(46, 55, 183, .58) rgba(255, 255, 255,.35);
+    scrollbar-width: thin;
+  }
+
+  .race-festival-scene {
+    min-width: 760px;
+  }
+
+  .race-track {
+    min-width: 760px;
+  }
+
+  .race-leaderboard {
+    right: 82px;
+    width: 218px;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --race-lane-height: 78px;
+    --race-name-width: 112px;
+    /* JS reserves 65px after each boat so the finish marker stays aligned. */
+    --race-finish-offset: 65px;
+  }
+
+  .spinner-panel {
+    padding-inline: 12px;
+  }
+
+  .stage-tabs {
+    margin-top: 11px;
+    border-radius: 14px;
+  }
+
+  .stage-tabs button,
+  .stage-tabs .stage-tab {
+    min-height: 44px;
+    padding-inline: 7px;
+    font-size: 11px;
+  }
+
+  .team-method-picker {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .team-method-label {
+    grid-column: 1 / -1;
+    padding: 3px 5px 0;
+    text-align: center;
+  }
+
+  .race-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    padding: 13px;
+    border-radius: 18px;
+  }
+
+  .race-festival-brand {
+    gap: 9px;
+  }
+
+    .race-kicker {
+    font-size: 8px;
+    letter-spacing: .1em;
+  }
+
+  .race-title {
+    font-size: clamp(19px, 6.4vw, 24px);
+  }
+
+  .race-subtitle {
+    max-width: 200px;
+    font-size: 10px;
+  }
+
+  .race-toolbar {
+    align-self: start;
+  }
+
+  .race-toolbar button:not(.race-skip-button),
+  .race-tool-button:not(.race-skip-button) {
+    width: 38px;
+    min-width: 38px;
+    padding: 0;
+    overflow: hidden;
+    font-size: 0;
+  }
+
+  .race-toolbar button:not(.race-skip-button)::before,
+  .race-tool-button:not(.race-skip-button)::before {
+    content: "\26F6";
+    font-size: 19px;
+  }
+
+  .race-board {
+    width: 100%;
+    margin-inline: 0;
+    border-radius: 19px;
+  }
+
+  /* At phone width the full race remains visible; boats still have enough runway to animate. */
+  .race-festival-scene {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .race-track {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .race-festival-scene {
+    height: 108px;
+  }
+
+  .race-anniversary-mark {
+    top: 24px;
+    left: 16px;
+    min-width: 72px;
+    padding: 6px 9px 5px;
+  }
+
+  .race-anniversary-mark strong {
+    font-size: 20px;
+  }
+
+  .race-track {
+    border-top-width: 2px;
+  }
+
+  .race-lane-name {
+    gap: 6px;
+    padding-inline: 7px;
+    font-size: 10px;
+  }
+
+  .race-lane-name::before {
+    width: 27px;
+    height: 27px;
+    border-width: 1px;
+    font-size: 10px;
+  }
+
+  .race-boat {
+    --race-boat-scale: .64;
+  }
+
+  .race-boat-label {
+    padding: 2px 5px 3px;
+    font-size: 7px;
+  }
+
+  .race-finish-line > img {
+    width: 76px;
+  }
+
+  .race-leaderboard {
+    position: sticky;
+    left: 0;
+    top: auto;
+    right: auto;
+    width: min(calc(100vw - 54px), 100%);
+    max-height: none;
+    margin: 0;
+    border-width: 1px 0 0;
+    border-radius: 0;
+    box-shadow: 0 -8px 20px rgba(22, 26, 92, .18);
+    backdrop-filter: none;
+  }
+
+  .race-leaderboard-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .race-winner-banner {
+    bottom: 18px;
+    width: calc(100% - 22px);
+    gap: 9px;
+    padding: 10px 12px;
+  }
+
+  .race-winner-icon {
+    width: 42px;
+    height: 42px;
+  }
+
+  .race-start-button {
+    min-height: 58px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 360px) {
+  :root {
+    --race-name-width: 0px;
+    --race-finish-offset: 65px;
+  }
+
+  .race-boat {
+    --race-boat-scale: .6;
+  }
+
+  .race-lane {
+    grid-template-columns: 0 minmax(0, 1fr);
+  }
+
+  /* Team identity remains on the boat and in the leaderboard on narrow phones. */
+  .race-lane-name {
+    display: none;
+  }
+
+  .race-course {
+    grid-column: 1 / -1;
+  }
+
+  .stage-tabs button,
+  .stage-tabs .stage-tab {
+    font-size: 10px;
+  }
+
+  .race-header {
+    padding: 11px;
+  }
+
+    .race-subtitle {
+    display: none;
+  }
+
+  .race-toolbar .race-skip-button {
+    right: 8px;
+    bottom: 14px;
+    max-width: 145px;
+    padding-inline: 9px;
+    font-size: 10px;
+  }
+}
+
+@media (max-height: 760px) and (min-width: 641px) {
+  :root {
+    --race-lane-height: clamp(70px, 8.5vh, 84px);
+  }
+
+  .race-leaderboard {
+    top: 159px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .race-header::after,
+  .race-track.is-high-energy,
+  .race-track.is-racing .race-course::before,
+  .race-boat::before,
+  .race-speed-lines,
+  .race-troll-effect,
+  .race-troll-effect::before,
+  .race-troll-effect::after,
+  .race-boat[class*="is-troll-"] .race-boat-sprite,
+  .wheel-wrap::before,
+  .spin-button::before,
+  .race-boat-flag,
+  .race-track.is-racing .race-boat,
+  .race-lane.is-racing .race-boat,
+  .race-boat.is-boosting,
+  .race-lane.is-boosting .race-boat,
+  .race-lane.is-winner .race-boat,
+  .race-start-button::before {
+    animation: none !important;
+  }
+
+  .race-boat,
+  .race-speed-lines,
+  .race-boat::before {
+    transition: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .race-header,
+  .race-board,
+  .race-lane-name,
+  .race-leaderboard,
+  .race-winner-banner,
+  .race-start-button {
+    border: 2px solid ButtonText;
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .race-title,
+  .race-kicker,
+  .race-subtitle,
+  .race-leaderboard-title,
+  .race-winner-label {
+    color: CanvasText;
+  }
+
+  .race-boat-label {
+    border: 1px solid ButtonText;
+    background: Canvas;
+    color: CanvasText;
+  }
+}
+
+/* Keep the live leaderboard just below the shallow 2172:400 cover scene. */
+@media (min-width: 641px) and (max-width: 900px) {
+  .race-leaderboard {
+    top: 146px;
+  }
+}
+
+@media (min-width: 901px) {
+  .race-leaderboard {
+    top: clamp(175px, calc((100vw - 84px) / 5.43), 284px);
+  }
+}
+
+#raceView:fullscreen .race-leaderboard {
+  top: calc(100vw / 5.43 + 3px);
+}
+
+/* One uploaded image is the only logo in the app. Every slot below shows it
+   when present and falls back to plain text, never to drawn artwork. */
+/* The rounding has to bite the artwork itself. Any padding here pushes the
+   bitmap inward, so the corner arc would trim the backing plate while the
+   logo's own square corners stay sharp inside it. */
+[data-logo-slot] {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  padding: 0;
+  border-radius: 9px;
+  background: var(--logo-plate, #ffffff);
+  box-shadow: none;
+  object-fit: contain;
+}
+
+.result-festival-banner img {
+  width: auto;
+  height: 46px;
+  max-width: 210px;
+  border-radius: 8px;
+}
+
+.race-winner-icon {
+  width: auto;
+  min-width: 56px;
+  max-width: 190px;
+  padding: 6px 10px;
+}
+
+.race-winner-icon [data-logo-slot] {
+  height: 40px;
+}
+
+.race-winner-icon {
+  overflow: hidden;
+}
+
+.race-winner-icon img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.race-winner-icon.has-logo {
+  background: #ffffff;
+}
+
+.race-winner-icon.has-logo b {
+  display: none;
+}
+
+
+
+/* Barging into the next lane. The boat has to ride over its neighbour and throw
+   a harder wake, otherwise the move reads as a glitch rather than a challenge. */
+.race-lane.is-cutting {
+  z-index: 9;
+}
+
+.race-boat.is-cutting {
+  z-index: 7;
+  filter: drop-shadow(0 14px 9px rgba(31, 38, 132, .34)) drop-shadow(0 0 12px rgba(255, 196, 0, .45));
+}
+
+.race-boat.is-cutting::before {
+  opacity: 1;
+  animation-duration: .1s;
+}
+
+.race-boat.is-cutting .race-speed-lines {
+  opacity: .9;
+}
+
+/* Closing stretch: everything tightens up for the run to the line. */
+.race-track.is-final-stretch .race-course::before {
+  opacity: .58;
+}
+
+.race-track.is-final-stretch .race-boat {
+  filter: drop-shadow(0 13px 8px rgba(31, 38, 132, .32)) drop-shadow(0 0 10px rgba(255, 196, 0, .3));
+}
+
+.race-track.is-final-stretch .race-finish-line {
+  box-shadow: 0 0 0 3px var(--seci-accent), 0 0 26px rgba(255, 196, 0, .55);
+}
+
+.race-status.is-clutch {
+  color: #fff;
+  border-color: var(--seci-accent);
+  background: linear-gradient(135deg, #ef1b2d, #a5111d);
+  box-shadow: 0 6px 18px rgba(196, 18, 31, .3);
+}
+
+.race-status.is-clutch::before {
+  content: "F525 ";
+}
+
+/* ==========================================================================
+   Trung Thu: đêm hội trăng rằm. Warm moon-cream pages, lantern red and gold
+   chrome, a dusk river with the full moon, floating hoa đăng and lanterns.
+   ========================================================================== */
+:root {
+  --tt-night-950: #141947;
+  --tt-night-900: #1f2566;
+  --tt-night-800: #2d2a86;
+  --tt-violet: #6a3aa8;
+  --tt-red: #e3261b;
+  --tt-red-deep: #a8140c;
+  --tt-orange: #ff7a1a;
+  --tt-gold: #ffc53d;
+  --tt-gold-deep: #d99100;
+  --tt-moon: #fff1c4;
+  --tt-cream: #fff8ea;
+  --tt-lantern-glow: rgba(255, 214, 126, .55);
+
+  --seci-ink-950: var(--tt-night-950);
+  --seci-ink-900: var(--tt-night-900);
+  --seci-blue-800: var(--tt-night-800);
+  --seci-blue: var(--tt-red);
+  --seci-blue-bright: #ff5a3d;
+  --seci-accent: var(--tt-gold);
+  --seci-accent-deep: var(--tt-gold-deep);
+  --seci-paper: var(--tt-cream);
+  --seci-red: var(--tt-red);
+  --seci-red-deep: var(--tt-red-deep);
+  --seci-ink: var(--tt-night-900);
+  --race-sky: #ffd9b0;
+  --race-water-light: #7fa3ee;
+  --race-water: #2f5fc0;
+  --race-water-deep: #1d3f94;
+  --lavender: var(--tt-red);
+  --blue-strong: var(--tt-red);
+}
+
+html {
+  background: #fff1d6;
+}
+
+body {
+  background:
+    radial-gradient(circle at 92% 6%, #fff4d0 0 4.6rem, rgba(255, 222, 140, .45) 4.7rem, rgba(255, 222, 140, .12) 8rem, transparent 12rem),
+    radial-gradient(circle at 6% 38%, rgba(255, 122, 26, .1), transparent 26rem),
+    radial-gradient(circle at 70% 100%, rgba(227, 38, 27, .07), transparent 30rem),
+    linear-gradient(160deg, #fffaf0 0%, #fff2d8 55%, #ffe7c4 100%);
+}
+
+.brand-mark {
+  background: linear-gradient(145deg, #ff5a3d, var(--tt-red-deep));
+  box-shadow: 0 9px 22px rgba(168, 20, 12, .28);
+}
+
+/* --- Dusk river scene -------------------------------------------------- */
+.race-festival-scene {
+  background:
+    radial-gradient(1.6px 1.6px at 6% 12%, #fff6d6 98%, transparent),
+    radial-gradient(1.4px 1.4px at 17% 30%, #fff6d6 98%, transparent),
+    radial-gradient(1.8px 1.8px at 29% 8%, #fff6d6 98%, transparent),
+    radial-gradient(1.3px 1.3px at 41% 22%, #fff6d6 98%, transparent),
+    radial-gradient(1.6px 1.6px at 53% 10%, #fff6d6 98%, transparent),
+    radial-gradient(1.3px 1.3px at 63% 28%, #fff6d6 98%, transparent),
+    radial-gradient(1.5px 1.5px at 94% 18%, #fff6d6 98%, transparent),
+    radial-gradient(1.4px 1.4px at 71% 6%, #fff6d6 98%, transparent),
+    linear-gradient(180deg, #232a78 0%, #473c9c 30%, #9258b4 54%, #ee8a7c 78%, #ffc98a 100%);
+}
+
+/* The moon hangs at infinity, so it stays put while the banks rush past. */
+.race-festival-scene::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 2%;
+  right: 12%;
+  height: 74%;
+  aspect-ratio: 1;
+  pointer-events: none;
+  background: url("assets/trung-thu/moon.svg") center / contain no-repeat;
+}
+
+.race-anniversary-mark {
+  border: 2px solid var(--tt-gold);
+  color: var(--tt-gold);
+  background: linear-gradient(160deg, #ff4a2e, var(--tt-red-deep));
+  box-shadow: 0 0 0 3px rgba(255, 197, 61, .25), 0 8px 18px rgba(80, 10, 4, .35), 0 0 26px var(--tt-lantern-glow);
+}
+
+.race-anniversary-mark small {
+  color: #fff1c4;
+}
+
+.race-track {
+  border-top-color: #ffd27a;
+  border-bottom-color: var(--tt-night-950);
+  background:
+    url("assets/trung-thu/hoa-dang.svg") calc(var(--race-lantern-x, 0) * -1px) 0 / 840px 300px repeat,
+    repeating-linear-gradient(180deg, rgba(255, 231, 160, .34) 0 3px, transparent 3px 13px) 80.5% 0 / 64px 100% no-repeat,
+    radial-gradient(ellipse 70px 100% at 80.5% 0, rgba(255, 226, 150, .42), transparent 100%),
+    linear-gradient(180deg, rgba(255, 168, 120, .3), transparent 150px),
+    url("assets/trung-thu/water-track-seamless.svg") center top / 100% auto repeat-y,
+    var(--race-water-deep);
+}
+
+.race-board {
+  background: linear-gradient(180deg, #ffd9b0 0 132px, var(--race-water) 132px);
+}
+
+/* --- Headings: night sky bars with a moon ------------------------------- */
+.race-header,
+.wheel-festival-heading {
+  border-color: rgba(255, 214, 126, .5);
+  color: var(--tt-cream);
+  background:
+    radial-gradient(circle at 74% 28%, #fff4d0 0 15px, rgba(255, 226, 150, .38) 16px, transparent 44px),
+    radial-gradient(1.4px 1.4px at 12% 22%, #fff6d6 98%, transparent),
+    radial-gradient(1.4px 1.4px at 36% 70%, #fff6d6 98%, transparent),
+    radial-gradient(1.6px 1.6px at 58% 18%, #fff6d6 98%, transparent),
+    radial-gradient(1.2px 1.2px at 86% 74%, #fff6d6 98%, transparent),
+    linear-gradient(120deg, var(--tt-night-950), var(--tt-night-800) 58%, var(--tt-violet));
+  box-shadow: 0 14px 28px rgba(20, 25, 71, .24), inset 0 -3px var(--tt-gold);
+}
+
+/* A lantern garland strung across the right of each night bar, fading out
+   before it reaches the title. */
+.race-header::after,
+.wheel-festival-heading::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0 0 0 auto;
+  width: min(62%, 620px);
+  opacity: 1;
+  pointer-events: none;
+  background: url("assets/trung-thu/bunting.svg") right -40px top -10px / 820px auto no-repeat;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 34%);
+  mask-image: linear-gradient(90deg, transparent, #000 34%);
+  transform: none;
+}
+
+.race-title,
+.wheel-festival-title {
+  color: #fff6dc;
+  text-shadow: 0 3px 0 rgba(20, 25, 71, .5), 0 0 22px rgba(255, 197, 61, .35);
+}
+
+.race-subtitle {
+  color: rgba(255, 241, 196, .82);
+}
+
+/* --- Wheel: a lantern of reds and golds with a moon at its heart --------- */
+.wheel-area::before {
+  opacity: .55;
+}
+
+.wheel-hub {
+  border: 6px double var(--tt-gold);
+  color: #7a2a10;
+  background: radial-gradient(circle at 40% 34%, #fffcee, #fff0c0 55%, #ffd67e);
+  box-shadow: 0 0 0 5px rgba(255, 214, 126, .35), 0 0 28px rgba(255, 214, 126, .85), 0 7px 17px rgba(80, 30, 4, .3);
+}
+
+.wheel-hub-star {
+  color: var(--tt-red);
+  text-shadow: 0 0 8px rgba(255, 197, 61, .8);
+}
+
+.wheel-hub small {
+  color: var(--tt-red-deep);
+}
+
+.pointer {
+  border-top-color: var(--tt-red);
+  filter: drop-shadow(0 4px 0 var(--tt-gold)) drop-shadow(0 8px 7px rgba(80, 10, 4, .3));
+}
+
+.pointer::after {
+  border-color: var(--tt-red-deep);
+  background: var(--tt-gold);
+  box-shadow: 0 0 0 2px #fff1c4, 0 0 14px var(--tt-lantern-glow);
+}
+
+/* --- Result ceremony ---------------------------------------------------- */
+.result-festival-banner {
+  color: var(--tt-cream);
+  background:
+    linear-gradient(90deg, rgba(20, 25, 71, .92), rgba(45, 42, 134, .72) 62%, rgba(106, 58, 168, .35)),
+    url("assets/trung-thu/banner.svg") center 42% / cover no-repeat;
+  box-shadow: 0 8px 20px rgba(20, 25, 71, .24), inset 0 -3px var(--tt-gold);
+}
+
+.result-festival-banner::after {
+  content: "✦  ✦  ✦";
+  color: rgba(255, 214, 126, .35);
+}
+
+.race-winner-banner {
+  background:
+    radial-gradient(circle at 93% 32%, rgba(255, 241, 196, .5) 0 20px, transparent 58px),
+    linear-gradient(120deg, rgba(20, 25, 71, .97), rgba(45, 42, 134, .95) 55%, rgba(168, 20, 12, .95));
+  box-shadow: 0 20px 46px rgba(20, 25, 71, .34), 0 0 34px rgba(255, 197, 61, .38), inset 0 1px rgba(255, 255, 255, .18);
+}
+
+@media (max-width: 640px) {
+  /* Narrow bars: keep the garland up in the corner, clear of the title. */
+  .race-header::after,
+  .wheel-festival-heading::after {
+    width: 46%;
+    background-position: right -24px top -14px;
+    background-size: 520px auto;
+  }
+
+  .race-anniversary-mark {
+    transform: rotate(-3deg) scale(.82);
+    transform-origin: left top;
+  }
+}

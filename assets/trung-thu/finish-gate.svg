@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 640" role="img" aria-labelledby="title">
+  <title id="title">Mid-Autumn finish gate</title>
+  <defs>
+    <pattern id="check" width="48" height="48" patternUnits="userSpaceOnUse">
+      <rect width="24" height="24" fill="#fff6dc"/><rect x="24" y="24" width="24" height="24" fill="#fff6dc"/>
+      <rect x="24" width="24" height="24" fill="#b3201a"/><rect y="24" width="24" height="24" fill="#b3201a"/>
+    </pattern>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ffe7a0" stop-opacity=".7"/>
+      <stop offset="1" stop-color="#ffb35c" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- Curved communal-house roof with upturned corners. -->
+  <path d="M8 118q-4 22 20 22h364q24 0 20-22l-40 10H48z" fill="#6e2a16"/>
+  <path d="M36 124l56-80h236l56 80z" fill="#8a3418"/>
+  <path d="M84 44h252v-14H84z" fill="#4a1a0c"/>
+  <path d="M84 30q-14-18 4-30M336 30q14-18-4-30" stroke="#4a1a0c" stroke-width="10" fill="none" stroke-linecap="round"/>
+  <circle cx="210" cy="22" r="14" fill="#ffc53d"/>
+  <path d="M42 140h336v52H42z" fill="#ffc53d" stroke="#b3201a" stroke-width="6"/>
+  <path d="M210 150l7 14 15 2-11 11 3 15-14-7-14 7 3-15-11-11 15-2z" fill="#e3261b"/>
+  <path d="M52 140h40v470H52zM328 140h40v470h-40z" fill="#c8261b"/>
+  <path d="M60 140h8v470h-8zM336 140h8v470h-8z" fill="#ff6a4a" opacity=".6"/>
+  <path d="M92 198h236v40H92z" fill="url(#check)"/>
+  <circle cx="148" cy="296" r="46" fill="url(#glow)"/>
+  <circle cx="272" cy="296" r="46" fill="url(#glow)"/>
+  <path d="M148 238v30M272 238v30" stroke="#4a2410" stroke-width="4"/>
+  <g>
+    <rect x="132" y="264" width="32" height="8" rx="3" fill="#5a2a12"/>
+    <ellipse cx="148" cy="296" rx="28" ry="26" fill="#e3261b"/>
+    <ellipse cx="148" cy="296" rx="13" ry="26" fill="none" stroke="#8e140c" stroke-width="2.5" opacity=".6"/>
+    <rect x="132" y="320" width="32" height="8" rx="3" fill="#5a2a12"/>
+    <path d="M148 328v26" stroke="#ffc53d" stroke-width="5" stroke-linecap="round"/>
+    <rect x="256" y="264" width="32" height="8" rx="3" fill="#5a2a12"/>
+    <ellipse cx="272" cy="296" rx="28" ry="26" fill="#ffc53d"/>
+    <ellipse cx="272" cy="296" rx="13" ry="26" fill="none" stroke="#b37a00" stroke-width="2.5" opacity=".6"/>
+    <rect x="256" y="320" width="32" height="8" rx="3" fill="#5a2a12"/>
+    <path d="M272 328v26" stroke="#e3261b" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <path d="M40 606h64v24H40zM316 606h64v24h-64z" fill="#ffc53d"/>
+</svg>

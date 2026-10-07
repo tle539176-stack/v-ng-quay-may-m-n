@@ -1,0 +1,77 @@
+{
+  "name": "SECI Regatta Visual Kit",
+  "version": "1.0.0",
+  "theme": "Bright river regatta - cool blue chrome, ten vivid team colours",
+  "license": "CC0-1.0",
+  "source": "Original project artwork, drawn as vectors for this theme.",
+  "note": "No seasonal reference and no drawn logo: every logo slot shows the single image the user uploads. Supersedes assets/autumn and assets/national-day.",
+  "palette": {
+    "ink950": "#06283A",
+    "ink900": "#0A3F57",
+    "blue800": "#0B7FB8",
+    "blue": "#0A9EE8",
+    "blueBright": "#22B9EE",
+    "accent": "#FFC400",
+    "red": "#EF1B2D",
+    "paper": "#F2FAFE"
+  },
+  "teamColors": [
+    "#EF1B2D",
+    "#FF7A1A",
+    "#FFC400",
+    "#7ED321",
+    "#00B862",
+    "#00C9C9",
+    "#1EB8FF",
+    "#2563FF",
+    "#8B3DFF",
+    "#FF2E88"
+  ],
+  "assets": [
+    {
+      "file": "scene-far.svg",
+      "viewBox": "0 0 2172 400",
+      "role": "distant hills parallax layer, tiles horizontally"
+    },
+    {
+      "file": "scene-near.svg",
+      "viewBox": "0 0 2172 400",
+      "role": "near bank parallax layer, tiles horizontally"
+    },
+    {
+      "file": "bunting.svg",
+      "viewBox": "0 0 1600 140",
+      "role": "festival bunting in the ten team colours"
+    },
+    {
+      "file": "skyline.svg",
+      "viewBox": "0 0 1600 360",
+      "role": "background silhouette"
+    },
+    {
+      "file": "finish-gate.svg",
+      "viewBox": "0 0 420 640",
+      "role": "finish marker"
+    },
+    {
+      "file": "banner.svg",
+      "viewBox": "0 0 1200 400",
+      "role": "result modal banner backdrop"
+    },
+    {
+      "file": "water-track-seamless.svg",
+      "viewBox": "0 0 1200 600",
+      "role": "lane water, tiles vertically"
+    },
+    {
+      "file": "water-wake.svg",
+      "viewBox": "0 0 640 180",
+      "role": "stern wake"
+    },
+    {
+      "file": "water-caustics.svg",
+      "viewBox": "0 0 1200 360",
+      "role": "empty-state water texture"
+    }
+  ]
+}

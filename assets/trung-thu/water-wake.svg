@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 180" role="img" aria-labelledby="title">
+  <title id="title">Layered racing boat water wake</title>
+  <defs>
+    <linearGradient id="fade" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".42" stop-color="#fff" stop-opacity=".42"/>
+      <stop offset="1" stop-color="#fff" stop-opacity=".95"/>
+    </linearGradient>
+    <filter id="soft" x="-10%" y="-30%" width="120%" height="160%">
+      <feGaussianBlur stdDeviation="2.2"/>
+    </filter>
+  </defs>
+  <path d="M10 98c150-42 300-40 607-8-210 10-400 24-607 8z" fill="url(#fade)" opacity=".52" filter="url(#soft)"/>
+  <g fill="none" stroke-linecap="round">
+    <path d="M34 102c150-27 323-23 575 2" stroke="#fff" stroke-width="10" opacity=".72"/>
+    <path d="M112 132c143-31 289-27 464-7" stroke="#d9fbff" stroke-width="8" opacity=".68"/>
+    <path d="M202 63c112-9 232-2 351 13" stroke="#fff" stroke-width="6" opacity=".46"/>
+    <path d="M286 151c87-18 174-15 258-7" stroke="#fff" stroke-width="5" opacity=".42"/>
+  </g>
+  <g fill="#fff">
+    <circle cx="406" cy="56" r="8" opacity=".7"/>
+    <circle cx="452" cy="42" r="5" opacity=".62"/>
+    <circle cx="491" cy="69" r="4" opacity=".8"/>
+    <circle cx="525" cy="48" r="7" opacity=".7"/>
+    <circle cx="564" cy="72" r="5" opacity=".65"/>
+    <circle cx="596" cy="57" r="9" opacity=".78"/>
+  </g>
+</svg>

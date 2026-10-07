@@ -8,7 +8,7 @@ iPhone Safari will not play audio from a server without them.
     python serve-lan.py            # http://<this machine's IP>:8767/
     python serve-lan.py 8767 --host 127.0.0.1
 
-The horse race page also saves its data here, so it survives a cleared
+The wheel and horse race pages save their data here, so it survives a cleared
 browser and is the same on every device: GET/POST /api/data/<app> reads and
 writes du-lieu/<app>.json, and older copies are kept in du-lieu/sao-luu/.
 """
@@ -241,7 +241,8 @@ def main():
     print(f"  Ban Trung Thu : http://{address}:{options.port}/trung-thu.html")
     print(f"  Ban thuong    : http://{address}:{options.port}/")
     # Relative on purpose: a Vietnamese folder name may not print on every console.
-    print("Du lieu dua ngua tu luu vao: du-lieu\\dua-ngua.json (sao luu: du-lieu\\sao-luu)")
+    print("Du lieu tu luu vao: du-lieu\\vong-quay.json va du-lieu\\dua-ngua.json")
+    print("Ban cu duoc sao luu trong: du-lieu\\sao-luu")
     print("Giu cua so nay mo trong suot buoi hop. Nhan Ctrl+C de tat.")
     try:
         server.serve_forever()

@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2172 400" role="img" aria-labelledby="title" preserveAspectRatio="none">
+<title id="title">Distant town at dusk, seamless when tiled horizontally</title>
+<defs><radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffe7a0" stop-opacity=".62"/><stop offset=".45" stop-color="#ffc56b" stop-opacity=".22"/><stop offset="1" stop-color="#ffb35c" stop-opacity="0"/></radialGradient></defs>
+<g fill="#ffd1e0" opacity=".34">
+<ellipse cx="300" cy="96" rx="150" ry="14"/>
+<ellipse cx="420" cy="84" rx="90" ry="10"/>
+<ellipse cx="1150" cy="70" rx="170" ry="13"/>
+<ellipse cx="1290" cy="82" rx="100" ry="9"/>
+<ellipse cx="1880" cy="102" rx="130" ry="12"/>
+</g>
+<path d="M0 248c90.5-30 271.5 30 362 0c90.5-30 271.5 30 362 0c90.5-30 271.5 30 362 0c90.5-30 271.5 30 362 0c90.5-30 271.5 30 362 0c90.5-30 271.5 30 362 0V400H0Z" fill="#8a64c2" opacity=".55"/>
+<g fill="#4c3a92" opacity=".9">
+<rect x="491" y="266" width="58" height="20"/>
+<path d="M476 264q6 4 12 4h64q6 0 12-4l-10-8H486z"/>
+<rect x="496" y="242" width="48" height="16"/>
+<path d="M481 240q6 4 12 4h54q6 0 12-4l-10-8H491z"/>
+<rect x="500" y="218" width="40" height="16"/>
+<path d="M485 216q6 4 12 4h46q6 0 12-4l-10-8H495z"/>
+<rect x="504" y="194" width="32" height="16"/>
+<path d="M489 192q6 4 12 4h38q6 0 12-4l-10-8H499z"/>
+<rect x="508" y="170" width="24" height="16"/>
+<path d="M493 168q6 4 12 4h30q6 0 12-4l-10-8H503z"/>
+<path d="M518 162h4v-18h-4z"/>
+<rect x="1581" y="266" width="58" height="20"/>
+<path d="M1566 264q6 4 12 4h64q6 0 12-4l-10-8H1576z"/>
+<rect x="1586" y="242" width="48" height="16"/>
+<path d="M1571 240q6 4 12 4h54q6 0 12-4l-10-8H1581z"/>
+<rect x="1590" y="218" width="40" height="16"/>
+<path d="M1575 216q6 4 12 4h46q6 0 12-4l-10-8H1585z"/>
+<rect x="1594" y="194" width="32" height="16"/>
+<path d="M1579 192q6 4 12 4h38q6 0 12-4l-10-8H1589z"/>
+<rect x="1598" y="170" width="24" height="16"/>
+<path d="M1583 168q6 4 12 4h30q6 0 12-4l-10-8H1593z"/>
+<path d="M1608 162h4v-18h-4z"/>
+<rect x="760" y="264" width="58" height="22"/>
+<path d="M754 264l35-14l35 14z"/>
+<rect x="822" y="258" width="60" height="28"/>
+<path d="M816 258l36-14l36 14z"/>
+<rect x="884" y="252" width="62" height="34"/>
+<path d="M878 252l37-14l37 14z"/>
+<rect x="946" y="246" width="64" height="40"/>
+<path d="M940 246l38-14l38 14z"/>
+<rect x="1008" y="260" width="48" height="26"/>
+<path d="M1002 260l30-14l30 14z"/>
+<rect x="1070" y="254" width="50" height="32"/>
+<path d="M1064 254l31-14l31 14z"/>
+<rect x="1132" y="248" width="52" height="38"/>
+<path d="M1126 248l32-14l32 14z"/>
+<rect x="1194" y="262" width="54" height="24"/>
+<path d="M1188 262l33-14l33 14z"/>
+<rect x="1256" y="256" width="56" height="30"/>
+<path d="M1250 256l34-14l34 14z"/>
+<rect x="1318" y="250" width="58" height="36"/>
+<path d="M1312 250l35-14l35 14z"/>
+</g>
+<g fill="#ffd27a">
+<rect x="776" y="272" width="6" height="7" rx="1"/>
+<rect x="842" y="266" width="6" height="7" rx="1"/>
+<rect x="905" y="274" width="6" height="7" rx="1"/>
+<rect x="968" y="262" width="6" height="7" rx="1"/>
+<rect x="1034" y="270" width="6" height="7" rx="1"/>
+<rect x="1100" y="268" width="6" height="7" rx="1"/>
+<rect x="1160" y="262" width="6" height="7" rx="1"/>
+<rect x="1226" y="272" width="6" height="7" rx="1"/>
+<rect x="1290" y="266" width="6" height="7" rx="1"/>
+<rect x="512" y="270" width="6" height="7" rx="1"/>
+<rect x="1602" y="270" width="6" height="7" rx="1"/>
+<rect x="1352" y="274" width="6" height="7" rx="1"/>
+</g>
+<path d="M0 298c135.8-16 407.2 16 543 0c135.8-16 407.2 16 543 0c135.8-16 407.2 16 543 0c135.8-16 407.2 16 543 0V400H0Z" fill="#3e3488" opacity=".88"/>
+</svg>

@@ -1,0 +1,137 @@
+/* Built-in SECI logo (seci-logo.js). Gold on maroon, as on the banner.
+   The core and the four points are separate layers: at rest they form the
+   original logo, and every animation below only pulls the points out along
+   their own axis and brings them back. */
+:root {
+  --seci-logo-gold: #d9bc6a;
+  --seci-logo-maroon: #7e1b28;
+  --seci-logo-maroon-deep: #5e1019;
+  --seci-logo-split: 64px;
+}
+
+.seci-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.seci-logo path,
+.seci-logo rect {
+  fill: var(--seci-logo-gold);
+}
+
+.seci-logo-core {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform .5s cubic-bezier(.2, .9, .25, 1);
+}
+
+.seci-logo-point {
+  --dx: 0;
+  --dy: 0;
+  --split: 0px;
+  transform: translate(calc(var(--dx) * var(--split)), calc(var(--dy) * var(--split)));
+  transition: transform .5s cubic-bezier(.2, .9, .25, 1);
+}
+
+.seci-logo-point[data-side="top"] { --dy: -1; }
+.seci-logo-point[data-side="right"] { --dx: 1; }
+.seci-logo-point[data-side="bottom"] { --dy: 1; }
+.seci-logo-point[data-side="left"] { --dx: -1; }
+
+/* Hover / keyboard focus on the header mark: the points step out and hold. */
+.brand-mark:hover .seci-logo-point,
+.brand-mark:focus-visible .seci-logo-point,
+.seci-logo.is-split .seci-logo-point {
+  --split: var(--seci-logo-split);
+}
+
+.brand-mark:hover .seci-logo-core,
+.brand-mark:focus-visible .seci-logo-core,
+.seci-logo.is-split .seci-logo-core {
+  transform: scale(.94);
+}
+
+/* While a race is running: points out, the core turns a quarter (the knot is
+   four-fold symmetric, so 90° looks identical), points back in. Loops seamlessly. */
+html.is-busy .seci-logo-point {
+  animation: seci-logo-points 1.8s cubic-bezier(.45, 0, .25, 1) infinite;
+}
+
+html.is-busy .seci-logo-core {
+  animation: seci-logo-turn 1.8s cubic-bezier(.6, 0, .3, 1) infinite;
+}
+
+/* Winner moment: one split-turn-rejoin each time the banner or result opens. */
+.race-winner-banner.is-visible .seci-logo-point,
+.modal-backdrop.is-open .result-festival-banner .seci-logo-point {
+  animation: seci-logo-points 1.4s .25s cubic-bezier(.45, 0, .25, 1) both;
+}
+
+.race-winner-banner.is-visible .seci-logo-core,
+.modal-backdrop.is-open .result-festival-banner .seci-logo-core {
+  animation: seci-logo-turn 1.4s .25s cubic-bezier(.6, 0, .3, 1) both;
+}
+
+@keyframes seci-logo-points {
+  0%, 100% { transform: translate(0, 0); }
+  30%, 70% {
+    transform: translate(calc(var(--dx) * var(--seci-logo-split)), calc(var(--dy) * var(--seci-logo-split)));
+  }
+}
+
+@keyframes seci-logo-turn {
+  0%, 30% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(45deg) scale(.92); }
+  70%, 100% { transform: rotate(90deg) scale(1); }
+}
+
+/* --- Hosts ------------------------------------------------------------- */
+
+/* Header mark: the built-in logo replaces the old ✦ until an image is uploaded. */
+.brand-mark:not(.has-image) {
+  background: radial-gradient(circle at 50% 38%, var(--seci-logo-maroon), var(--seci-logo-maroon-deep));
+  box-shadow: 0 9px 22px rgba(94, 16, 25, .28);
+}
+
+.brand-mark .brand-symbol[data-seci-logo] {
+  width: 100%;
+  height: 100%;
+  padding: 3px;
+  font-size: 0;
+}
+
+.race-winner-icon:not(.has-logo) {
+  background: radial-gradient(circle at 50% 38%, var(--seci-logo-maroon), var(--seci-logo-maroon-deep));
+}
+
+.race-winner-icon b[data-seci-logo] {
+  display: block;
+  width: 44px;
+  height: 44px;
+  font-size: 0;
+}
+
+.seci-logo-plate {
+  flex: 0 0 auto;
+  display: block;
+  width: 56px;
+  height: 56px;
+  padding: 3px;
+  border-radius: 10px;
+  background: radial-gradient(circle at 50% 38%, var(--seci-logo-maroon), var(--seci-logo-maroon-deep));
+  box-shadow: 0 0 0 1px rgba(217, 188, 106, .45);
+}
+
+.seci-logo-plate[hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seci-logo-core,
+  .seci-logo-point {
+    transition: none;
+    animation: none !important;
+  }
+}

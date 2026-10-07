@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" role="img" aria-labelledby="title" preserveAspectRatio="xMidYMid slice">
+  <title id="title">Mid-Autumn night banner backdrop</title>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1c2466"/>
+      <stop offset=".55" stop-color="#4a3a9c"/>
+      <stop offset="1" stop-color="#c8609a"/>
+    </linearGradient>
+    <radialGradient id="halo" cx="50%" cy="50%" r="50%">
+      <stop offset=".45" stop-color="#fff2c2" stop-opacity=".6"/>
+      <stop offset="1" stop-color="#ffc56b" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ffe7a0" stop-opacity=".6"/>
+      <stop offset="1" stop-color="#ffb35c" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="400" fill="url(#sky)"/>
+  <g fill="#fff6d6">
+    <circle cx="120" cy="60" r="2.5"/><circle cx="260" cy="120" r="2"/><circle cx="420" cy="48" r="2.5"/>
+    <circle cx="560" cy="100" r="2"/><circle cx="700" cy="40" r="2.5"/><circle cx="1080" cy="70" r="2"/>
+    <circle cx="1150" cy="150" r="2.5"/><circle cx="330" cy="200" r="1.8"/><circle cx="620" cy="190" r="1.8"/>
+  </g>
+  <circle cx="900" cy="150" r="170" fill="url(#halo)"/>
+  <circle cx="900" cy="150" r="96" fill="#fff1c4"/>
+  <circle cx="872" cy="124" r="14" fill="#e8c476" opacity=".35"/>
+  <circle cx="936" cy="186" r="18" fill="#e8c476" opacity=".3"/>
+  <path d="M0 290c130-40 254-44 372-12 100 26 184 20 274-12 96-34 188-32 284 6 88 34 172 38 270 10v118H0z" fill="#2e2877" opacity=".85"/>
+  <g fill="#231c5c">
+    <path d="M110 330v-60h120v60zM96 272l74-40 74 40z"/>
+    <path d="M980 330v-50h110v50zM966 282l69-36 69 36z"/>
+  </g>
+  <path d="M0 330h1200v70H0z" fill="#2552b4"/>
+  <path d="M0 356c220 18 440 12 660-8 200-18 360-14 540 6v46H0z" fill="#3a6fd0" opacity=".7"/>
+  <path d="M870 336h60l-10 64h-40z" fill="#ffe7a0" opacity=".28"/>
+  <path d="M380 10C520 70 720 70 860 10" fill="none" stroke="#4a2410" stroke-width="3"/>
+  <g>
+    <circle cx="470" cy="84" r="34" fill="url(#glow)"/>
+    <path d="M470 42v24" stroke="#4a2410" stroke-width="2"/>
+    <ellipse cx="470" cy="84" rx="18" ry="17" fill="#e3261b"/>
+    <path d="M470 101v16" stroke="#ffc53d" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="620" cy="100" r="34" fill="url(#glow)"/>
+    <path d="M620 55v28" stroke="#4a2410" stroke-width="2"/>
+    <ellipse cx="620" cy="100" rx="18" ry="17" fill="#ffc53d"/>
+    <path d="M620 117v16" stroke="#e3261b" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="770" cy="84" r="34" fill="url(#glow)"/>
+    <path d="M770 42v24" stroke="#4a2410" stroke-width="2"/>
+    <ellipse cx="770" cy="84" rx="18" ry="17" fill="#ff2e88"/>
+    <path d="M770 101v16" stroke="#ffc53d" stroke-width="3" stroke-linecap="round"/>
+  </g>
+</svg>

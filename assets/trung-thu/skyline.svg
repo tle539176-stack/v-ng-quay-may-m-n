@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 360" role="img" aria-labelledby="title desc">
+  <title id="title">Old quarter under the full moon</title>
+  <desc id="desc">A full moon over tiled roofs, a banyan tree and a pagoda, with lanterns strung between the houses.</desc>
+  <defs>
+    <radialGradient id="moonglow" cx="50%" cy="50%" r="50%">
+      <stop offset=".5" stop-color="#ffe7a0" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#ffe7a0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="800" cy="170" r="170" fill="url(#moonglow)"/>
+  <circle cx="800" cy="170" r="98" fill="#ffe9a8"/>
+  <path d="M0 268c120-46 236-52 352-18 96 28 176 22 258-14 92-40 178-38 268 4 84 40 164 44 244 12 90-36 182-30 278 16v92H0z" fill="#b07ad0" opacity=".3"/>
+  <g fill="#e8a33a">
+    <path d="M560 330V226h150v104zM720 330V210h160v120zM890 330V230h150v100z"/>
+  </g>
+  <g fill="#8a3418">
+    <path d="M546 228h178l-24-34H570zM706 212h188l-26-36H732zM876 232h178l-24-34H900z"/>
+  </g>
+  <g fill="#ffe7a3">
+    <path d="M580 250h40v34h-40zM650 250h40v34h-40zM742 236h44v36h-44zM814 236h44v36h-44zM910 254h40v34h-40zM980 254h40v34h-40z"/>
+  </g>
+  <path d="M530 330h540v24H530z" fill="#6e2a16"/>
+  <g fill="#e3261b">
+    <ellipse cx="600" cy="306" rx="11" ry="10"/><ellipse cx="670" cy="306" rx="11" ry="10"/>
+    <ellipse cx="930" cy="306" rx="11" ry="10"/><ellipse cx="1000" cy="306" rx="11" ry="10"/>
+  </g>
+  <g fill="#2d6b3c">
+    <circle cx="150" cy="250" r="70"/><circle cx="240" cy="228" r="72"/><circle cx="320" cy="262" r="58"/><circle cx="90" cy="286" r="46"/>
+  </g>
+  <path d="M206 344c6-40 8-80 4-110h22c-4 30-2 70 4 110z" fill="#5a3a22"/>
+  <g fill="#4c3a92">
+    <path d="M1330 330v-26h60v26zM1336 304l-14-2 24-12h28l24 12-14 2zM1340 290v-20h40v20zM1332 270l14-12h28l14 12zM1348 258v-16h24v16zM1340 242l12-10h16l12 10zM1358 232v-20h4v20z"/>
+    <circle cx="1480" cy="276" r="60"/><circle cx="1540" cy="296" r="44"/>
+  </g>
+  <path d="M470 150C640 214 960 214 1130 150" fill="none" stroke="#4a2410" stroke-width="4"/>
+  <g>
+    <ellipse cx="560" cy="196" rx="15" ry="14" fill="#e3261b"/>
+    <ellipse cx="680" cy="214" rx="15" ry="14" fill="#ffc53d"/>
+    <ellipse cx="920" cy="214" rx="15" ry="14" fill="#ff2e88"/>
+    <ellipse cx="1040" cy="196" rx="15" ry="14" fill="#ff7a1a"/>
+  </g>
+</svg>

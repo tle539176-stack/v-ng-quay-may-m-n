@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 640" role="img" aria-labelledby="title">
+  <title id="title">Regatta finish gate</title>
+  <defs>
+    <pattern id="check" width="48" height="48" patternUnits="userSpaceOnUse">
+      <rect width="24" height="24" fill="#ffffff"/><rect x="24" y="24" width="24" height="24" fill="#ffffff"/>
+      <rect x="24" width="24" height="24" fill="#0a3f57"/><rect y="24" width="24" height="24" fill="#0a3f57"/>
+    </pattern>
+  </defs>
+  <path d="M42 86h336v58H42z" fill="#0a9ee8" stroke="#eafaff" stroke-width="8"/>
+  <g fill="#ffc400">
+    <path d="M185 96l7 15 16 2-12 11 3 17-14-8-14 8 3-17-12-11 16-2z"/>
+    <path d="M243 96l7 15 16 2-12 11 3 17-14-8-14 8 3-17-12-11 16-2z"/>
+  </g>
+  <path d="M52 136h38v474H52zM330 136h38v474h-38z" fill="#0b7fb8"/>
+  <path d="M91 150h238v42H91z" fill="url(#check)"/>
+  <g>
+    <path d="M49 34h99v58H49z" fill="#ef1b2d"/>
+    <path d="M272 34h99v58h-99z" fill="#00c9c9"/>
+  </g>
+  <path d="M45 610h52v18H45zM323 610h52v18h-52z" fill="#ffc400"/>
+</svg>

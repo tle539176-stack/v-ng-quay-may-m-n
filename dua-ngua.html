@@ -252,12 +252,47 @@
 
     .win-name { color: var(--c, #fff); text-shadow: 0 0 2.4cqw var(--c, #fff), 0 .3cqw 0 rgba(0, 0, 0, .5); }
     .final-card { width: min(100%, 54cqw); border-color: #ffd84a; background: radial-gradient(circle at 50% 0%, rgba(255, 196, 0, .22), transparent 60%), linear-gradient(180deg, rgba(14, 36, 56, .96), rgba(8, 20, 33, .96)); }
-    .final-avatar { width: 13cqw; min-width: 84px; height: 13cqw; min-height: 84px; margin: 1.2cqw auto .2cqw; border-width: .45cqw; font-size: clamp(30px, 5.6cqw, 80px); box-shadow: 0 0 0 .7cqw rgba(255, 196, 0, .22), 0 0 3cqw rgba(255, 196, 0, .45); }
-    .final-name { font-size: clamp(22px, 4.6cqw, 66px) !important; }
-    .final-team { margin-top: .4cqw; color: #c9d9e6; font: 800 clamp(12px, 1.6cqw, 22px)/1.3 system-ui, sans-serif; }
+    /* Màn công bố: ảnh người được chọn lớn gấp 3 lần trước (13cqw → 39cqw), nằm giữa, không che tên.
+       Ảnh giữ nguyên tỉ lệ (contain) trong khung bo góc nên không bị cắt mặt. */
+    #finalScreen { padding: 1cqw 2cqw; }
+    .final-card { position: relative; display: flex; flex-direction: column; align-items: center; width: min(100%, 74cqw); padding: 1cqw 2.4cqw 1.2cqw; }
+    .final-card .kicker { position: absolute; top: 1.4cqw; left: 2cqw; text-align: left; }
+    .final-avatar {
+      --size: min(39cqw, 72vw, 58vh, calc(56.25cqw - 170px));   /* 56.25cqw = chiều cao khung 16:9; chừa chỗ cho tên và nút */
+      flex: 0 0 auto; width: var(--size); min-width: 0; height: var(--size); min-height: 0; margin: 0 auto .5cqw;
+      border-radius: 14%; border-width: .6cqw; font-size: calc(var(--size) * .46);
+      background: radial-gradient(circle at 50% 35%, #145a7a, #0a3f57 70%);
+      box-shadow: 0 0 0 .8cqw rgba(255, 196, 0, .22), 0 0 4cqw rgba(255, 196, 0, .55);
+      animation: finalPop .9s cubic-bezier(.2, .9, .3, 1) both, finalGlow 2.2s ease-in-out .9s infinite;
+    }
+    .final-avatar img { object-fit: contain; }
+    @keyframes finalPop {
+      0% { transform: scale(.35); opacity: 0; filter: brightness(1.8); }
+      50% { transform: scale(1.08); opacity: 1; }
+      68% { transform: scale(.96); }
+      84% { transform: scale(1.02); filter: brightness(1.15); }
+      100% { transform: scale(1); filter: none; }
+    }
+    @keyframes finalGlow { 50% { box-shadow: 0 0 0 1.1cqw rgba(255, 196, 0, .3), 0 0 6cqw rgba(255, 216, 74, .85); } }
+    .final-name { margin-top: 0 !important; font-size: clamp(20px, 4.2cqw, 66px) !important; }
+    .final-meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .4cqw 1.4cqw; margin-top: .3cqw; }
+    .final-team { color: #c9d9e6; font: 800 clamp(12px, 1.6cqw, 22px)/1.3 system-ui, sans-serif; }
     .final-share {
-      display: inline-block; margin-top: 1.1cqw; padding: .5cqw 2cqw; border-radius: 99px; color: #2b1d00; background: var(--gold);
-      font-size: clamp(13px, 2cqw, 28px); font-weight: 900; letter-spacing: .12em; animation: pulse 1.6s ease-in-out infinite;
+      display: inline-block; padding: .4cqw 2cqw; border-radius: 99px; color: #2b1d00; background: var(--gold);
+      font-size: clamp(12px, 1.8cqw, 28px); font-weight: 900; letter-spacing: .12em; animation: pulse 1.6s ease-in-out infinite;
+    }
+    .final-card .card-actions { margin-top: .8cqw; }
+    .final-card .btn-arcade, .final-card .btn-ghost { min-height: 3.6cqw; }
+    @media (prefers-reduced-motion: reduce) { .final-avatar { animation: none; } }
+    /* Màn nhỏ: ảnh bên trái (≤ 58% chiều cao khung hình), tên và nút bên phải để không bị tràn. */
+    @container (max-width: 620px) {
+      .final-card { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 3cqw; align-items: center; justify-items: start; width: 100%; padding: 2cqw 3cqw; text-align: left; }
+      .final-card .kicker { position: static; grid-column: 2; }
+      .final-avatar { --size: min(33cqw, 72vw, 58vh); grid-column: 1; grid-row: 1 / span 4; margin: 0; }
+      .final-card > :not(.final-avatar) { grid-column: 2; }
+      .final-name { font-size: clamp(16px, 6.5cqw, 40px) !important; }
+      .final-meta { justify-content: flex-start; }
+      .final-card .card-actions { justify-content: flex-start; margin-top: 2cqw; }
     }
 
     /* ---------- History ---------- */
@@ -288,6 +323,20 @@
     .input { width: 100%; padding: 10px 12px; border: 1px solid rgba(160, 196, 224, .3); border-radius: 11px; outline: none; color: var(--text); background: #0b1826; }
     .input:focus { border-color: var(--sky); box-shadow: 0 0 0 3px rgba(30, 184, 255, .18); }
     .error { min-height: 18px; margin-top: 6px; color: #ff8a7a; font-size: 12px; }
+    /* Chỉnh khung ảnh đại diện */
+    .modal.cropping { width: min(100%, 460px); }
+    .crop-view { position: relative; width: min(100%, 340px); aspect-ratio: 1; margin: 0 auto; border-radius: 16px; overflow: hidden; background: #0b1826; }
+    .crop-view canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+    .crop-view canvas:active { cursor: grabbing; }
+    .crop-ring {
+      position: absolute; inset: 0; pointer-events: none; border-radius: 16px; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .5);
+      /* Vòng tròn chạm 4 cạnh khung vuông (closest-side = nửa cạnh). */
+      background: radial-gradient(circle closest-side at 50% 50%, transparent 98.6%, rgba(255, 216, 74, .9) 99%, rgba(255, 216, 74, .9) 100%, rgba(2, 8, 14, .32) 100%);
+    }
+    .crop-tools { display: flex; align-items: center; gap: 10px; margin-top: 12px; color: var(--muted); font-weight: 900; }
+    .crop-tools input { flex: 1; min-width: 0; accent-color: var(--gold); }
+    .crop-tools .btn { min-height: 36px; padding: 0 12px; }
+    .crop-hint { margin-top: 6px; color: var(--muted); font-size: 12px; text-align: center; }
     .modal-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
     .btn { min-height: 40px; padding: 0 15px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel-2); color: var(--text); font-weight: 800; }
     .btn:hover:not(:disabled) { background: #1b3550; }
@@ -472,6 +521,11 @@
     <section class="modal" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
       <h2 id="dialogTitle"></h2>
       <p id="dialogMessage" class="msg"></p>
+      <div id="cropBox" hidden>
+        <div class="crop-view"><canvas id="cropCanvas" width="640" height="640" aria-label="Kéo để chỉnh khung ảnh"></canvas><div class="crop-ring" aria-hidden="true"></div></div>
+        <div class="crop-tools"><span aria-hidden="true">－</span><input id="cropZoom" type="range" min="1" max="4" step="0.01" value="1" aria-label="Phóng to ảnh" /><span aria-hidden="true">＋</span><button id="cropRotate" class="btn" type="button" title="Xoay ảnh 90°">⟳ Xoay</button></div>
+        <p class="crop-hint">Kéo ảnh để đưa khuôn mặt vào giữa vòng tròn · lăn chuột, thanh trượt hoặc chụm 2 ngón để phóng to</p>
+      </div>
       <label id="dialogLabel" for="dialogInput" hidden></label>
       <input id="dialogInput" class="input" maxlength="80" autocomplete="off" hidden />
       <div id="dialogError" class="error" aria-live="polite"></div>
@@ -505,7 +559,9 @@
     const PLAZA_BASE = 384;
     const TRACK_TOP = 404, TRACK_BOTTOM = 650, TRACK_H = TRACK_BOTTOM - TRACK_TOP;
     const BASE_SPEED = 620;                 // px/s of the road at raceSpeed 1
-    const FACTOR = { sky: .07, city: .25, mid: .6, road: 1, fore: 1.6 };
+    // Cảnh nền và khán giả trôi chậm còn ~68% so với trước để người xem nhìn rõ; vẫn giữ thứ tự parallax.
+    // stands: hàng rào và khán giả phía xa (trước đây đi cùng mặt đường).
+    const FACTOR = { sky: .048, city: .17, mid: .41, stands: .68, road: 1, fore: 1.09 };
     const NOSE = 94;                        // muzzle tip, in horse units
     const ZONES = [
       { key: 'square', name: 'Quảng trường trung tâm', from: 0 },
@@ -601,6 +657,12 @@
     // Ảnh cũng có thể là đường dẫn tới file trong dự án, ví dụ "./assets/A1.png".
     const normalizeImagePath = value => typeof value === 'string' && !value.includes('..') && /^(\.\/)?[^:?#\\<>"']+\.(png|jpe?g|webp|svg)$/i.test(value.trim()) ? value.trim() : '';
     const photoOf = member => (member && (member.imageData || member.image)) || '';
+    // Ảnh gốc (để chỉnh lại khung về sau) và vị trí khung cắt: tâm cx, cy (0..1), độ phóng z, số lần xoay 90° rot.
+    const ORIGINAL_MAX = 1500000;
+    function normalizeCrop(c) {
+      if (!c || ![c.cx, c.cy, c.z].every(v => Number.isFinite(Number(v)))) return null;
+      return { cx: clamp(Number(c.cx), 0, 1), cy: clamp(Number(c.cy), 0, 1), z: clamp(Number(c.z), 1, 4), rot: [0, 1, 2, 3].includes(c.rot) ? c.rot : 0 };
+    }
 
     // Mỗi team đúng một người đua ở vòng 1 (isRacer); chưa ai được đánh dấu thì là người đầu tiên.
     function fixRacers(team) {
@@ -619,7 +681,9 @@
     }
     const defaultSettings = () => ({ sound: true, excludeAfterSpin: false, logoData: '', raceSeconds: 20, round2Method: 'wheel', excludeChosenMembers: true });
     // sample: dữ liệu mẫu chưa ai sửa – không bao giờ được đẩy lên máy chủ đè dữ liệu thật.
-    const initialState = () => ({ teams: sampleTeams(), history: [], excludedTeams: [], excludedMembers: [], settings: defaultSettings(), pending: null, savedAt: 0, sample: true });
+    // lastWinnerTeamId: team vừa thắng vòng 1 – khi đua đúng 4 team, team này không được thắng lượt kế tiếp.
+    // injuredTeams: team có ngựa bị thương – các trận sau phải đạp xích lô chở ngựa cho tới khi thắng một trận.
+    const initialState = () => ({ teams: sampleTeams(), history: [], excludedTeams: [], excludedMembers: [], lastWinnerTeamId: null, injuredTeams: [], prevCycle: [], settings: defaultSettings(), pending: null, savedAt: 0, sample: true });
 
     function normalizeData(raw) {
       const source = raw && raw.data ? raw.data : raw;
@@ -640,6 +704,8 @@
           let memberId = validId(member.id) ? member.id : uid(); if (memberIds.has(memberId)) memberId = uid(); memberIds.add(memberId);
           const result = { id: memberId, name: memberName, imageData: normalizeImage(member.imageData), isRacer: member.isRacer === true };
           const path = normalizeImagePath(member.image); if (path) result.image = path;
+          const original = normalizeImage(member.imageOriginal, ORIGINAL_MAX);
+          if (original && result.imageData) { result.imageOriginal = original; const cropBox = normalizeCrop(member.imageCrop); if (cropBox) result.imageCrop = cropBox; }
           return result;
         });
         return fixRacers({ id, name, imageData: normalizeImage(team.imageData), members });
@@ -655,13 +721,21 @@
       const s = source.settings || {};
       const p = source.pending;
       const pending = p && (p.round === 'team' || p.round === 'member') && typeof p.winnerId === 'string' && typeof p.teamId === 'string'
-        ? { round: p.round, method: ['wheel', 'auto'].includes(p.method) ? p.method : 'horse', winnerId: p.winnerId, teamId: p.teamId, createdAt: typeof p.createdAt === 'string' ? p.createdAt : new Date().toISOString() }
+        ? {
+          round: p.round, method: ['wheel', 'auto'].includes(p.method) ? p.method : 'horse', winnerId: p.winnerId, teamId: p.teamId, createdAt: typeof p.createdAt === 'string' ? p.createdAt : new Date().toISOString(),
+          injureId: typeof p.injureId === 'string' ? p.injureId : null
+        }
         : null;
       return {
         teams, history,
         excludedTeams: Array.from(new Set((source.excludedTeams || []).filter(hasTeam))),
         // Chỉ người thật sự được quay trúng (hoặc được đánh dấu tay trong Cài đặt) mới tính là đã phát biểu.
         excludedMembers: Array.from(new Set((source.excludedMembers || []).filter(hasMemberKey))),
+        // Dữ liệu cũ chưa có hai trường này vẫn tải bình thường.
+        lastWinnerTeamId: hasTeam(source.lastWinnerTeamId) ? source.lastWinnerTeamId : null,
+        // Thứ tự team được chọn ở chu kỳ trước (khi bật loại team) – chu kỳ sau không lặp lại.
+        prevCycle: (Array.isArray(source.prevCycle) ? source.prevCycle : []).filter(hasTeam),
+        injuredTeams: Array.from(new Set((Array.isArray(source.injuredTeams) ? source.injuredTeams : []).filter(hasTeam))),
         settings: {
           sound: s.sound !== false, excludeAfterSpin: Boolean(s.excludeAfterSpin), logoData: normalizeImage(s.logoData, 2000000),
           raceSeconds: Number.isFinite(Number(s.raceSeconds)) && s.raceSeconds !== undefined ? clamp(Math.round(Number(s.raceSeconds)), 12, 45) : 20,
@@ -679,7 +753,7 @@
       const raw = localStorage.getItem(LEGACY_KEY);
       if (!raw) return null;
       const data = normalizeData(JSON.parse(raw));
-      return { ...data, history: [], excludedTeams: [], excludedMembers: [], pending: null };
+      return { ...data, history: [], excludedTeams: [], excludedMembers: [], lastWinnerTeamId: null, injuredTeams: [], prevCycle: [], pending: null };
     }
 
     let bootMessage = '';
@@ -731,7 +805,21 @@
     function recycleExhausted(round) {
       if (!state.settings.excludeAfterSpin) return;
       const base = teamsWithSpeakers();
-      if (round === 'team' && base.length && base.every(t => state.excludedTeams.includes(t.id))) state.excludedTeams = [];
+      if (round === 'team' && base.length && base.every(t => state.excludedTeams.includes(t.id))) {
+        // Hết một chu kỳ: nhớ thứ tự vừa chọn để chu kỳ mới không lặp lại kết quả đó.
+        state.prevCycle = state.excludedTeams.filter(id => base.some(t => t.id === id));
+        state.excludedTeams = [];
+      }
+    }
+    // Lượt thứ pos của chu kỳ hiện tại không được ra team đã ra ở lượt thứ pos của chu kỳ trước.
+    function cycleRule() {
+      if (!state.settings.excludeAfterSpin || !state.prevCycle.length) return null;
+      return { prev: state.prevCycle, pos: state.excludedTeams.length, remaining: availableTeams().map(t => t.id) };
+    }
+    // Các team còn lại có xếp được vào các lượt sau mà không trùng lượt tương ứng của chu kỳ trước không.
+    function canArrange(ids, prev, pos) {
+      if (!ids.length) return true;
+      return ids.some((id, i) => id !== prev[pos] && canArrange(ids.filter((_, j) => j !== i), prev, pos + 1));
     }
     // Lượt mới: xóa mọi dấu "đã phát biểu" và "team đã chọn".
     function startNewTurn() {
@@ -743,6 +831,9 @@
       const ids = new Set(state.teams.map(team => team.id));
       state.excludedTeams = state.excludedTeams.filter(id => ids.has(id));
       state.excludedMembers = state.excludedMembers.filter(key => { const [teamId, ...rest] = key.split(':'); return Boolean(memberById(teamById(teamId), rest.join(':'))); });
+      state.injuredTeams = state.injuredTeams.filter(id => ids.has(id));
+      state.prevCycle = state.prevCycle.filter(id => ids.has(id));
+      if (!ids.has(state.lastWinnerTeamId)) state.lastWinnerTeamId = null;
     }
 
     // ---------- DOM ----------
@@ -758,7 +849,8 @@
       restoreExcluded: $('#restoreExcluded'), newSession: $('#newSession'), exportButton: $('#exportButton'), importButton: $('#importButton'), importInput: $('#importInput'),
       legacyButton: $('#legacyButton'), sampleButton: $('#sampleButton'),
       dialogBackdrop: $('#dialogBackdrop'), dialogTitle: $('#dialogTitle'), dialogMessage: $('#dialogMessage'), dialogLabel: $('#dialogLabel'),
-      dialogInput: $('#dialogInput'), dialogError: $('#dialogError'), dialogActions: $('#dialogActions'), photoInput: $('#photoInput'), toast: $('#toast')
+      dialogInput: $('#dialogInput'), dialogError: $('#dialogError'), dialogActions: $('#dialogActions'), photoInput: $('#photoInput'), toast: $('#toast'),
+      cropBox: $('#cropBox'), cropCanvas: $('#cropCanvas'), cropZoom: $('#cropZoom'), cropRotate: $('#cropRotate')
     };
     const ctx = els.canvas.getContext('2d');
     let viewScale = 1;
@@ -827,8 +919,16 @@
       let incoming; try { incoming = normalizeData(record.data); } catch (_) { return; }
       sync.version = Number(record.version) || 0;
       const known = new Set(incoming.history.map(h => h.id));
-      incoming.history = incoming.history.concat(state.history.filter(h => !known.has(h.id)))
+      const localOnly = state.history.filter(h => !known.has(h.id));
+      incoming.history = incoming.history.concat(localOnly)
         .sort((a, b) => String(a.time).localeCompare(String(b.time)));
+      // Máy này có kết quả đua mới mà máy chủ chưa có: giữ luôn team thắng gần nhất và ngựa bị thương của nó.
+      if (localOnly.some(h => h.type === 'team')) {
+        const ids = new Set(incoming.teams.map(t => t.id));
+        incoming.lastWinnerTeamId = ids.has(state.lastWinnerTeamId) ? state.lastWinnerTeamId : incoming.lastWinnerTeamId;
+        incoming.injuredTeams = state.injuredTeams.filter(id => ids.has(id));
+        incoming.prevCycle = state.prevCycle.filter(id => ids.has(id));
+      }
       if (state.pending && !incoming.pending) incoming.pending = state.pending;
       incoming.sample = false;
       state = incoming; writeLocal(); refreshAfterServerChange();
@@ -1069,10 +1169,10 @@
     const SKINS = ['#f2c9a0', '#e0ac7e', '#c68a5c', '#f6d5b5'];
 
     const scene = {
-      time: 0, scroll: { sky: 0, city: 0, mid: 0, road: 0, fore: 0 },
+      time: 0, scroll: { sky: 0, city: 0, mid: 0, stands: 0, road: 0, fore: 0 },
       mid: { items: [], next: 0 }, fore: { items: [], next: 0 }, road: { tiles: [], next: 0 },
       clouds: Array.from({ length: 8 }, (_, i) => ({ x: i * 220 + rand(0, 120), y: rand(40, 190), s: rand(.6, 1.25) })),
-      dust: [], lines: [], confetti: [], shake: 0, flash: 0, hype: 0, startLine: null, gateX: null,
+      dust: [], lines: [], confetti: [], sparks: [], shake: 0, flash: 0, hype: 0, startLine: null, gateX: null,
       fansFar: { items: [], next: 0, cursor: 0 }, fansNear: { items: [], next: 0, cursor: 0 }
     };
 
@@ -1107,7 +1207,7 @@
 
       // Cổ động viên: lặp lại các nhóm thành viên không cưỡi ngựa ở cả hai hàng rào.
       if (game.fanGroups.length) {
-        spawnFans(scene.fansFar, scene.scroll.road, 130, 380);
+        spawnFans(scene.fansFar, scene.scroll.stands, 130, 380);
         spawnFans(scene.fansNear, scene.scroll.fore, 420, 900);
       }
     }
@@ -1126,7 +1226,7 @@
         return { index, color: r.color, ink: r.ink, teamName: r.name, members: supportersOf(team).map(m => ({ name: m.name, photo: photoOf(m) })) };
       }).filter(group => group.members.length);
       const offset = Math.floor(Math.random() * Math.max(1, game.fanGroups.length));
-      scene.fansFar = { items: [], next: scene.scroll.road + 40, cursor: offset };
+      scene.fansFar = { items: [], next: scene.scroll.stands + 40, cursor: offset };
       scene.fansNear = { items: [], next: scene.scroll.fore + 160, cursor: offset + 1 };
       spawnLayers();
     }
@@ -1134,7 +1234,7 @@
     function resetScene() {
       Object.keys(scene.scroll).forEach(key => { scene.scroll[key] = 0; });
       scene.mid = { items: [], next: -260 }; scene.fore = { items: [], next: 120 }; scene.road = { tiles: [], next: -TILE_W };
-      scene.dust = []; scene.lines = []; scene.confetti = []; scene.shake = 0; scene.flash = 0; scene.hype = 0; scene.gateX = null;
+      scene.dust = []; scene.lines = []; scene.confetti = []; scene.sparks = []; scene.shake = 0; scene.flash = 0; scene.hype = 0; scene.gateX = null;
       scene.startLine = 612;
       game.fanGroups = []; scene.fansFar = { items: [], next: 0, cursor: 0 }; scene.fansNear = { items: [], next: 0, cursor: 0 };
       spawnLayers();
@@ -1334,7 +1434,8 @@
     };
 
     // ---------- Cổ động viên ở hàng rào ----------
-    const FAN_SPACING = 50;
+    const FAN_SPACING = 62;                 // đủ rộng cho đầu cổ động viên 1,5 lần mà không chồng nhau
+    const FAN_HEAD = 24;
     function drawFanGroup(c, item, x, base, s, sign = true) {
       const group = item.group; const t = scene.time;
       const alpha = clamp((scene.time - item.born) / .5, 0, 1); if (alpha <= 0) return;
@@ -1346,7 +1447,7 @@
       const width = group.members.length * FAN_SPACING * s;
       c.save(); c.globalAlpha *= alpha;
       // Bảng cổ vũ của team, giơ cao trên đầu nhóm.
-      const signY = base - 112 * s - (leading || won ? 6 * s : 0) + Math.sin(t * 5 + item.seed * 9) * 2 * s;
+      const signY = base - 126 * s - (leading || won ? 6 * s : 0) + Math.sin(t * 5 + item.seed * 9) * 2 * s;
       if (sign) {
       c.strokeStyle = '#5a4632'; c.lineWidth = 3 * s;
       c.beginPath(); c.moveTo(x + 14 * s, signY + 18 * s); c.lineTo(x + 18 * s, base - 70 * s); c.moveTo(x + width - 14 * s, signY + 18 * s); c.lineTo(x + width - 18 * s, base - 70 * s); c.stroke();
@@ -1367,15 +1468,15 @@
         c.strokeStyle = '#f0c49a'; c.lineWidth = 5 * s; c.lineCap = 'round';
         const wave = Math.sin(t * 9 + k * 2 + item.seed * 5) * 6 * s;
         c.beginPath(); c.moveTo(fx - 12 * s, top + 8 * s); c.lineTo(fx - 22 * s, top - 18 * s + wave); c.moveTo(fx + 12 * s, top + 8 * s); c.lineTo(fx + 22 * s, top - 18 * s - wave); c.stroke();
-        const headY = top - 15 * s; const radius = 16 * s;
+        const headY = top - 21 * s; const radius = FAN_HEAD * s;
         const face = member.photo ? imageFor(member.photo) : null;
         circle(c, fx, headY, radius + 2.5 * s, group.color);
         if (face) {
           c.save(); c.beginPath(); c.arc(fx, headY, radius, 0, Math.PI * 2); c.clip();
-          c.drawImage(face, fx - radius, headY - radius, radius * 2, radius * 2); c.restore();
+          drawCover(c, face, fx - radius, headY - radius, radius * 2); c.restore();
         } else {
           circle(c, fx, headY, radius, '#0a3f57');
-          c.fillStyle = '#fff'; c.font = `900 ${Math.round(15 * s)}px Bahnschrift, sans-serif`; c.fillText(initialOf(member.name), fx, headY + 1);
+          c.fillStyle = '#fff'; c.font = `900 ${Math.round(22 * s)}px Bahnschrift, sans-serif`; c.fillText(initialOf(member.name), fx, headY + 1);
         }
       });
       c.restore();
@@ -1407,7 +1508,87 @@
       c.fillStyle = hoof; c.beginPath(); c.ellipse(fx + 1.5, fy, 5, 3.6, a2, 0, Math.PI * 2); c.fill();
     }
 
-    function drawHorse(c, r, x, y, s, g) {
+    // Ảnh vuông ở giữa, không kéo méo ảnh chữ nhật.
+    function drawCover(c, img, x, y, size) {
+      const iw = img.naturalWidth, ih = img.naturalHeight, m = Math.min(iw, ih);
+      c.drawImage(img, (iw - m) / 2, (ih - m) / 2, m, m, x, y, size, size);
+    }
+    // Đầu người đua: ảnh thật trong mũ màu team. RIDER_HEAD = 1,5 lần cỡ cũ (11).
+    const RIDER_HEAD = 16.5;
+    function drawRiderHead(c, r, cx, cy, R = RIDER_HEAD) {
+      const face = r.image ? imageFor(r.image) : null;
+      if (face) {
+        c.save(); c.beginPath(); c.arc(cx, cy, R, 0, Math.PI * 2); c.clip(); drawCover(c, face, cx - R, cy - R, R * 2); c.restore();
+        c.strokeStyle = r.color; c.lineWidth = R * .3; c.beginPath(); c.arc(cx, cy, R * 1.08, 0, Math.PI * 2); c.stroke();
+        c.fillStyle = r.color; c.beginPath(); c.arc(cx, cy, R * 1.14, Math.PI * 1.12, Math.PI * 1.88); c.fill();
+      } else {
+        circle(c, cx, cy + R * .08, R * .68, '#f0c49a');
+        c.fillStyle = r.color; c.beginPath(); c.arc(cx - R * .09, cy - R * .02, R * .82, Math.PI * 1.05, Math.PI * 2.05); c.fill();
+        c.fillStyle = '#1b1b1f'; c.fillRect(cx, cy - R * .1, R * .82, R * .27);
+      }
+    }
+    // Ngựa bị thương: băng gạc ở chân trước và sao quay quanh đầu (vui, không máu me).
+    function drawHurt(c, hx, hy) {
+      const t = scene.time;
+      c.fillStyle = '#ffffff'; c.strokeStyle = '#d8d2c6'; c.lineWidth = 1;
+      rr(c, 22, -40, 13, 11, 3); c.fill(); c.stroke();
+      c.strokeStyle = '#e8414f'; c.lineWidth = 2; c.beginPath(); c.moveTo(25, -34.5); c.lineTo(32, -34.5); c.moveTo(28.5, -38); c.lineTo(28.5, -31); c.stroke();
+      for (let k = 0; k < 3; k++) {
+        const a = t * 4 + k * 2.1; const sx = hx + 6 + Math.cos(a) * 17, sy = hy - 24 + Math.sin(a) * 5;
+        c.fillStyle = '#ffd84a'; c.beginPath();
+        for (let q = 0; q < 10; q++) { const rad = q % 2 ? 2.4 : 5.5; const ang = q * Math.PI / 5 + a; c.lineTo(sx + Math.cos(ang) * rad, sy + Math.sin(ang) * rad); }
+        c.closePath(); c.fill();
+      }
+    }
+
+    // Tên lửa đồ chơi: thân đỏ, mũi trắng, lửa phụt phía sau theo cường độ flame (0..1).
+    function drawRocket(c, x, y, k, flame) {
+      const t = scene.time;
+      c.save(); c.translate(x, y); c.scale(k, k);
+      if (flame > .02) {
+        const len = (24 + 40 * flame) * (.85 + .15 * Math.sin(t * 47));
+        c.fillStyle = 'rgba(255, 122, 26, .9)'; c.beginPath(); c.moveTo(-20, -7); c.quadraticCurveTo(-20 - len * .6, -10, -20 - len, 0); c.quadraticCurveTo(-20 - len * .6, 10, -20, 7); c.closePath(); c.fill();
+        c.fillStyle = 'rgba(255, 240, 150, .95)'; c.beginPath(); c.moveTo(-20, -4); c.quadraticCurveTo(-20 - len * .35, -5, -20 - len * .6, 0); c.quadraticCurveTo(-20 - len * .35, 5, -20, 4); c.closePath(); c.fill();
+      }
+      c.fillStyle = '#c62f3c'; c.beginPath(); c.moveTo(-18, -7); c.lineTo(-27, -14); c.lineTo(-24, -6); c.closePath(); c.moveTo(-18, 7); c.lineTo(-27, 14); c.lineTo(-24, 6); c.closePath(); c.fill();
+      c.fillStyle = '#e8414f'; rr(c, -22, -8, 38, 16, 7); c.fill();
+      c.fillStyle = '#ffffff'; c.beginPath(); c.moveTo(14, -8); c.quadraticCurveTo(30, -2, 32, 0); c.quadraticCurveTo(30, 2, 14, 8); c.closePath(); c.fill();
+      circle(c, 2, 0, 4.2, '#7fd4ff'); c.strokeStyle = '#ffffff'; c.lineWidth = 1.6; c.beginPath(); c.arc(2, 0, 4.2, 0, Math.PI * 2); c.stroke();
+      c.restore();
+    }
+    // Người cưỡi ngã ngồi dưới đất phía sau ngựa, rồi đứng dậy móc tên lửa gắn vào mông ngựa.
+    function drawGroundRider(c, r, x, y, s, ev) {
+      const t = scene.time;
+      c.save(); c.translate(x - 84 * s, y); c.scale(s, s); c.lineCap = 'round';
+      c.fillStyle = 'rgba(10, 20, 30, .22)'; c.beginPath(); c.ellipse(4, 2, 26, 5, 0, 0, Math.PI * 2); c.fill();
+      if (ev.mode === 'fallen') {
+        const q = ev.fallQ;                       // rơi từ yên xuống, lộn một vòng rồi ngồi bệt
+        c.translate(lerp(40, 0, q), lerp(-70, 0, q)); c.rotate(lerp(-2.4, 0, easeOutBack(q)));
+        c.strokeStyle = '#1b1b1f'; c.lineWidth = 9; c.beginPath(); c.moveTo(0, -12); c.lineTo(22, -8); c.lineTo(34, -3); c.stroke();
+        c.strokeStyle = r.color; c.lineWidth = 17; c.beginPath(); c.moveTo(0, -12); c.lineTo(-6, -42); c.stroke();
+        c.strokeStyle = r.color; c.lineWidth = 6; c.beginPath(); c.moveTo(-4, -38); c.lineTo(-22, -54 + Math.sin(t * 9) * 3); c.moveTo(-4, -38); c.lineTo(12, -56 - Math.sin(t * 9) * 3); c.stroke();
+        drawRiderHead(c, r, -2, -58);
+        for (let k = 0; k < 3; k++) {
+          const a = t * 5 + k * 2.1; const sx = -2 + Math.cos(a) * 20, sy = -84 + Math.sin(a) * 5;
+          c.fillStyle = '#ffd84a'; c.beginPath();
+          for (let m = 0; m < 10; m++) { const rad = m % 2 ? 2.4 : 5.5; const ang = m * Math.PI / 5 + a; c.lineTo(sx + Math.cos(ang) * rad, sy + Math.sin(ang) * rad); }
+          c.closePath(); c.fill();
+        }
+      } else {
+        // Đứng cạnh ngựa: tay đưa tên lửa từ túi quần lên mông ngựa (mông ngựa ở x = +22, y = -84).
+        c.strokeStyle = '#1b1b1f'; c.lineWidth = 9; c.beginPath(); c.moveTo(-6, -40); c.lineTo(-8, 0); c.moveTo(4, -40); c.lineTo(8, 0); c.stroke();
+        c.strokeStyle = r.color; c.lineWidth = 17; c.beginPath(); c.moveTo(0, -40); c.lineTo(4, -74); c.stroke();
+        const q = ev.rocketHand; const hx = lerp(10, 22, q), hy = lerp(-44, -82, q);
+        if (q < 1) drawRocket(c, hx + 8, hy, .75, 0);
+        c.strokeStyle = r.color; c.lineWidth = 6; c.beginPath(); c.moveTo(4, -70); c.lineTo(hx, hy); c.stroke();
+        circle(c, hx, hy, 3.6, '#f0c49a');
+        drawRiderHead(c, r, 6, -92);
+      }
+      c.restore();
+    }
+
+    // opt: noRider/noShadow/flip (ngựa được cõng hoặc chở), hurt, rocket (-1 = không có, 0..1 = lửa)
+    function drawHorse(c, r, x, y, s, g, opt = {}) {
       const t = scene.time; const p = r.phase * Math.PI * 2;
       const coat = r.coat.coat, mane = r.coat.mane;
       const far = shade(coat, -.28); const lowerNear = r.coat.sock ? '#f3efe8' : shade(coat, -.08); const lowerFar = r.coat.sock ? '#cfc9be' : shade(coat, -.34);
@@ -1415,7 +1596,7 @@
       const lean = (g ? -.035 * Math.sin(p * 2) * g : 0) - clamp(r.surge, -1, 1) * .05;
 
       // shadow stays on the ground
-      c.fillStyle = 'rgba(10, 20, 30, .22)'; c.beginPath(); c.ellipse(x + 4 * s, y + 2, (58 - Math.abs(bob) * 1.5) * s, 7 * s, 0, 0, Math.PI * 2); c.fill();
+      if (!opt.noShadow) { c.fillStyle = 'rgba(10, 20, 30, .22)'; c.beginPath(); c.ellipse(x + 4 * s, y + 2, (58 - Math.abs(bob) * 1.5) * s, 7 * s, 0, 0, Math.PI * 2); c.fill(); }
 
       c.save(); c.translate(x, y + bob * s); c.scale(s, s); c.rotate(lean);
       // far legs
@@ -1433,6 +1614,11 @@
       c.beginPath(); c.ellipse(31, -63, 23, 22, .2, 0, Math.PI * 2); c.fill();
       c.fillStyle = 'rgba(0, 0, 0, .12)'; c.beginPath(); c.ellipse(0, -48, 40, 7, 0, 0, Math.PI * 2); c.fill();
       c.fillStyle = 'rgba(255, 255, 255, .13)'; c.beginPath(); c.ellipse(-8, -76, 34, 5, 0, 0, Math.PI * 2); c.fill();
+      if (opt.rocket >= 0) {
+        // Tên lửa buộc trên mông ngựa.
+        drawRocket(c, -62, -86, .8, opt.rocket);
+        c.strokeStyle = '#5a3a1e'; c.lineWidth = 3; c.beginPath(); c.moveTo(-66, -80); c.lineTo(-60, -60); c.moveTo(-56, -80); c.lineTo(-48, -62); c.stroke();
+      }
       // neck and head
       const headBob = g ? Math.sin(p + 1.2) * 4 * g : Math.sin(t * 1.3 + r.phase * 4) * 1.5;
       const hx = 66, hy = -100 + headBob; const tilt = .62 + (g ? Math.sin(p + 1.2) * .06 : 0);
@@ -1450,58 +1636,136 @@
       // near legs
       drawLeg(c, 28, -50, 'fore', p + Math.PI * 2 * .6, g, coat, lowerNear, '#1b1512');
       drawLeg(c, -30, -54, 'hind', p + Math.PI * 2 * .12, g, coat, lowerNear, '#1b1512');
+      if (opt.hurt) drawHurt(c, hx, hy);
       // saddle cloth with lane number
       c.fillStyle = r.color; rr(c, -16, -86, 34, 26, 4); c.fill();
-      c.fillStyle = r.ink; c.font = '900 17px Bahnschrift, "Segoe UI", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(String(r.number), 1, -72);
+      if (!opt.flip) { c.fillStyle = r.ink; c.font = '900 17px Bahnschrift, "Segoe UI", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(String(r.number), 1, -72); }
       c.fillStyle = '#3a2416'; rr(c, -12, -90, 30, 7, 3); c.fill();
-      // jockey (crouched, steadier than the horse)
+      if (opt.noRider) { c.restore(); return; }
+      // jockey (crouched, steadier than the horse); thân người hơi nâng lên cho vừa đầu lớn
       c.save(); c.translate(0, -bob * .35);
       const mouthX = hx + Math.cos(tilt) * 26 - Math.sin(tilt) * 6, mouthY = hy + Math.sin(tilt) * 26 + Math.cos(tilt) * 6;
       c.lineCap = 'round';
       c.strokeStyle = '#f4f1ea'; c.lineWidth = 9; c.beginPath(); c.moveTo(2, -92); c.lineTo(15, -80); c.stroke();
       c.strokeStyle = '#1b1b1f'; c.lineWidth = 7; c.beginPath(); c.moveTo(15, -80); c.lineTo(5, -68); c.stroke();
-      c.strokeStyle = r.color; c.lineWidth = 16; c.beginPath(); c.moveTo(0, -94); c.lineTo(22, -108); c.stroke();
-      c.strokeStyle = 'rgba(255, 255, 255, .85)'; c.lineWidth = 3; c.beginPath(); c.moveTo(4, -104); c.lineTo(18, -96); c.stroke();
-      c.strokeStyle = shade(r.color, -.15); c.lineWidth = 7; c.beginPath(); c.moveTo(22, -105); c.lineTo(34, -97); c.lineTo(47, -95); c.stroke();
+      c.strokeStyle = r.color; c.lineWidth = 17; c.beginPath(); c.moveTo(0, -94); c.lineTo(22, -110); c.stroke();
+      c.strokeStyle = 'rgba(255, 255, 255, .85)'; c.lineWidth = 3; c.beginPath(); c.moveTo(4, -105); c.lineTo(18, -97); c.stroke();
+      c.strokeStyle = shade(r.color, -.15); c.lineWidth = 7; c.beginPath(); c.moveTo(22, -106); c.lineTo(34, -97); c.lineTo(47, -95); c.stroke();
       c.strokeStyle = 'rgba(40, 25, 15, .8)'; c.lineWidth = 1.5; c.beginPath(); c.moveTo(48, -95); c.lineTo(mouthX, mouthY); c.stroke();
       circle(c, 48, -95, 3.6, '#f0c49a');
-      const face = r.image ? imageFor(r.image) : null;
-      if (face) {
-        // Mặt thật của người đua, viền mũ màu team.
-        c.save(); c.beginPath(); c.arc(32, -114, 11, 0, Math.PI * 2); c.clip();
-        c.drawImage(face, 21, -125, 22, 22); c.restore();
-        c.strokeStyle = r.color; c.lineWidth = 3.5; c.beginPath(); c.arc(32, -114, 12, 0, Math.PI * 2); c.stroke();
-        c.fillStyle = r.color; c.beginPath(); c.arc(32, -114, 12.5, Math.PI * 1.12, Math.PI * 1.88); c.fill();
-      } else {
-        circle(c, 32, -113, 7.5, '#f0c49a');
-        c.fillStyle = r.color; c.beginPath(); c.arc(31, -114, 9, Math.PI * 1.05, Math.PI * 2.05); c.fill();
-        c.fillStyle = '#1b1b1f'; c.fillRect(32, -115, 9, 3);
-      }
+      drawRiderHead(c, r, 34, -121);
       c.restore();
       c.restore();
     }
 
+    // Người cưỡi xuống ngựa, cõng con ngựa bị thương trên lưng mà chạy tiếp.
+    function drawCarrier(c, r, x, y, s) {
+      const t = scene.time; const p = r.phase * Math.PI * 2; const bob = -Math.abs(Math.sin(p * 2)) * 5;
+      c.fillStyle = 'rgba(10, 20, 30, .22)'; c.beginPath(); c.ellipse(x, y + 2, 44 * s, 7 * s, 0, 0, Math.PI * 2); c.fill();
+      c.save(); c.translate(x, y + bob * s); c.scale(s, s); c.lineCap = 'round';
+      const leg = (ph, color) => {
+        const a = Math.sin(ph) * .85; const kx = -4 + Math.sin(a) * 22, ky = -44 + Math.cos(a) * 22;
+        const b = a - .25 - Math.max(0, -Math.cos(ph)) * 1.1; const fx = kx + Math.sin(b) * 22, fy = ky + Math.cos(b) * 22;
+        c.strokeStyle = color; c.lineWidth = 9; c.beginPath(); c.moveTo(-4, -44); c.lineTo(kx, ky); c.lineTo(fx, fy); c.stroke();
+        c.fillStyle = '#1b1b1f'; c.beginPath(); c.ellipse(fx + 3, fy, 6, 3.5, 0, 0, Math.PI * 2); c.fill();
+      };
+      leg(p * 2 + Math.PI, '#2a2a30');
+      c.strokeStyle = shade(r.color, -.2); c.lineWidth = 6; c.beginPath(); c.moveTo(6, -76); c.lineTo(-16, -96); c.stroke();
+      // Ngựa nằm ngửa trên lưng, chân giơ lên trời, đầu ngoái về phía sau.
+      c.save(); c.translate(-10, -84 - 88 * .6); c.scale(-.6, -.6);
+      drawHorse(c, r, 0, 0, 1, .3, { noRider: true, noShadow: true, flip: true, hurt: true });
+      c.restore();
+      c.strokeStyle = r.color; c.lineWidth = 17; c.beginPath(); c.moveTo(-4, -44); c.lineTo(8, -78); c.stroke();
+      c.strokeStyle = 'rgba(255, 255, 255, .85)'; c.lineWidth = 3; c.beginPath(); c.moveTo(-6, -60); c.lineTo(9, -56); c.stroke();
+      leg(p * 2, '#1b1b1f');
+      c.strokeStyle = r.color; c.lineWidth = 6; c.beginPath(); c.moveTo(10, -76); c.lineTo(22, -100); c.stroke();
+      circle(c, 22, -101, 3.6, '#f0c49a');
+      drawRiderHead(c, r, 26, -90);
+      // Giọt mồ hôi bay ra sau.
+      for (let k = 0; k < 2; k++) {
+        const u = (t * 1.8 + k * .5) % 1; c.globalAlpha = 1 - u;
+        c.fillStyle = '#7fd4ff'; c.beginPath(); c.ellipse(8 - u * 26, -104 - k * 8 + u * 6, 2.4, 3.6, -.5, 0, Math.PI * 2); c.fill();
+        c.globalAlpha = 1;
+      }
+      c.restore();
+    }
+
+    // Xích lô: người đạp phía trước, ghế phía sau chở con ngựa bị thương.
+    function drawCyclo(c, r, x, y, s, g) {
+      const p = r.phase * Math.PI * 2; const spin = p * 2;
+      c.fillStyle = 'rgba(10, 20, 30, .22)'; c.beginPath(); c.ellipse(x - 14 * s, y + 2, 84 * s, 7 * s, 0, 0, Math.PI * 2); c.fill();
+      c.save(); c.translate(x, y); c.scale(s, s); c.lineCap = 'round';
+      const wheel = (wx, wy, R) => {
+        c.strokeStyle = '#1d1f24'; c.lineWidth = 4.5; c.beginPath(); c.arc(wx, wy, R, 0, Math.PI * 2); c.stroke();
+        c.strokeStyle = 'rgba(220, 226, 232, .85)'; c.lineWidth = 1.4; c.beginPath();
+        for (let k = 0; k < 6; k++) { const a = spin + k * Math.PI / 3; c.moveTo(wx, wy); c.lineTo(wx + Math.cos(a) * (R - 2), wy + Math.sin(a) * (R - 2)); }
+        c.stroke(); circle(c, wx, wy, 3, '#9aa3ad');
+      };
+      // Mui xe phía sau.
+      c.strokeStyle = shade(r.color, -.35); c.lineWidth = 3; c.beginPath(); c.moveTo(-98, -64); c.quadraticCurveTo(-100, -116, -60, -118); c.stroke();
+      c.fillStyle = shade(r.color, -.12); c.beginPath(); c.moveTo(-100, -100); c.quadraticCurveTo(-96, -124, -58, -122); c.lineTo(-48, -112); c.quadraticCurveTo(-84, -112, -92, -92); c.closePath(); c.fill();
+      // Ngựa bị thương ngồi trong ghế.
+      c.save(); c.translate(-64, -46 + (g ? Math.sin(p * 2) * 1.2 : 0)); c.scale(.5, .5);
+      drawHorse(c, r, 0, 0, 1, 0, { noRider: true, noShadow: true, hurt: true });
+      c.restore();
+      wheel(-62, -19, 19);
+      // Thùng ghế che chân ngựa.
+      c.fillStyle = r.color; rr(c, -102, -60, 78, 32, 8); c.fill();
+      c.fillStyle = 'rgba(255, 255, 255, .8)'; c.fillRect(-98, -48, 70, 4);
+      c.fillStyle = shade(r.color, -.25); rr(c, -104, -32, 82, 6, 3); c.fill();
+      // Khung và bánh trước.
+      c.strokeStyle = '#2f3540'; c.lineWidth = 4;
+      c.beginPath(); c.moveTo(-26, -34); c.lineTo(20, -32); c.lineTo(58, -19); c.moveTo(20, -32); c.lineTo(12, -62); c.moveTo(52, -19); c.lineTo(44, -84); c.lineTo(36, -86); c.stroke();
+      wheel(58, -19, 19);
+      // Người đạp: hai chân theo bàn đạp.
+      const crank = { x: 20, y: -32 }; const hip = { x: 12, y: -64 };
+      [spin + Math.PI, spin].forEach((a, k) => {
+        const fx = crank.x + Math.cos(a) * 9, fy = crank.y + Math.sin(a) * 9;
+        const dx = fx - hip.x, dy = fy - hip.y; const d = Math.hypot(dx, dy); const lift = Math.sqrt(Math.max(0, 24 * 24 - d * d / 4));
+        const kx = hip.x + dx / 2 + (dy / d) * lift * .9, ky = hip.y + dy / 2 - (dx / d) * lift * .9;
+        c.strokeStyle = k ? '#1b1b1f' : '#2a2a30'; c.lineWidth = 8; c.beginPath(); c.moveTo(hip.x, hip.y); c.lineTo(kx, ky); c.lineTo(fx, fy); c.stroke();
+      });
+      c.strokeStyle = r.color; c.lineWidth = 16; c.beginPath(); c.moveTo(12, -64); c.lineTo(24, -96); c.stroke();
+      c.strokeStyle = shade(r.color, -.15); c.lineWidth = 6; c.beginPath(); c.moveTo(24, -92); c.lineTo(38, -86); c.stroke();
+      circle(c, 38, -86, 3.4, '#f0c49a');
+      drawRiderHead(c, r, 30, -112);
+      c.restore();
+    }
+
     // Name tag rides behind the horse, inside its own lane.
-    function drawTag(c, r, x, y, s, laneH) {
+    function drawTag(c, r, x, y, s, laneH, heads = [], index = -1) {
       const avatar = r.image ? imageFor(r.image) : null;
       const font = Math.round(clamp(15 * s + 2, 12, 18));
       c.font = `800 ${font}px "Segoe UI", system-ui, sans-serif`;
       let label = r.riderName ? `${r.name} · ${r.riderName}` : r.name; const maxW = 190;
       while (c.measureText(label).width > maxW && label.length > 2) label = label.slice(0, -2) + '…';
-      const badge = font + 8; const textW = c.measureText(label).width; const avaW = avatar ? badge + 4 : 0;
-      const w = badge + avaW + textW + 18; const h = badge + 2;
-      const right = x - 62 * s; const left = right - w; const top = y - Math.min(laneH * .5, 40 * s) - h / 2;
-      c.globalAlpha = .94;
+      // Ảnh trong thẻ tên lớn 1,5 lần, nhưng không cao quá làn để không đè thẻ của làn bên.
+      const badge = font + 8; const textW = c.measureText(label).width;
+      const ava = avatar ? Math.round(Math.min(badge * 1.5, Math.max(badge, laneH * .92))) : 0; const avaW = avatar ? ava + 4 : 0;
+      const w = badge + avaW + textW + 18; const h = Math.max(badge, ava) + 2;
+      const grounded = r.ev && (r.ev.mode === 'fallen' || r.ev.mode === 'rocket');
+      const boosting = r.ev && r.ev.rocketOn && r.ev.rocket > .05;   // chừa chỗ cho ngọn lửa phía sau
+      const right = x - (r.cyclo ? 112 : grounded ? 118 : boosting ? 136 : 62) * s; const top = y - Math.min(laneH * .5, 40 * s) - h / 2;
+      // Thẻ không được che avatar của người đua khác: trượt sang trái qua avatar đó, hết chỗ thì làm mờ.
+      const blocking = L => heads.filter(hd => hd.index !== index && hd.x + hd.R > L && hd.x - hd.R < L + w && hd.y + hd.R > top && hd.y - hd.R < top + h);
+      let left = right - w; let fade = 1;
+      for (let guard = 0; guard < 4 && blocking(left).length; guard++) left = Math.min(...blocking(left).map(hd => hd.x - hd.R - 6)) - w;
+      if (left < 4 || blocking(left).length) { left = right - w; fade = blocking(left).length ? .4 : 1; }
+      // Trượt mượt thay vì nhảy cóc giữa hai vị trí.
+      r.tagShift = lerp(r.tagShift || 0, left - (right - w), .22); left = right - w + r.tagShift;
+      const base = c.globalAlpha;
+      c.globalAlpha = base * .94 * fade;
       c.fillStyle = 'rgba(6, 18, 30, .78)'; rr(c, left, top, w, h, h / 2); c.fill();
       c.strokeStyle = r.color; c.lineWidth = 2.5; c.stroke();
-      c.globalAlpha = 1;
+      c.globalAlpha = base * fade;
       const leading = r.rank === 1 && (game.mode === 'racing' || game.mode === 'finishing' || game.mode === 'result');
       circle(c, left + h / 2, top + h / 2, badge / 2, leading ? '#ffc400' : r.color);
       c.fillStyle = leading ? '#2b1d00' : r.ink; c.textAlign = 'center'; c.textBaseline = 'middle';
       c.font = `900 ${font - 1}px Bahnschrift, sans-serif`; c.fillText(String(game.mode === 'lobby' || game.mode === 'countdown' ? r.number : r.rank), left + h / 2, top + h / 2 + .5);
       if (avatar) {
-        const ax = left + badge + 4 + badge / 2; c.save(); c.beginPath(); c.arc(ax, top + h / 2, badge / 2, 0, Math.PI * 2); c.clip();
-        c.drawImage(avatar, ax - badge / 2, top + h / 2 - badge / 2, badge, badge); c.restore();
+        const ax = left + badge + 4 + ava / 2; c.save(); c.beginPath(); c.arc(ax, top + h / 2, ava / 2, 0, Math.PI * 2); c.clip();
+        drawCover(c, avatar, ax - ava / 2, top + h / 2 - ava / 2, ava); c.restore();
+        c.strokeStyle = r.color; c.lineWidth = 2; c.beginPath(); c.arc(ax, top + h / 2, ava / 2, 0, Math.PI * 2); c.stroke();
       }
       c.fillStyle = '#fff'; c.textAlign = 'left'; c.font = `800 ${font}px "Segoe UI", system-ui, sans-serif`;
       c.fillText(label, left + badge + avaW + 9, top + h / 2 + .5);
@@ -1664,30 +1928,38 @@
     function catmull(p0, p1, p2, p3, u) {
       return .5 * (2 * p1 + (-p0 + p2) * u + (2 * p0 - 5 * p1 + 4 * p2 - p3) * u * u + (-p0 + 3 * p1 - 3 * p2 + p3) * u * u * u);
     }
+    // Kịch bản: nhiều lần đổi người dẫn đầu, cả đoàn bám sát nhau; team thắng chỉ được
+    // dẫn tối đa một mốc ở giữa trận và chỉ bứt hẳn lên ở chặng cuối.
     function createPlan(n, winner, seed) {
       const rnd = prng(seed); const r = (a, b) => a + (b - a) * rnd();
-      const T = [0, .07, .15, .25, .35, .45, .55, .65, .72, .8, .875, .95, 1];
-      const order = Array.from({ length: n }, (_, i) => i);
-      for (let i = n - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
-      // Three leaders take turns in the middle of the race. Any of them may be
-      // the winner, so "the horse that never led" is not a tell.
-      const A = order[0], B = order[1], C = n > 2 ? order[2] : order[0];
-      const trio = [winner];
-      if (C !== winner) trio.push(C);
-      order.forEach(i => { if (trio.length < Math.min(3, n) && !trio.includes(i)) trio.push(i); });
-      const keys = T.map(t => Array.from({ length: n }, (_, i) => {
+      const T = [0, .05, .11, .17, .23, .29, .35, .41, .47, .53, .59, .65, .71, .77, .83, .89, .945, 1];
+      const others = Array.from({ length: n }, (_, i) => i).filter(i => i !== winner);
+      for (let i = others.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [others[i], others[j]] = [others[j], others[i]]; }
+      const trio = [winner].concat(others.slice(0, Math.min(2, others.length)));
+      const leaders = []; let winnerLed = false;
+      T.forEach((t, k) => {
+        if (t === 0 || t > .83) { leaders.push(-1); return; }
+        const prev = leaders[k - 1];
+        const winnerOk = !winnerLed && t >= .23 && t <= .59 && (n === 2 || rnd() < .45);
+        let pool = Array.from({ length: n }, (_, i) => i).filter(i => i !== prev && (winnerOk || i !== winner));
+        if (!pool.length) pool = n === 2 && prev !== winner && t <= .59 ? [winner] : [others[0]];
+        const leader = pool[Math.floor(rnd() * pool.length)];
+        if (leader === winner) winnerLed = true;
+        leaders.push(leader);
+      });
+      const keys = T.map((t, k) => Array.from({ length: n }, (_, i) => {
         if (t === 0) return 0;
-        if (t <= .25) return r(-.2, .2);                                   // cả đoàn sát nhau
-        if (t <= .45) return i === A ? r(.62, .8) : (t === .45 && i === B ? r(.3, .45) : r(-.6, .25));
-        if (t <= .65) return i === B ? r(.62, .8) : i === A ? r(.1, .38) : (t === .65 && i === C ? r(.32, .48) : r(-.65, .22));
-        if (t < .8) return i === C ? r(.62, .8) : i === B ? r(.18, .42) : r(-.65, .18);
-        if (t < 1) return trio.includes(i) ? r(.46, .58) : r(-.78, -.15); // ba ngựa ngang nhau
-        if (i === winner) return 1;                                         // bứt tốc về đích
-        const place = trio.indexOf(i); return place === 1 ? .64 : place === 2 ? .5 : r(-.8, -.2);
+        const lead = leaders[k], chaser = leaders[k - 1];
+        if (t <= .17) return i === lead ? r(.16, .26) : r(-.16, .12);           // xuất phát: cả đoàn sát nhau
+        if (t <= .83) return i === lead ? r(.34, .5) : i === chaser ? r(.18, .32) : r(-.32, .16);
+        const place = trio.indexOf(i);
+        if (t < .9) return place === 0 ? r(.26, .32) : place > 0 ? r(.34, .44) : r(-.55, -.1);   // ba ngựa ngang nhau, team thắng hơi sau
+        if (t < 1) return place === 0 ? r(.6, .68) : place > 0 ? r(.44, .54) : r(-.7, -.2);      // bứt tốc ở chặng cuối
+        return place === 0 ? 1 : place === 1 ? .64 : place === 2 ? .5 : r(-.8, -.2);
       }));
       const wobble = Array.from({ length: n }, () => ({ f1: r(14, 26), p1: r(0, 6.28), f2: r(30, 48), p2: r(0, 6.28) }));
       return {
-        n, winner,
+        n, winner, trio, leaders,
         evaluate(progress) {
           const t = clamp(progress, 0, 1); let k = 0;
           while (k < T.length - 2 && t > T[k + 1]) k++;
@@ -1695,10 +1967,124 @@
           const fade = smooth(0, .06, t) * (1 - smooth(.9, .975, t));
           return Array.from({ length: n }, (_, i) => {
             const v = catmull(keys[Math.max(0, k - 1)][i], keys[k][i], keys[k + 1][i], keys[Math.min(T.length - 1, k + 2)][i], u);
-            return v + (Math.sin(t * wobble[i].f1 + wobble[i].p1) * .045 + Math.sin(t * wobble[i].f2 + wobble[i].p2) * .025) * fade;
+            return v + (Math.sin(t * wobble[i].f1 + wobble[i].p1) * .04 + Math.sin(t * wobble[i].f2 + wobble[i].p2) * .022) * fade;
           });
         }
       };
+    }
+
+    /** Team thắng, chốt bằng Web Crypto. Đua đúng 4 team: team vừa thắng lượt trước không được thắng tiếp. */
+    // Chu kỳ (khi bật loại team): lượt này không ra team của lượt tương ứng ở chu kỳ trước, và vẫn còn
+    // cách xếp các lượt còn lại cho khỏi trùng. Ưu tiên giữ cả hai luật; chỉ nới khi không thể.
+    function pickWinnerIndex(field, round, lastWinnerId, cycle = null) {
+      const all = field.map((_, i) => i);
+      const notTwice = i => !(round === 'team' && field.length === 4 && field[i].id === lastWinnerId);
+      const fitsCycle = i => !cycle || (field[i].id !== cycle.prev[cycle.pos]
+        && canArrange(cycle.remaining.filter(id => id !== field[i].id), cycle.prev, cycle.pos + 1));
+      const tiers = [all.filter(i => notTwice(i) && fitsCycle(i)), all.filter(fitsCycle), all.filter(notTwice), all];
+      const allowed = tiers.find(list => list.length);
+      return allowed[secureIndex(allowed.length)];
+    }
+
+    // ---------- Tình huống tranh đấu ----------
+    // Mọi tình huống là hàm thuần của tiến độ cuộc đua (seek-safe): tua tới đích hay đổi kích thước
+    // màn hình đều cho đúng cảnh. Chúng chỉ đổi vị trí tạm thời, không bao giờ đổi team thắng.
+    const DUEL_LEN = .085;
+    function createEvents(n, winner, seed, opts = {}) {
+      const rnd = prng((seed ^ 0x9e3779b9) >>> 0); const r = (a, b) => a + (b - a) * rnd();
+      const cyclo = new Set(opts.cyclo || []); const trio = opts.trio || [];
+      let cheat = null;
+      // Chơi xấu chỉ ở vòng 1: nạn nhân là team không thắng, kẻ chơi xấu ở làn sát bên.
+      if (opts.round === 'team' && n >= 3 && rnd() < .8) {
+        const list = [];
+        for (let v = 0; v < n; v++) {
+          if (v === winner || cyclo.has(v)) continue;
+          [v - 1, v + 1].forEach(c => { if (c >= 0 && c < n && c !== winner && !cyclo.has(c)) list.push({ victim: v, cheater: c, rival: trio.includes(v) }); });
+        }
+        const best = list.filter(x => !x.rival); const pool = best.length ? best : list;
+        if (pool.length) { const pick = pool[Math.floor(rnd() * pool.length)]; cheat = { victim: pick.victim, cheater: pick.cheater, at: r(.3, .4) }; }
+      }
+      const duels = [];
+      [[.12, .2], [.6, .68]].forEach(([lo, hi], k) => {
+        if (k === 1 && rnd() < .3) return;
+        const banned = cheat && k === 1 ? [cheat.victim] : [];
+        const pairs = Array.from({ length: Math.max(0, n - 1) }, (_, i) => [i, i + 1])
+          .filter(pair => pair.every(i => !cyclo.has(i) && !banned.includes(i)));
+        if (!pairs.length) return;
+        const [a, b] = pairs[Math.floor(rnd() * pairs.length)];
+        const duel = { a, b, at: r(lo, hi), len: DUEL_LEN, fall: null };
+        // Thua đấu kiếm có thể ngã ngựa rồi gắn tên lửa quay lại. Người ngã không dính vụ chơi xấu,
+        // và ở trận đấu kiếm muộn thì không phải team thắng (để chặng cuối vẫn theo kịch bản).
+        const fallers = [a, b].filter(i => !(cheat && (i === cheat.victim || i === cheat.cheater)) && !(k === 1 && i === winner));
+        if (fallers.length && rnd() < .6) duel.fall = { who: fallers[Math.floor(rnd() * fallers.length)] };
+        duels.push(duel);
+      });
+      return { duels, cheat, cyclo: Array.from(cyclo) };
+    }
+    const windowEnv = (p, at, len, edge = .22) => { const w = (p - at) / len; return w <= 0 || w >= 1 ? 0 : smooth(0, edge, w) * (1 - smooth(1 - edge, 1, w)); };
+    const blankInfo = () => ({ mode: 'ride', dy: 0, sword: 0, swordDir: 0, stick: -1, hurt: 0, fallQ: 0, rocketHand: 0, rocketOn: false, rocket: 0 });
+    // Ngã ngựa sau đấu kiếm (tính từ lúc đấu kiếm xong, e): ngã → móc tên lửa gắn mông ngựa → bứt tốc về lại vị trí cũ.
+    const FALL = { fallen: .04, rocket: .08, boost: .15, back: .18, flameOff: .19 };
+    function applyFall(d, p, offsets, info, labels) {
+      const e = d.at + d.len; const i = d.fall.who; if (p < e) return 0;
+      const base = offsets[i]; const low = Math.min(base, -.9); const it = info[i];
+      if (p < e + FALL.fallen) {
+        offsets[i] = lerp(base, low, smooth(e, e + .03, p)); it.mode = 'fallen'; it.fallQ = clamp((p - e) / .012, 0, 1);
+        labels.push({ text: 'NGÃ NGỰA!', a: i, b: i, kind: 'fall' });
+        return p < e + .008 ? 6 : 0;
+      }
+      if (p < e + FALL.rocket) {
+        offsets[i] = low; it.mode = 'rocket'; it.rocketHand = smooth(e + FALL.fallen + .005, e + FALL.rocket - .006, p); it.rocketOn = it.rocketHand >= 1;
+        labels.push({ text: 'GẮN TÊN LỬA!', a: i, b: i, kind: 'rocket' });
+        return 0;
+      }
+      const bump = .32 * (1 - smooth(e + .12, e + FALL.back, p));
+      offsets[i] = lerp(low, base + bump, smooth(e + FALL.rocket, e + .13, p));
+      it.rocketOn = true; it.rocket = 1 - smooth(e + FALL.boost, e + FALL.flameOff, p);
+      if (p < e + FALL.boost) labels.push({ text: 'TÊN LỬA BỨT TỐC!', a: i, b: i, kind: 'boost' });
+      return p < e + FALL.rocket + .012 ? 5 : 1.5 * it.rocket;
+    }
+
+    /** Vị trí đã điều chỉnh và trạng thái hoạt cảnh của từng người đua tại tiến độ p. */
+    function applyEvents(ev, p, base) {
+      const offsets = base.slice(); const info = base.map(blankInfo); const labels = []; let shake = 0;
+      if (!ev) return { offsets, info, labels, shake };
+      ev.cyclo.forEach(i => {
+        if (!info[i]) return; info[i].mode = 'cyclo'; info[i].hurt = 1;
+        if (p < .2 || (p > .5 && p < .58)) labels.push({ text: 'CHỞ NGỰA BẰNG XÍCH LÔ', a: i, b: i, kind: 'cyclo' });
+      });
+      ev.duels.forEach(d => {
+        if (d.fall) shake = Math.max(shake, applyFall(d, p, offsets, info, labels));
+        const env = windowEnv(p, d.at, d.len); if (!env) return;
+        const mid = (offsets[d.a] + offsets[d.b]) / 2; const jostle = Math.sin(p * 160) * .03 * env;
+        // Áp sát nhưng vẫn lệch nhau một chút để hai avatar không chồng lên nhau.
+        offsets[d.a] = lerp(offsets[d.a], mid - .1 + jostle, .85 * env); offsets[d.b] = lerp(offsets[d.b], mid + .1 - jostle, .85 * env);
+        info[d.a].dy = .07 * env; info[d.b].dy = -.07 * env;
+        info[d.a].sword = env; info[d.a].swordDir = 1; info[d.b].sword = env; info[d.b].swordDir = -1;
+        if (env > .35) { labels.push({ text: 'ĐẤU KIẾM!', a: d.a, b: d.b, kind: 'duel' }); shake = Math.max(shake, 2.5 * env); }
+      });
+      const c = ev.cheat;
+      if (c) {
+        const A = c.at; const v = c.victim, k = c.cheater; const dir = k < v ? 1 : -1;
+        const approach = smooth(A - .02, A + .035, p) * (1 - smooth(A + .06, A + .09, p));
+        if (approach > 0) {
+          offsets[k] = lerp(offsets[k], offsets[v] - .2, .9 * approach);
+          info[k].dy = .07 * approach * dir; info[v].dy = -.07 * approach * dir;
+        }
+        if (p > A && p < A + .075) info[k].stick = p < A + .035 ? 0 : clamp((p - A - .035) / .02, 0, 1);
+        offsets[k] += .18 * smooth(A + .05, A + .08, p) * (1 - smooth(A + .14, A + .2, p));   // kẻ chơi xấu vọt lên một đoạn
+        if (p >= A + .05) {
+          info[v].hurt = 1;
+          const stop = smooth(A + .05, A + .11, p); const carry = smooth(A + .1, A + .14, p);
+          offsets[v] = lerp(lerp(offsets[v], -1, stop), -.62 + .1 * Math.sin(p * 23), carry);
+          info[v].mode = p < A + .1 ? 'stopped' : 'carry';
+        }
+        if (p > A + .03 && p < A + .075) { labels.push({ text: 'CHƠI XẤU!', a: k, b: v, kind: 'foul' }); }
+        if (p > A + .035 && p < A + .06) shake = Math.max(shake, 9 * (1 - Math.abs((p - A - .047) / .013)));
+        if (p > A + .062 && p < A + .105) labels.push({ text: 'NGỰA BỊ THƯƠNG!', a: v, b: v, kind: 'hurt' });
+        if (p > A + .105 && p < A + .21) labels.push({ text: 'CÕNG NGỰA CHẠY!', a: v, b: v, kind: 'carry' });
+      }
+      return { offsets, info, labels, shake: Math.max(0, shake) };
     }
     function raceSpeed(t) {
       const launch = t <= 0 ? 0 : .15 + .85 * smooth(0, .045, t);
@@ -1717,7 +2103,7 @@
     // GAME FLOW
     // ======================================================================
     const game = {
-      mode: 'lobby', round: 'team', teamId: null, pool: [], racers: [], plan: null, winner: -1,
+      mode: 'lobby', round: 'team', teamId: null, pool: [], racers: [], plan: null, events: null, winner: -1,
       progress: 0, startAt: 0, duration: 20000, speed: 0, finishAt: 0, record: null,
       leader: -1, orderKey: '', boardAt: 0, msgAt: 0, zone: 0, flags: {}, hoofClock: 0, intro: null, fanGroups: [], wheel: null
     };
@@ -1737,7 +2123,7 @@
       };
     }
     function setRacers(items, round) {
-      game.racers = items.map((item, index) => makeRacer(item, index, round));
+      game.racers = items.map((item, index) => makeRacer(item, index, round)); game.labels = [];
       renderBoard(game.racers.map((_, i) => i));
     }
 
@@ -1764,9 +2150,10 @@
     // fromUser: người dùng vừa bấm sang ván mới – nếu chỉ còn 1 team thì vào thẳng vòng quay thành viên.
     function enterTeamLobby(fromUser = false) {
       if (fromUser && !isBusy()) { recycleExhausted('team'); if (availableTeams().length === 1) { chooseOnlyTeam(); return; } }
-      game.mode = 'lobby'; game.round = 'team'; game.teamId = null; game.record = null; game.progress = 0;
+      game.mode = 'lobby'; game.round = 'team'; game.teamId = null; game.record = null; game.progress = 0; game.events = null;
       game.pool = availableTeams();
-      setRacers(game.pool.slice(0, MAX_LANES), 'team'); resetScene(); setHudRound(); setProgressHud(0);
+      setRacers(game.pool.slice(0, MAX_LANES), 'team');
+      game.racers.forEach(r => { r.cyclo = state.injuredTeams.includes(r.id); }); resetScene(); setHudRound(); setProgressHud(0);
       hideOverlays(); renderLobby(); say('Sẵn sàng xuất phát!', '', true); syncControls();
     }
     // Chỉ còn 1 team: không cần đua, team đó được chọn và vào vòng quay thành viên ngay.
@@ -1783,7 +2170,7 @@
       // Màu của team ở vòng 1 được giữ cho vòng quay.
       const previous = game.racers.find(r => r.id === teamId) || (game.wheel && game.wheel.teamId === teamId ? game.wheel : null);
       const color = previous ? previous.color : COLORS[Math.max(0, state.teams.indexOf(team)) % COLORS.length];
-      game.mode = 'lobby'; game.round = 'member'; game.teamId = teamId; game.record = null; game.progress = 0;
+      game.mode = 'lobby'; game.round = 'member'; game.teamId = teamId; game.record = null; game.progress = 0; game.events = null;
       game.pool = availableMembers(team);
       const wheelMode = state.settings.round2Method !== 'horse';
       game.wheel = wheelMode ? makeWheel(team, color, game.wheel) : null;
@@ -1805,7 +2192,7 @@
         const excluded = state.teams.filter(t => !pool.includes(t) && !finished.includes(t));
         body = `<p class="kicker">VÒNG 1</p><h2>ĐUA NGỰA CHỌN TEAM</h2>
           <p class="sub">${pool.length} team · bấm bắt đầu để các điểm trên logo SECI sinh ra những chiến mã</p>
-          <div class="chips">${pool.map((t, i) => { const rider = racerOf(t); return `<span class="chip"><i style="background:${i < MAX_LANES ? COLORS[i % COLORS.length] : '#56606c'}"></i>${escapeHtml(t.name)} <small>${rider ? `🏇 ${escapeHtml(rider.name)} · ` : ''}${t.members.length} TV</small></span>`; }).join('')}${excluded.map(t => `<span class="chip out">${escapeHtml(t.name)}</span>`).join('')}${finished.map(t => `<span class="chip out" title="Mọi thành viên đã phát biểu">${escapeHtml(t.name)} <small>✓ hết người</small></span>`).join('')}</div>
+          <div class="chips">${pool.map((t, i) => { const rider = racerOf(t); return `<span class="chip"><i style="background:${i < MAX_LANES ? COLORS[i % COLORS.length] : '#56606c'}"></i>${escapeHtml(t.name)} <small>${state.injuredTeams.includes(t.id) ? '🛺 xích lô · ' : ''}${rider ? `🏇 ${escapeHtml(rider.name)} · ` : ''}${t.members.length} TV</small></span>`; }).join('')}${excluded.map(t => `<span class="chip out">${escapeHtml(t.name)}</span>`).join('')}${finished.map(t => `<span class="chip out" title="Mọi thành viên đã phát biểu">${escapeHtml(t.name)} <small>✓ hết người</small></span>`).join('')}</div>
           <p class="sub" style="margin-top:.5cqw">Mỗi team 1 người cưỡi ngựa 🏇, các thành viên còn lại đứng hàng rào cổ vũ.</p>`;
         if (pool.length > MAX_LANES) body += `<p class="note">Có ${pool.length} team – khi bắt đầu sẽ bốc thăm ngẫu nhiên ${MAX_LANES} team vào đường đua.</p>`;
         if (excluded.length) body += `<p class="note">Đang tạm loại ${excluded.length} team đã được chọn trước đó.</p>`;
@@ -1854,12 +2241,20 @@
       const items = game.round === 'team' ? availableTeams() : availableMembers(team);
       if (items.length < 2) { showToast('Cần ít nhất 2 người đua.', 'error'); return; }
       const field = items.length > MAX_LANES ? secureShuffle(items).slice(0, MAX_LANES) : items.slice();
-      const winner = secureIndex(field.length);
+      const winner = pickWinnerIndex(field, game.round, state.lastWinnerTeamId, game.round === 'team' ? cycleRule() : null);
+      // Vòng 1: team có ngựa bị thương (chưa thắng lại trận nào) phải đạp xích lô.
+      const cyclo = game.round === 'team' ? field.map((item, i) => (state.injuredTeams.includes(item.id) ? i : -1)).filter(i => i >= 0) : [];
+      const seed = secureSeed();
+      const plan = createPlan(field.length, winner, seed);
+      const events = createEvents(field.length, winner, seed, { round: game.round, cyclo, trio: plan.trio });
       // Kết quả được chốt và lưu trước khi chạy hoạt ảnh; tải lại trang không đổi được kết quả.
-      state.pending = { round: game.round, winnerId: field[winner].id, teamId: game.round === 'team' ? field[winner].id : team.id, createdAt: new Date().toISOString() };
+      state.pending = {
+        round: game.round, winnerId: field[winner].id, teamId: game.round === 'team' ? field[winner].id : team.id, createdAt: new Date().toISOString(),
+        injureId: events.cheat ? field[events.cheat.victim].id : null
+      };
       persist();
-      setRacers(field, game.round); resetScene();
-      game.plan = createPlan(field.length, winner, secureSeed()); game.winner = winner;
+      setRacers(field, game.round); cyclo.forEach(i => { game.racers[i].cyclo = true; }); resetScene();
+      game.plan = plan; game.events = events; game.winner = winner;
       game.duration = state.settings.raceSeconds * 1000; game.progress = 0; game.flags = {}; game.leader = -1; game.orderKey = ''; game.zone = 0; game.hoofClock = 0;
       hideOverlays(); setProgressHud(0);
       // Nhạc đua phát từ đầu ngay khi bấm "Bắt đầu đua" (trong cú bấm nên trình duyệt cho phép).
@@ -2012,6 +2407,25 @@
       if (key !== game.orderKey && now - game.boardAt > 160) { game.orderKey = key; game.boardAt = now; renderBoard(order); }
       const zone = zoneIndexAt(p);
       if (zone !== game.zone) { game.zone = zone; say(`Đoàn đua tiến vào ${ZONES[zone].name}!`, 'zone', true); }
+      const ev = game.events;
+      if (ev) {
+        ev.duels.forEach((d, k) => {
+          if (p >= d.at + d.len * .2 && !game.flags[`duel${k}`]) { game.flags[`duel${k}`] = true; say(`ĐẤU KIẾM! ${racers[d.a].name} và ${racers[d.b].name} áp sát so kiếm!`, 'hot', true); }
+        });
+        const c = ev.cheat;
+        if (c) {
+          if (p >= c.at + .035 && !game.flags.foul) { game.flags.foul = true; say(`CHƠI XẤU! ${racers[c.cheater].name} vụt gậy vào chân ngựa ${racers[c.victim].name}!`, 'hot', true); }
+          if (p >= c.at + .062 && !game.flags.hurt) { game.flags.hurt = true; say(`Ngựa của ${racers[c.victim].name} bị đau, đứng khựng lại!`, 'hot', true); }
+          if (p >= c.at + .105 && !game.flags.carry) { game.flags.carry = true; say(`${racers[c.victim].name} xuống ngựa, CÕNG NGỰA CHẠY về đích!`, 'hot', true); }
+        }
+        ev.duels.forEach((d, k) => {
+          if (!d.fall) return; const e = d.at + d.len; const name = racers[d.fall.who].name;
+          if (p >= e && !game.flags[`fall${k}`]) { game.flags[`fall${k}`] = true; say(`${name} NGÃ NGỰA sau màn đấu kiếm!`, 'hot', true); }
+          if (p >= e + FALL.fallen && !game.flags[`rocket${k}`]) { game.flags[`rocket${k}`] = true; say(`${name} móc trong túi ra… một quả TÊN LỬA!`, 'hot', true); }
+          if (p >= e + FALL.rocket && !game.flags[`boost${k}`]) { game.flags[`boost${k}`] = true; say(`TÊN LỬA BỨT TỐC! ${name} lao vút trở lại cuộc đua!`, 'hot', true); }
+        });
+        if (ev.cyclo.length && p >= .02 && !game.flags.cyclo) { game.flags.cyclo = true; say(`${ev.cyclo.map(i => racers[i].name).join(', ')} đạp xích lô chở ngựa bị thương!`, '', true); }
+      }
       if (p >= .8 && !game.flags.tight) { game.flags.tight = true; say(racers.length >= 3 ? 'Gay cấn! Ba chiến mã gần như ngang nhau!' : 'Gay cấn! Hai chiến mã ngang nhau!', 'hot', true); }
       if (p >= .86 && !game.flags.gate) { game.flags.gate = true; say('Cổng FINISH đã xuất hiện phía trước!', 'hot', true); }
       if (p >= .95 && !game.flags.sprint) { game.flags.sprint = true; say('Nước rút cuối cùng! Ai sẽ về nhất?!', 'hot', true); }
@@ -2026,7 +2440,7 @@
     }
 
     function onCross() {
-      game.mode = 'finishing'; game.finishAt = performance.now(); els.skip.hidden = true;
+      game.mode = 'finishing'; game.finishAt = performance.now(); els.skip.hidden = true; game.labels = [];
       scene.flash = reducedMotion() ? .35 : .9; scene.shake = reducedMotion() ? 0 : 16; scene.hype = 1;
       spawnConfetti(); playWin(); cheer(); stopMusic(1400);
       const winner = game.racers[game.winner];
@@ -2069,9 +2483,9 @@
       els.final.innerHTML = `<div class="card final-card"><p class="kicker">NGƯỜI ĐƯỢC CHỌN</p>
         <div class="avatar final-avatar" style="--c:${color}">${photo ? `<img src="${escapeHtml(photo)}" alt="" />` : escapeHtml(initialOf(record.resultName))}</div>
         <h2 class="final-name win-name" style="--c:#ffd84a">${escapeHtml(record.resultName)}</h2>
-        <p class="final-team">${escapeHtml(record.teamName)}</p>
-        <p class="final-share">MỜI BẠN CHIA SẺ</p>
-        <div class="card-actions"><button class="btn-arcade" type="button" data-go="round1">VÁN MỚI · VÒNG 1</button><button class="btn-ghost" type="button" data-go="again">${state.settings.round2Method !== 'horse' ? 'Quay' : 'Đua'} lại vòng 2 · ${escapeHtml(record.teamName)}</button></div></div>`;
+        <div class="final-meta"><p class="final-team">${escapeHtml(record.teamName)}</p>
+        <p class="final-share">MỜI BẠN CHIA SẺ</p></div>
+        <div class="card-actions"><button class="btn-ghost" type="button" data-go="again">◀ Quay lại đội ${escapeHtml(record.teamName)}</button><button class="btn-arcade" type="button" data-go="round1">TIẾP TỤC VÒNG TIẾP THEO ▶</button></div></div>`;
       els.final.hidden = false;
       requestAnimationFrame(() => { const b = els.final.querySelector('.btn-arcade'); if (b) b.focus(); });
     }
@@ -2088,6 +2502,12 @@
       if (record.eliminated) {
         if (record.type === 'team' && !state.excludedTeams.includes(team.id)) state.excludedTeams.push(team.id);
         if (record.type === 'member') { const key = memberKey(team.id, selected.id); if (!state.excludedMembers.includes(key)) state.excludedMembers.push(key); }
+      }
+      if (record.type === 'team') {
+        state.lastWinnerTeamId = team.id;
+        // Ngựa bị thương: đạp xích lô mọi trận sau cho tới khi team thắng một trận mới được cưỡi ngựa lại.
+        state.injuredTeams = state.injuredTeams.filter(id => id !== team.id);
+        if (pending.injureId && teamById(pending.injureId) && !state.injuredTeams.includes(pending.injureId)) state.injuredTeams.push(pending.injureId);
       }
       state.history.push(record); state.pending = null; persist(); renderHistory();
       return record;
@@ -2107,6 +2527,7 @@
 
     // ---------- Frame loop ----------
     let lastNow = performance.now();
+    let eventShake = 0;
     function frame(now) {
       const dt = Math.min(.05, Math.max(0, (now - lastNow) / 1000)); lastNow = now;
       try { update(dt, now); draw(); } catch (error) { console.error(error); }
@@ -2119,11 +2540,15 @@
       if (game.mode === 'racing') {
         game.progress = clamp((now - game.startAt) / game.duration, 0, 1);
         game.speed = raceSpeed(game.progress);
-        const offsets = game.plan.evaluate(game.progress);
+        const frameEvents = applyEvents(game.events, game.progress, game.plan.evaluate(game.progress));
+        game.labels = frameEvents.labels; eventShake = frameEvents.shake;
         racers.forEach((r, i) => {
-          r.prev = r.offset; r.offset = offsets[i];
+          const before = r.ev ? r.ev.mode : 'ride';
+          r.prev = r.offset; r.offset = frameEvents.offsets[i]; r.ev = frameEvents.info[i];
           r.surge = lerp(r.surge, clamp((r.offset - r.prev) / Math.max(dt, .001) * .5, -1, 1), .12);
+          if (before !== r.ev.mode && r.ev.mode === 'carry') burstDust(r, i, 14);    // nhảy xuống ngựa
         });
+        eventEffects(dt);
         if (game.progress >= .85) {
           const s = (game.progress - .85) / .15; const winner = racers[game.winner];
           const nose = xFor(winner.offset) + NOSE * laneGeom(game.winner, racers.length).s;
@@ -2175,7 +2600,10 @@
       scene.lines = scene.lines.filter(l => l.x + l.len > 0);
       scene.confetti.forEach(p => { p.vy += 520 * dt; p.vx *= (1 - .9 * dt); p.x += p.vx * dt; p.y += p.vy * dt; p.rot += p.vr * dt; });
       scene.confetti = scene.confetti.filter(p => p.y < H + 40);
-      const ambientShake = !reducedMotion() && game.mode === 'racing' ? Math.max(0, game.speed - 1.3) * 2.6 : 0;
+      if (game.mode !== 'racing') eventShake = 0;
+      scene.sparks.forEach(sp => { sp.life += dt; sp.x += sp.vx * dt; sp.y += sp.vy * dt; sp.vy += 900 * dt; });
+      scene.sparks = scene.sparks.filter(sp => sp.life < sp.max);
+      const ambientShake = !reducedMotion() && game.mode === 'racing' ? Math.max(0, game.speed - 1.3) * 2.6 + eventShake : 0;
       scene.shake = Math.max(ambientShake, scene.shake * Math.exp(-dt * 5));
       scene.flash = Math.max(0, scene.flash - dt * 1.8);
       scene.hype = Math.max(game.mode === 'result' ? .35 : 0, scene.hype - dt * .12);
@@ -2253,26 +2681,164 @@
       scene.dust.forEach(d => { c.fillStyle = `rgba(214, 196, 160, ${(.5 * (1 - d.life / d.max)).toFixed(3)})`; c.beginPath(); c.arc(d.x, d.y, d.r, 0, Math.PI * 2); c.fill(); });
       game.racers.forEach((r, i) => {
         if (r.reveal <= 0) return;
-        const geom = laneGeom(i, n);
-        if (r.reveal >= 1) { drawHorse(c, r, r.x, geom.y, geom.s, g); return; }
-        c.save(); c.globalAlpha = clamp(r.reveal * 1.8, 0, 1);
-        drawHorse(c, r, r.x, geom.y, geom.s * (.55 + .45 * easeOutBack(r.reveal)), g); c.restore();
+        const geom = laneGeom(i, n); const y = racerY(i); const ev = r.ev || blankInfo();
+        const s = r.reveal >= 1 ? geom.s : geom.s * (.55 + .45 * easeOutBack(r.reveal));
+        c.save(); if (r.reveal < 1) c.globalAlpha = clamp(r.reveal * 1.8, 0, 1);
+        if (r.cyclo) drawCyclo(c, r, r.x, y, s, g);
+        else if (ev.mode === 'carry') drawCarrier(c, r, r.x, y, s);
+        else if (ev.mode === 'fallen' || ev.mode === 'rocket') {
+          drawHorse(c, r, r.x, y, s, 0, { noRider: true, rocket: ev.rocketOn ? 0 : -1 });
+          drawGroundRider(c, r, r.x, y, s, ev);
+        }
+        else drawHorse(c, r, r.x, y, s, ev.mode === 'stopped' ? 0 : g, { hurt: ev.hurt > 0, rocket: ev.rocketOn ? ev.rocket : -1 });
+        c.restore();
+      });
+      drawCombat(c, g);
+      scene.sparks.forEach(sp => {
+        const k = 1 - sp.life / sp.max; c.strokeStyle = sp.color; c.globalAlpha = k; c.lineWidth = 2.6; c.lineCap = 'round';
+        c.beginPath(); c.moveTo(sp.x, sp.y); c.lineTo(sp.x - sp.vx * .025, sp.y - sp.vy * .025); c.stroke();
+      });
+      c.globalAlpha = 1;
+    }
+    // Kiếm và gậy vẽ ở lớp trên cùng để không bị ngựa làn bên che khuất.
+    function riderHand(i, g) {
+      const r = game.racers[i]; const s = laneGeom(i, game.racers.length).s;
+      const bob = g ? -Math.abs(Math.sin(r.phase * Math.PI * 2)) * 7 * g : 0;
+      return { x: r.x + 48 * s, y: racerY(i) + (bob * .65 - 95) * s, s };
+    }
+    function drawBlade(c, from, to, s, len) {
+      const a = Math.atan2(to.y - from.y, to.x - from.x);
+      c.save(); c.translate(from.x, from.y); c.rotate(a); c.lineCap = 'round';
+      c.strokeStyle = '#6b4a1f'; c.lineWidth = 5 * s; c.beginPath(); c.moveTo(-7 * s, 0); c.lineTo(2 * s, 0); c.stroke();
+      c.strokeStyle = '#ffd84a'; c.lineWidth = 4 * s; c.beginPath(); c.moveTo(2 * s, -8 * s); c.lineTo(2 * s, 8 * s); c.stroke();
+      c.strokeStyle = '#1b2a38'; c.lineWidth = 7 * s; c.beginPath(); c.moveTo(4 * s, 0); c.lineTo(len, 0); c.stroke();
+      c.strokeStyle = '#eef4fa'; c.lineWidth = 4.5 * s; c.beginPath(); c.moveTo(4 * s, 0); c.lineTo(len, 0); c.stroke();
+      c.restore();
+    }
+    function drawCombat(c, g) {
+      const ev = game.events; if (!ev || game.mode !== 'racing') return;
+      const t = scene.time;
+      ev.duels.forEach(d => {
+        const ra = game.racers[d.a], rb = game.racers[d.b]; if (!ra || !rb || !ra.ev || ra.ev.sword < .05) return;
+        const env = ra.ev.sword; const ha = riderHand(d.a, g), hb = riderHand(d.b, g); const s = Math.min(ha.s, hb.s);
+        const clash = { x: (ha.x + hb.x) / 2 + (46 + Math.sin(t * 17) * 7) * s, y: (ha.y + hb.y) / 2 + Math.cos(t * 17) * 5 * s };
+        [ha, hb].forEach(h => drawBlade(c, h, clash, s, (Math.hypot(clash.x - h.x, clash.y - h.y) + 14 * s) * clamp(env * 1.6, 0, 1)));
+        if (env > .35) { const pulse = .7 + .3 * Math.sin(t * 34); c.fillStyle = `rgba(255, 240, 160, ${(.85 * pulse).toFixed(3)})`; starBurst(c, clash.x, clash.y, 11 * s * pulse, 5 * s, 8); }
+      });
+      const ch = ev.cheat; if (!ch) return;
+      const k = game.racers[ch.cheater]; if (!k || !k.ev || k.ev.stick < 0) return;
+      const v = ch.victim; const rv = game.racers[v]; const sv = laneGeom(v, game.racers.length).s;
+      const h = riderHand(ch.cheater, g); const target = { x: rv.x - 30 * sv, y: racerY(v) - 30 * sv };   // chân sau, tránh đè avatar người cưỡi
+      const aim = Math.atan2(target.y - h.y, target.x - h.x); const angle = lerp(aim - 2.1, aim, k.ev.stick * k.ev.stick);
+      const len = Math.max(Math.hypot(target.x - h.x, target.y - h.y) + 20 * h.s, 88 * h.s);
+      c.lineCap = 'round';
+      c.strokeStyle = '#4a2a10'; c.lineWidth = 8 * h.s; c.beginPath(); c.moveTo(h.x, h.y); c.lineTo(h.x + Math.cos(angle) * len, h.y + Math.sin(angle) * len); c.stroke();
+      c.strokeStyle = '#b07a3e'; c.lineWidth = 5 * h.s; c.beginPath(); c.moveTo(h.x, h.y); c.lineTo(h.x + Math.cos(angle) * len, h.y + Math.sin(angle) * len); c.stroke();
+      if (k.ev.stick >= 1) { c.fillStyle = '#fff3a0'; starBurst(c, target.x, target.y, 22 * sv, 9 * sv, 9); c.fillStyle = '#ff7a1a'; starBurst(c, target.x, target.y, 11 * sv, 5 * sv, 9); }
+    }
+    function starBurst(c, x, y, outer, inner, points) {
+      c.beginPath();
+      for (let q = 0; q < points * 2; q++) { const rad = q % 2 ? inner : outer; const a = q * Math.PI / points - Math.PI / 2; c.lineTo(x + Math.cos(a) * rad, y + Math.sin(a) * rad); }
+      c.closePath(); c.fill();
+    }
+    const racerY = i => { const n = game.racers.length; const geom = laneGeom(i, n); const r = game.racers[i]; return geom.y + (r && r.ev ? r.ev.dy : 0) * geom.laneH; };
+
+    // Nhãn tình huống kiểu truyện tranh; luôn nằm trong khung hình và không chồng lên nhau.
+    const LABEL_STYLE = {
+      fall: ['#ff9d1a', '#ffffff'], rocket: ['#d7f36b', '#1b2a00'], boost: ['#ff2e88', '#ffffff'],
+      duel: ['#ffd400', '#b0001e'], foul: ['#ff3b3b', '#ffffff'], hurt: ['#ffffff', '#d4002a'], carry: ['#7ef0ff', '#08202f'], cyclo: ['#ffc400', '#2b1d00']
+    };
+    function drawEventLabels(c) {
+      const n = game.racers.length;
+      let list = game.mode === 'racing' ? (game.labels || []) : [];
+      if (game.mode === 'lobby' || game.mode === 'countdown') list = game.racers.map((r, i) => (r.cyclo && r.reveal > 0 ? { text: 'CHỞ NGỰA BẰNG XÍCH LÔ', a: i, b: i, kind: 'cyclo' } : null)).filter(Boolean);
+      const placed = [];
+      list.forEach(label => {
+        const ra = game.racers[label.a], rb = game.racers[label.b]; if (!ra || !rb) return;
+        const s = Math.min(laneGeom(label.a, n).s, laneGeom(label.b, n).s);
+        const font = Math.round(clamp(24 * s, 17, 28));
+        c.font = `900 ${font}px Bahnschrift, "Arial Black", sans-serif`;
+        const w = c.measureText(label.text).width + font * 1.3, h = font + 14;
+        let cx = clamp((ra.x + rb.x) / 2 + 10 * s, w / 2 + 8, W - w / 2 - 8);
+        let cy = clamp(Math.min(racerY(label.a), racerY(label.b)) - 158 * s, 100 + h / 2, TRACK_BOTTOM - h / 2);
+        for (let guard = 0; guard < 6 && placed.some(b => Math.abs(b.x - cx) < (b.w + w) / 2 && Math.abs(b.y - cy) < (b.h + h) / 2 + 2); guard++) cy = Math.max(100 + h / 2, cy - h - 6);
+        placed.push({ x: cx, y: cy, w, h });
+        const [fill, ink] = LABEL_STYLE[label.kind] || LABEL_STYLE.duel;
+        const pop = 1 + .05 * Math.sin(scene.time * 12);
+        c.save(); c.translate(cx, cy); c.rotate(-.05); c.scale(pop, pop);
+        c.fillStyle = 'rgba(0, 0, 0, .35)'; rr(c, -w / 2 + 3, -h / 2 + 4, w, h, h / 2.6); c.fill();
+        c.fillStyle = fill; rr(c, -w / 2, -h / 2, w, h, h / 2.6); c.fill();
+        c.strokeStyle = '#1b1b1f'; c.lineWidth = 3; c.stroke();
+        c.fillStyle = ink; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(label.text, 0, 1.5);
+        c.restore();
       });
     }
+
+    // ---------- Hiệu ứng của tình huống (chỉ trang trí, không ảnh hưởng kết quả) ----------
+    function burstDust(r, i, count) {
+      if (reducedMotion()) return;
+      const s = laneGeom(i, game.racers.length).s; const y = racerY(i);
+      for (let k = 0; k < count; k++) scene.dust.push({ x: r.x + rand(-40, 40) * s, y: y - rand(0, 14), vx: rand(-160, 120), vy: -rand(30, 120), r: rand(5, 10) * s, life: 0, max: rand(.5, .9) });
+    }
+    function burstSparks(x, y, count) {
+      if (reducedMotion()) count = Math.ceil(count / 3);
+      for (let k = 0; k < count; k++) { const a = rand(0, Math.PI * 2), v = rand(160, 420); scene.sparks.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 120, life: 0, max: rand(.25, .5), color: pick(['#fff6b0', '#ffd84a', '#ffffff', '#ff9d1a']) }); }
+    }
+    function eventEffects(dt) {
+      const ev = game.events; if (!ev) return; const n = game.racers.length;
+      ev.duels.forEach((d, k) => {
+        if (!d.fall) return; const i = d.fall.who; const r = game.racers[i]; if (!r || !r.ev) return;
+        const s = laneGeom(i, n).s;
+        if (r.ev.mode === 'fallen' && !game.flags[`thud${k}`]) { game.flags[`thud${k}`] = true; burstDust(r, i, 12); noise(.2, .08, 500); tone(300, .3, 'triangle', .04, 0, 120); }
+        if (r.ev.rocket > .3) {
+          if (!game.flags[`whoosh${k}`]) { game.flags[`whoosh${k}`] = true; tone(180, .7, 'sawtooth', .035, 0, 1400); noise(.6, .05, 2400, 'highpass'); burstDust(r, i, 10); }
+          if (Math.random() < dt * 40 * r.ev.rocket) burstSparks(r.x - 100 * s, racerY(i) - 84 * s, 3);
+        }
+      });
+      ev.duels.forEach(d => {
+        const ra = game.racers[d.a], rb = game.racers[d.b]; if (!ra || !rb || !ra.ev || ra.ev.sword < .35) return;
+        if (Math.random() < dt * 7) {
+          const s = laneGeom(d.a, n).s;
+          burstSparks((ra.x + rb.x) / 2 + 94 * s, (racerY(d.a) + racerY(d.b)) / 2 - 95 * s, 9);
+          tone(1700 + rand(0, 500), .06, 'square', .02); tone(2600, .05, 'triangle', .015, .02);
+        }
+      });
+      const c = ev.cheat;
+      if (c && !game.flags.strike && game.racers[c.cheater].ev && game.racers[c.cheater].ev.stick >= 1) {
+        game.flags.strike = true; const rv = game.racers[c.victim]; const sv = laneGeom(c.victim, n).s;
+        burstSparks(rv.x - 30 * sv, racerY(c.victim) - 30 * sv, 22); burstDust(rv, c.victim, 10);
+        noise(.18, .09, 900); tone(220, .25, 'sawtooth', .04, 0, 110);
+      }
+    }
     function drawTags(c) {
-      const n = game.racers.length;
+      const n = game.racers.length; const heads = riderHeads();
       game.racers.forEach((r, i) => {
         if (r.reveal <= 0) return;
         const geom = laneGeom(i, n);
-        c.save(); c.globalAlpha = r.reveal; drawTag(c, r, r.x, geom.y, geom.s, geom.laneH); c.restore();
+        c.save(); c.globalAlpha = r.reveal; drawTag(c, r, r.x, geom.y, geom.s, geom.laneH, heads, i); c.restore();
       });
+    }
+    // Vị trí avatar của từng người đua (theo phương tiện hiện tại) để thẻ tên tránh đè lên.
+    function riderHeads() {
+      const n = game.racers.length;
+      return game.racers.map((r, index) => {
+        if (r.reveal <= 0) return null;
+        const s = laneGeom(index, n).s; const y = racerY(index); const mode = r.ev ? r.ev.mode : 'ride';
+        const [dx, dy] = r.cyclo ? [30, -112] : mode === 'carry' ? [26, -90] : mode === 'fallen' ? [-86, -58] : mode === 'rocket' ? [-78, -92] : [34, -121];
+        const head = { index, x: r.x + dx * s, y: y + dy * s, R: RIDER_HEAD * 1.25 * s };
+        // Con ngựa đang được cõng cũng phải nhìn thấy được.
+        if (mode === 'carry' && !r.cyclo) return [head, { index, x: r.x - 12 * s, y: y - 112 * s, R: 36 * s }];
+        // Tên lửa và ngọn lửa trên mông ngựa cũng không được bị thẻ tên che.
+        if (r.ev && r.ev.rocketOn && r.ev.rocket > .05) return [head, { index, x: r.x - 80 * s, y: y - 86 * s, R: 30 * s }];
+        return [head];
+      }).filter(Boolean).flat();
     }
     function drawFore(c) {
       const g = c.createLinearGradient(0, TRACK_BOTTOM, 0, H);
       g.addColorStop(0, '#d9d2c4'); g.addColorStop(.12, '#cfc7b8'); g.addColorStop(.16, '#3f8f3a'); g.addColorStop(1, '#2c6b2b');
       c.fillStyle = g; c.fillRect(-30, TRACK_BOTTOM, W + 60, H - TRACK_BOTTOM + 30);
       // Hàng rào phía gần: chỉ thấy đầu và tay cổ động viên nhô qua rào, không che ngựa.
-      drawFans(c, scene.fansNear, scene.scroll.fore, H + 6, 1, false);
+      drawFans(c, scene.fansNear, scene.scroll.fore, H + 22, 1, false);
       drawRails(c, H - 26, scene.scroll.fore, 74, '#f4f6f8');
       scene.fore.items.forEach(item => {
         const x = item.x - scene.scroll.fore; if (x > W + 40 || x + item.w < -120) return;
@@ -2284,8 +2850,8 @@
       c.save();
       if (scene.shake > .15) c.translate(rand(-1, 1) * scene.shake, rand(-1, 1) * scene.shake * .6);
       drawSky(c); drawCity(c); drawPlaza(c); drawMid(c);
-      drawFans(c, scene.fansFar, scene.scroll.road, TRACK_TOP + 2, .96, true);
-      drawRails(c, TRACK_TOP, scene.scroll.road, 90, '#f4f6f8');
+      drawFans(c, scene.fansFar, scene.scroll.stands, TRACK_TOP + 2, .96, true);
+      drawRails(c, TRACK_TOP, scene.scroll.stands, 90, '#f4f6f8');
       drawTrack(c);
       drawLine(c, scene.startLine, 240, 'back', 'XUẤT PHÁT', '#0a7fc0');
       drawLine(c, scene.gateX, 196, 'back', 'FINISH', '#ef1b2d');
@@ -2294,6 +2860,7 @@
       drawLine(c, scene.gateX, 196, 'front', 'FINISH', '#ef1b2d');
       drawTags(c);
       drawFore(c);
+      drawEventLabels(c);
       drawWheel(c);
       // Sảnh vòng 1: logo nguyên bản, 4 điểm nằm yên trên logo.
       if (game.mode === 'lobby' && game.round === 'team') drawLogo(c, LOGO_HOME.x, LOGO_HOME.y, LOGO_HOME.size, LOGO_POINT_TO_TEAM);
@@ -2390,6 +2957,7 @@
     function openDialogShell(title, message) {
       dialogOpen = true; els.dialogTitle.textContent = title; els.dialogMessage.textContent = message;
       els.dialogInput.hidden = true; els.dialogLabel.hidden = true; els.dialogError.textContent = ''; els.dialogActions.innerHTML = '';
+      els.cropBox.hidden = true; els.dialogBackdrop.querySelector('.modal').classList.remove('cropping');
       els.dialogBackdrop.classList.add('open'); els.dialogBackdrop.setAttribute('aria-hidden', 'false');
     }
     function closeDialog() { dialogOpen = false; els.dialogBackdrop.classList.remove('open'); els.dialogBackdrop.setAttribute('aria-hidden', 'true'); }
@@ -2449,14 +3017,92 @@
     let photoTarget = null;
     function requestPhoto(team, member) {
       photoTarget = { teamId: team.id, memberId: member.id };
-      if (!member.imageData) { els.photoInput.click(); return; }
-      openDialogShell(`Ảnh của ${member.name}`, 'Chọn ảnh khác hoặc xóa ảnh hiện tại.');
+      const current = photoOf(member);
+      if (!current) { els.photoInput.click(); return; }
+      openDialogShell(`Ảnh của ${member.name}`, 'Chỉnh lại khung ảnh, chọn ảnh khác hoặc xóa ảnh hiện tại.');
       els.dialogActions.append(
         makeButton('Hủy', 'btn', () => { photoTarget = null; closeDialog(); }),
-        makeButton('Xóa ảnh', 'btn danger', () => { closeDialog(); photoTarget = null; mutate(() => { member.imageData = ''; }, `Đã xóa ảnh của ${member.name}.`); }),
-        makeButton('Chọn ảnh khác', 'btn primary', () => { closeDialog(); els.photoInput.click(); })
+        makeButton('Xóa ảnh', 'btn danger', () => { closeDialog(); photoTarget = null; mutate(() => { member.imageData = ''; delete member.imageOriginal; delete member.imageCrop; }, `Đã xóa ảnh của ${member.name}.`); }),
+        makeButton('Chọn ảnh khác', 'btn', () => { closeDialog(); els.photoInput.click(); }),
+        makeButton('✂ Chỉnh khung ảnh', 'btn primary', () => { photoTarget = null; openCropper(team, member, member.imageOriginal || current, member.imageOriginal ? member.imageCrop : null); })
       );
     }
+
+    // ---------- Chỉnh khung ảnh đại diện (kéo, phóng to, xoay; lưu lại được để chỉnh tiếp) ----------
+    const CROP_OUT = 520;                     // cạnh ảnh vuông dùng trong cuộc đua và màn công bố
+    const crop = { teamId: '', memberId: '', img: null, src: '', source: null, w: 0, h: 0, cx: 0, cy: 0, z: 1, rot: 0, pointers: new Map() };
+    const loadImage = src => new Promise((resolve, reject) => { const img = new Image(); img.onload = () => resolve(img); img.onerror = reject; img.src = src; });
+    function setCropSource() {
+      const img = crop.img; const w = img.naturalWidth, h = img.naturalHeight;
+      if (crop.rot) {
+        const c = document.createElement('canvas'); const odd = crop.rot % 2 === 1;
+        c.width = odd ? h : w; c.height = odd ? w : h;
+        const g = c.getContext('2d'); g.translate(c.width / 2, c.height / 2); g.rotate(crop.rot * Math.PI / 2); g.drawImage(img, -w / 2, -h / 2);
+        crop.source = c; crop.w = c.width; crop.h = c.height;
+      } else { crop.source = img; crop.w = w; crop.h = h; }
+      crop.cx = crop.w / 2; crop.cy = crop.h / 2;
+    }
+    const cropHalf = () => Math.min(crop.w, crop.h) / 2 / crop.z;   // nửa cạnh khung cắt, tính theo px ảnh
+    function clampCrop() { const half = cropHalf(); crop.cx = clamp(crop.cx, half, crop.w - half); crop.cy = clamp(crop.cy, half, crop.h - half); }
+    function drawCrop() {
+      if (!crop.source) return;
+      const c = els.cropCanvas.getContext('2d'); const size = els.cropCanvas.width; const half = cropHalf();
+      c.fillStyle = '#0b1826'; c.fillRect(0, 0, size, size);
+      c.drawImage(crop.source, crop.cx - half, crop.cy - half, half * 2, half * 2, 0, 0, size, size);
+    }
+    function setCropZoom(z) { crop.z = clamp(z, 1, 4); els.cropZoom.value = String(crop.z); clampCrop(); drawCrop(); }
+    async function openCropper(team, member, src, saved) {
+      let img; try { img = await loadImage(src); } catch (_) { showToast('Không mở được ảnh này.', 'error'); return; }
+      Object.assign(crop, { teamId: team.id, memberId: member.id, img, src, rot: saved ? saved.rot : 0, z: saved ? saved.z : 1 });
+      crop.pointers.clear(); setCropSource();
+      if (saved) { crop.cx = saved.cx * crop.w; crop.cy = saved.cy * crop.h; }
+      clampCrop();
+      openDialogShell(`Chỉnh ảnh · ${member.name}`, 'Vòng tròn là phần hiện trên đường đua; màn công bố hiện cả khung vuông.');
+      els.dialogBackdrop.querySelector('.modal').classList.add('cropping'); els.cropBox.hidden = false;
+      els.cropZoom.value = String(crop.z); drawCrop();
+      els.dialogActions.append(
+        makeButton('Hủy', 'btn', closeDialog),
+        makeButton('Chọn ảnh khác', 'btn', () => { closeDialog(); photoTarget = { teamId: team.id, memberId: member.id }; els.photoInput.click(); }),
+        makeButton('Lưu ảnh', 'btn primary', saveCrop)
+      );
+    }
+    function saveCrop() {
+      const member = memberById(teamById(crop.teamId), crop.memberId); if (!member || !crop.source) { closeDialog(); return; }
+      const out = document.createElement('canvas'); out.width = out.height = CROP_OUT; const half = cropHalf();
+      out.getContext('2d').drawImage(crop.source, crop.cx - half, crop.cy - half, half * 2, half * 2, 0, 0, CROP_OUT, CROP_OUT);
+      const data = out.toDataURL('image/webp', .86);
+      if (!normalizeImage(data)) { showToast('Không thể lưu ảnh này.', 'error'); return; }
+      const before = { imageData: member.imageData, imageOriginal: member.imageOriginal, imageCrop: member.imageCrop };
+      member.imageData = data;
+      const original = normalizeImage(crop.src, ORIGINAL_MAX) ? crop.src : member.imageOriginal;
+      if (original) member.imageOriginal = original;
+      member.imageCrop = { cx: +(crop.cx / crop.w).toFixed(4), cy: +(crop.cy / crop.h).toFixed(4), z: +crop.z.toFixed(3), rot: crop.rot };
+      if (!persist()) { Object.assign(member, before); return; }
+      closeDialog(); renderSettings(); showToast(`Đã cập nhật ảnh của ${member.name}.`);
+    }
+    // Kéo để dời khung; 2 ngón để phóng to; lăn chuột để phóng to.
+    els.cropCanvas.addEventListener('pointerdown', event => {
+      if (!crop.source) return; els.cropCanvas.setPointerCapture(event.pointerId);
+      crop.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    });
+    els.cropCanvas.addEventListener('pointermove', event => {
+      const previous = crop.pointers.get(event.pointerId); if (!previous) return;
+      if (crop.pointers.size === 1) {
+        const pxPerImage = els.cropCanvas.getBoundingClientRect().width / (cropHalf() * 2);
+        crop.cx -= (event.clientX - previous.x) / pxPerImage; crop.cy -= (event.clientY - previous.y) / pxPerImage;
+      } else if (crop.pointers.size === 2) {
+        const other = [...crop.pointers.entries()].find(([id]) => id !== event.pointerId)[1];
+        const before = Math.hypot(previous.x - other.x, previous.y - other.y); const after = Math.hypot(event.clientX - other.x, event.clientY - other.y);
+        if (before > 0) crop.z = clamp(crop.z * after / before, 1, 4);
+        els.cropZoom.value = String(crop.z);
+      }
+      crop.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      clampCrop(); drawCrop();
+    });
+    ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(type => els.cropCanvas.addEventListener(type, event => crop.pointers.delete(event.pointerId)));
+    els.cropCanvas.addEventListener('wheel', event => { if (!crop.source) return; event.preventDefault(); setCropZoom(crop.z * Math.exp(-event.deltaY * .0015)); }, { passive: false });
+    els.cropZoom.addEventListener('input', () => setCropZoom(Number(els.cropZoom.value)));
+    els.cropRotate.addEventListener('click', () => { if (!crop.img) return; crop.rot = (crop.rot + 1) % 4; setCropSource(); clampCrop(); drawCrop(); });
     function readImage(file, maxSide, quality, done) {
       if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) { showToast('Vui lòng chọn ảnh PNG, JPG hoặc WebP.', 'error'); return; }
       if (file.size > 5 * 1024 * 1024) { showToast('Ảnh không được lớn hơn 5 MB.', 'error'); return; }
@@ -2476,12 +3122,11 @@
     els.photoInput.addEventListener('change', event => {
       const file = event.target.files[0]; event.target.value = ''; const target = photoTarget; photoTarget = null;
       if (!file || !target) return;
-      readImage(file, 520, .8, data => {
-        const member = memberById(teamById(target.teamId), target.memberId);
-        if (!member || !normalizeImage(data)) { showToast('Không thể lưu ảnh này.', 'error'); return; }
-        const before = member.imageData; member.imageData = data;
-        if (!persist()) { member.imageData = before; return; }
-        renderSettings(); showToast(`Đã cập nhật ảnh của ${member.name}.`);
+      // Ảnh gốc giữ ở 720px để vừa bộ nhớ trình duyệt; mở ngay khung chỉnh ảnh.
+      readImage(file, 720, .82, data => {
+        const team = teamById(target.teamId); const member = memberById(team, target.memberId);
+        if (!member) { showToast('Không thể lưu ảnh này.', 'error'); return; }
+        openCropper(team, member, data, null);
       });
     });
     els.logoInput.addEventListener('change', event => {
@@ -2561,8 +3206,11 @@
       mutate(() => { state.excludedTeams = []; state.excludedMembers = []; }, 'Đã khôi phục tất cả kết quả đã loại.');
     });
     els.newSession.addEventListener('click', () => confirmBox({
-      title: 'Bắt đầu phiên mới?', message: 'Lịch sử sẽ được xóa và mọi kết quả tạm loại được khôi phục. Danh sách team vẫn giữ nguyên.', confirmLabel: 'Phiên mới',
-      onConfirm: () => mutate(() => { state.history = []; state.excludedTeams = []; state.excludedMembers = []; }, 'Đã bắt đầu phiên mới.')
+      title: 'Bắt đầu phiên mới?', message: 'Lịch sử sẽ được xóa, mọi kết quả tạm loại được khôi phục và ngựa bị thương được chữa lành (không còn đi xích lô). Danh sách team vẫn giữ nguyên.', confirmLabel: 'Phiên mới',
+      onConfirm: () => {
+        mutate(() => { state.history = []; state.excludedTeams = []; state.excludedMembers = []; state.lastWinnerTeamId = null; state.injuredTeams = []; state.prevCycle = []; }, 'Đã bắt đầu phiên mới.');
+        if (game.mode === 'lobby' || game.mode === 'result') enterTeamLobby();
+      }
     }));
     els.exportButton.addEventListener('click', exportData);
     els.importButton.addEventListener('click', () => els.importInput.click());
@@ -2587,6 +3235,10 @@
       if (record.eliminated) {
         if (record.type === 'team') state.excludedTeams = state.excludedTeams.filter(id => id !== record.resultId);
         else state.excludedMembers = state.excludedMembers.filter(key => key !== memberKey(record.teamId, record.resultId));
+      }
+      if (record.type === 'team') {
+        const previous = state.history.filter(h => h.type === 'team').pop();
+        state.lastWinnerTeamId = previous && teamById(previous.resultId) ? previous.resultId : null;
       }
       persist(); renderHistory(); showToast('Đã hoàn tác kết quả gần nhất.');
       if (game.mode === 'lobby' || game.mode === 'result') enterTeamLobby();

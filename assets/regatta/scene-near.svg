@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2172 400" role="img" aria-labelledby="title" preserveAspectRatio="none">
+  <title id="title">Near bank layer, seamless when tiled horizontally</title>
+  <defs>
+    <linearGradient id="bank" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#63c894"/><stop offset=".55" stop-color="#41ad78"/><stop offset="1" stop-color="#2b8e60"/>
+    </linearGradient>
+    <linearGradient id="roofA" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a9ee8"/><stop offset="1" stop-color="#0b6a97"/>
+    </linearGradient>
+  </defs>
+
+  <g stroke="#26795a" stroke-width="7" stroke-linecap="round">
+    <path d="M170 330v-66M262 334v-54M352 328v-72M470 332v-58M1520 326v-78M1614 334v-56M1706 330v-66M2010 330v-68M2098 334v-54"/>
+  </g>
+  <g>
+    <circle cx="170" cy="256" r="56" fill="#2ea86a"/><circle cx="206" cy="278" r="42" fill="#46c17f"/><circle cx="134" cy="280" r="40" fill="#1c8f57"/>
+    <circle cx="262" cy="274" r="46" fill="#46c17f"/><circle cx="296" cy="290" r="34" fill="#2ea86a"/>
+    <circle cx="352" cy="250" r="60" fill="#2ea86a"/><circle cx="312" cy="278" r="42" fill="#1c8f57"/><circle cx="392" cy="280" r="40" fill="#46c17f"/>
+    <circle cx="470" cy="272" r="48" fill="#2ea86a"/><circle cx="506" cy="292" r="34" fill="#46c17f"/>
+    <circle cx="1520" cy="244" r="62" fill="#2ea86a"/><circle cx="1478" cy="276" r="44" fill="#46c17f"/><circle cx="1562" cy="278" r="42" fill="#1c8f57"/>
+    <circle cx="1614" cy="272" r="48" fill="#46c17f"/><circle cx="1650" cy="292" r="34" fill="#2ea86a"/>
+    <circle cx="1706" cy="258" r="54" fill="#2ea86a"/><circle cx="1746" cy="284" r="38" fill="#1c8f57"/>
+    <circle cx="2010" cy="254" r="58" fill="#1c8f57"/><circle cx="1972" cy="282" r="40" fill="#46c17f"/><circle cx="2050" cy="282" r="40" fill="#2ea86a"/>
+    <circle cx="2098" cy="276" r="46" fill="#2ea86a"/>
+  </g>
+
+  <g>
+    <path d="M636 330V214h224v116z" fill="#f4fbfe"/>
+    <path d="M606 216h284l-58-46H664z" fill="url(#roofA)"/>
+    <path d="M660 170h176v12H660z" fill="#0b7fb8"/>
+    <g fill="#bfe6f4"><path d="M664 240h40v52h-40zM724 240h40v52h-40zM784 240h40v52h-40z"/></g>
+    <path d="M700 296h96v34h-96z" fill="#0b7fb8"/>
+    <path d="M600 330h330v14H600z" fill="#0a3f57"/>
+  </g>
+
+  <g>
+    <path d="M1000 344c60-84 220-84 280 0" fill="none" stroke="#0a9ee8" stroke-width="16" stroke-linecap="round"/>
+    <path d="M1000 344c60-84 220-84 280 0" fill="none" stroke="#d6f4fd" stroke-width="7" stroke-linecap="round"/>
+    <g stroke="#0b7fb8" stroke-width="7" stroke-linecap="round">
+      <path d="M1044 316v34M1088 296v50M1140 290v56M1192 296v50M1236 316v34"/>
+    </g>
+  </g>
+
+  <g>
+    <path d="M1830 330V246h150v84z" fill="#f4fbfe"/>
+    <path d="M1806 248h198l-52-40h-94z" fill="#00c9c9"/>
+    <g stroke="#0b7fb8" stroke-width="9" stroke-linecap="round"><path d="M1842 330v-72M1902 330v-72M1966 330v-72"/></g>
+    <path d="M1800 330h214v14h-214z" fill="#0a3f57"/>
+  </g>
+
+  <g stroke="#0a3f57" stroke-width="5" stroke-linecap="round">
+    <path d="M120 330v-84M290 330v-84M560 330v-84M1400 330v-84M1780 330v-84"/>
+  </g>
+  <g>
+    <path d="M122 248h42l-10 15 10 15h-42z" fill="#ef1b2d"/>
+    <path d="M292 248h42l-10 15 10 15h-42z" fill="#ffc400"/>
+    <path d="M562 248h42l-10 15 10 15h-42z" fill="#8b3dff"/>
+    <path d="M1402 248h42l-10 15 10 15h-42z" fill="#00b862"/>
+    <path d="M1782 248h42l-10 15 10 15h-42z" fill="#ff2e88"/>
+  </g>
+
+  <path d="M0 330h2172v70H0z" fill="url(#bank)"/>
+  <path d="M0 352c135.75-14 407.25 14 543 0c135.75-14 407.25 14 543 0c135.75-14 407.25 14 543 0c135.75-14 407.25 14 543 0V400H0Z" fill="#e6d9a8" opacity=".72"/>
+  <path d="M0 392h2172v8H0z" fill="#1f7a53" opacity=".45"/>
+</svg>

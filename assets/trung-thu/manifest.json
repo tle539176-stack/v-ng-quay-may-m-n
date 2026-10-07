@@ -1,0 +1,32 @@
+{
+  "name": "SECI Trung Thu Visual Kit",
+  "version": "1.0.0",
+  "theme": "Tết Trung Thu Việt Nam - dusk river, full moon with the banyan tree, lantern red and gold",
+  "license": "CC0-1.0",
+  "source": "Original project artwork, drawn as vectors for this theme.",
+  "note": "Used only by trung-thu.html / race-ui-trung-thu.css. The regatta kit in assets/regatta is untouched.",
+  "palette": {
+    "night950": "#141947",
+    "night900": "#1F2566",
+    "night800": "#2D2A86",
+    "violet": "#6A3AA8",
+    "red": "#E3261B",
+    "redDeep": "#A8140C",
+    "gold": "#FFC53D",
+    "moon": "#FFF1C4",
+    "cream": "#FFF8EA"
+  },
+  "assets": [
+    { "file": "moon.svg", "viewBox": "0 0 400 400", "role": "full moon with cây đa and chú Cuội; fixed in the race sky" },
+    { "file": "scene-far.svg", "viewBox": "0 0 2172 400", "role": "distant town and pagodas at dusk, parallax layer, tiles horizontally" },
+    { "file": "scene-near.svg", "viewBox": "0 0 2172 400", "role": "old-quarter riverbank with lanterns, parallax layer, tiles horizontally" },
+    { "file": "bunting.svg", "viewBox": "0 0 1600 140", "role": "lantern garland (round and star lanterns)" },
+    { "file": "hoa-dang.svg", "viewBox": "0 0 840 300", "role": "floating lotus lanterns, tiles both ways, scrolls with the water via --race-lantern-x" },
+    { "file": "skyline.svg", "viewBox": "0 0 1600 360", "role": "background silhouette" },
+    { "file": "finish-gate.svg", "viewBox": "0 0 420 640", "role": "finish marker" },
+    { "file": "banner.svg", "viewBox": "0 0 1200 400", "role": "result modal banner backdrop" },
+    { "file": "water-track-seamless.svg", "viewBox": "0 0 1200 600", "role": "moonlit lane water, tiles vertically" },
+    { "file": "water-wake.svg", "viewBox": "0 0 640 180", "role": "stern wake (copied from regatta)" },
+    { "file": "water-caustics.svg", "viewBox": "0 0 1200 360", "role": "empty-state water texture (copied from regatta)" }
+  ]
+}
